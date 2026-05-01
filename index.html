@@ -1,0 +1,611 @@
+<!DOCTYPE html>
+<html lang="es" class="light">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="Content-Security-Policy"
+        content="default-src 'self'; script-src 'self' 'unsafe-inline' https://cdn.tailwindcss.com https://unpkg.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com; img-src 'self' data: file: blob:;">
+    <title>NoteVault - University Manager</title>
+    <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap"
+        rel="stylesheet" />
+    <link rel="stylesheet" href="styles.css">
+    <script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    "colors": {
+                        "on-secondary": "#ffffff",
+                        "on-secondary-container": "#4c4a84",
+                        "on-primary-fixed-variant": "#372abf",
+                        "on-tertiary-fixed-variant": "#7d2d00",
+                        "secondary-fixed": "#e3dfff",
+                        "primary": "#2a14b4",
+                        "inverse-surface": "#2e3132",
+                        "secondary-fixed-dim": "#c3c0ff",
+                        "inverse-on-surface": "#f0f1f2",
+                        "on-secondary-fixed": "#16124c",
+                        "on-error-container": "#93000a",
+                        "outline-variant": "#c7c4d7",
+                        "on-surface": "#191c1d",
+                        "on-tertiary-fixed": "#360f00",
+                        "surface-container-low": "#f3f4f5",
+                        "on-primary": "#ffffff",
+                        "on-primary-fixed": "#100069",
+                        "error-container": "#ffdad6",
+                        "secondary-container": "#c0bdff",
+                        "surface-variant": "#e1e3e4",
+                        "surface-dim": "#d9dadb",
+                        "on-tertiary-container": "#ffb393",
+                        "inverse-primary": "#c3c0ff",
+                        "surface-tint": "#5148d7",
+                        "surface-container-lowest": "#ffffff",
+                        "outline": "#777586",
+                        "on-tertiary": "#ffffff",
+                        "error": "#ba1a1a",
+                        "on-surface-variant": "#464554",
+                        "surface-container-highest": "#e1e3e4",
+                        "surface-container": "#edeeef",
+                        "surface": "#f8f9fa",
+                        "tertiary-container": "#8f3400",
+                        "on-background": "#191c1d",
+                        "primary-fixed-dim": "#c3c0ff",
+                        "tertiary": "#692400",
+                        "tertiary-fixed-dim": "#ffb597",
+                        "tertiary-fixed": "#ffdbcd",
+                        "on-error": "#ffffff",
+                        "surface-container-high": "#e7e8e9",
+                        "primary-container": "#4338ca",
+                        "on-secondary-fixed-variant": "#42407a",
+                        "on-primary-container": "#c1beff",
+                        "surface-bright": "#f8f9fa",
+                        "secondary": "#5a5893",
+                        "primary-fixed": "#e3dfff",
+                        "background": "#f8f9fa"
+                    },
+                    "borderRadius": {
+                        "DEFAULT": "0.25rem",
+                        "lg": "0.5rem",
+                        "xl": "0.75rem",
+                        "full": "9999px"
+                    },
+                    "fontFamily": {
+                        "sans": ["Inter", "sans-serif"],
+                        "headline": ["Inter", "sans-serif"],
+                        "body": ["Inter", "sans-serif"],
+                        "label": ["Inter", "sans-serif"]
+                    }
+                },
+            },
+        }
+    </script>
+</head>
+
+<body class="bg-surface text-on-surface flex h-screen overflow-hidden font-sans">
+
+    <!-- Sidebar -->
+    <aside
+        class="w-64 border-r border-outline-variant/20 bg-slate-50/70 dark:bg-slate-900/70 backdrop-blur-md flex flex-col h-full py-6 px-4"
+        id="sidebar">
+        <!-- Logo -->
+        <div class="mb-8 px-2 cursor-pointer" onclick="showDashboard('all')">
+            <h1
+                class="text-xl font-extrabold text-indigo-700 dark:text-indigo-400 tracking-tighter flex items-center gap-2">
+                <i data-lucide="book-marked" class="text-indigo-600"></i> NoteVault
+            </h1>
+            <p id="pro-edition"
+                class="text-[10px] text-on-surface-variant font-bold uppercase tracking-widest mt-1 opacity-70 cursor-pointer select-none">
+                Pro Edition</p>
+        </div>
+
+        <!-- Action: New Notebook -->
+        <div class="mb-6">
+            <button id="add-notebook"
+                class="w-full flex items-center justify-center gap-2 bg-primary text-on-primary py-2.5 px-4 rounded-xl font-semibold shadow-md shadow-primary/20 transition-all duration-300 hover:scale-[1.02] active:scale-95 cursor-pointer">
+                <i data-lucide="plus" style="width:18px;height:18px;"></i>
+                <span class="text-sm">Nueva Libreta</span>
+            </button>
+        </div>
+
+        <!-- Navigation -->
+        <nav class="flex-1 flex flex-col space-y-1">
+            <a id="nav-library"
+                class="nav-item active text-slate-600 dark:text-slate-400 hover:bg-slate-200/40 dark:hover:bg-slate-800/40 rounded-lg flex items-center gap-3 px-3 py-2.5 cursor-pointer active:scale-95 transition-colors duration-200 font-medium text-sm"
+                onclick="showDashboard('all')">
+                <i data-lucide="library"></i>
+                Librería
+            </a>
+            <a id="nav-favorites"
+                class="nav-item text-slate-600 dark:text-slate-400 hover:bg-slate-200/40 dark:hover:bg-slate-800/40 rounded-lg flex items-center gap-3 px-3 py-2.5 cursor-pointer active:scale-95 transition-colors duration-200 font-medium text-sm"
+                onclick="showDashboard('favorites')">
+                <i data-lucide="star"></i>
+                Favoritos
+            </a>
+            <a id="nav-trash"
+                class="nav-item text-slate-600 dark:text-slate-400 hover:bg-slate-200/40 dark:hover:bg-slate-800/40 rounded-lg flex items-center gap-3 px-3 py-2.5 cursor-pointer active:scale-95 transition-colors duration-200 font-medium text-sm"
+                onclick="showTrash()">
+                <i data-lucide="trash-2"></i>
+                Papelera
+            </a>
+            <a id="settings-btn"
+                class="nav-item text-slate-600 dark:text-slate-400 hover:bg-slate-200/40 dark:hover:bg-slate-800/40 rounded-lg flex items-center gap-3 px-3 py-2.5 cursor-pointer active:scale-95 transition-colors duration-200 font-medium text-sm mt-auto">
+                <i data-lucide="settings"></i>
+                Configuración
+            </a>
+
+            <div class="mt-6 pt-6 border-t border-outline-variant/10 flex-1 overflow-hidden flex flex-col">
+                <h4
+                    class="text-xs text-on-surface-variant font-bold uppercase tracking-widest px-3 mb-2 flex items-center justify-between">
+                    Mis Libretas
+                    <button class="hover:text-primary transition-colors"
+                        onclick="document.getElementById('add-notebook').click()"><i data-lucide="plus"
+                            style="width:14px;height:14px;"></i></button>
+                </h4>
+                <!-- Dynamic list -->
+                <div id="notebook-list" class="space-y-0.5 overflow-y-auto flex-1 custom-scrollbar -mx-2 px-2 pb-4">
+                </div>
+            </div>
+
+            <div id="media-player" class="hidden mt-4 pt-4 border-t border-outline-variant/10 shrink-0">
+                <div class="flex items-center justify-between mb-2">
+                    <span
+                        class="text-xs font-bold uppercase tracking-widest text-on-surface-variant">Reproduciendo</span>
+                    <button
+                        onclick="document.getElementById('media-player').classList.add('hidden'); window.mediaTempDisabled = true;"
+                        class="text-on-surface-variant hover:text-error transition-colors"><i data-lucide="x"
+                            class="w-3 h-3"></i></button>
+                </div>
+                <div
+                    class="bg-slate-800 dark:bg-slate-900 rounded-xl p-4 shadow-md border border-slate-700 dark:border-slate-800 relative overflow-hidden group">
+                    <div
+                        class="absolute inset-0 bg-gradient-to-br from-indigo-500/20 to-transparent pointer-events-none">
+                    </div>
+                    <div class="relative z-10">
+                        <div class="truncate text-sm font-extrabold text-white drop-shadow-sm" id="media-title">Sin
+                            reproducción</div>
+                        <div class="truncate text-xs text-slate-400 font-medium mt-0.5" id="media-artist">...</div>
+                        <div class="flex items-center justify-center gap-4 mt-4">
+                            <button onclick="window.api.mediaPrev()"
+                                class="p-1 text-slate-400 hover:text-white transition-colors active:scale-95"><i
+                                    data-lucide="skip-back" class="w-4 h-4 fill-current"></i></button>
+                            <button onclick="window.api.mediaToggle()"
+                                class="p-2.5 bg-indigo-500 text-white rounded-full hover:bg-indigo-400 hover:scale-105 active:scale-95 transition-all shadow-lg shadow-indigo-500/20"><i
+                                    data-lucide="play" id="media-play-icon"
+                                    class="w-4 h-4 fill-current ml-0.5"></i></button>
+                            <button onclick="window.api.mediaNext()"
+                                class="p-1 text-slate-400 hover:text-white transition-colors active:scale-95"><i
+                                    data-lucide="skip-forward" class="w-4 h-4 fill-current"></i></button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+        </nav>
+
+    </aside>
+
+    <!-- Main Workspace -->
+    <main class="flex-1 flex flex-col bg-surface-container-low overflow-hidden relative">
+
+        <!-- Top Navbar -->
+        <header
+            class="w-full h-16 shrink-0 bg-slate-50/50 dark:bg-slate-950/50 backdrop-blur-md shadow-[0_12px_32px_rgba(42,20,180,0.04)] flex items-center justify-between px-8 z-20">
+            <div class="flex items-center gap-8">
+                <!-- Toggle sidebar button on mobile or generally helpful -->
+                <button id="toggle-sidebar"
+                    class="p-2 hover:bg-surface-container-highest rounded-full transition-colors hidden md:block text-on-surface-variant">
+                    <i data-lucide="panel-left"></i>
+                </button>
+
+                <!-- Search Note (Visible generally for aesthetics, hooks up to note searching) -->
+                <div id="search-container" class="relative group hidden">
+                    <i data-lucide="search"
+                        class="absolute left-3 top-1/2 -translate-y-1/2 text-on-surface-variant text-sm group-focus-within:text-primary transition-colors"></i>
+                    <input type="text" id="search-notes"
+                        class="pl-10 pr-4 py-2 bg-surface-container-high border-none rounded-lg text-sm w-64 focus:ring-2 focus:ring-primary/20 transition-all placeholder:text-on-surface-variant/50 outline-none"
+                        placeholder="Buscar en la libreta activa...">
+                </div>
+            </div>
+
+            <div class="flex items-center gap-4">
+                <button id="add-note" style="display:none;"
+                    class="bg-indigo-600 hover:bg-indigo-700 text-white px-5 py-2 rounded-lg text-sm font-bold shadow-md shadow-indigo-200 dark:shadow-none transition-all active:scale-95 flex items-center gap-2">
+                    <i data-lucide="plus-circle" style="width:16px;height:16px;"></i> Nueva Nota
+                </button>
+            </div>
+        </header>
+
+        <!-- DASHBOARD VIEW -->
+        <div id="dashboard" class="flex-1 overflow-y-auto p-8 custom-scrollbar relative">
+            <div class="mb-12 flex items-end justify-between max-w-7xl mx-auto w-full">
+                <div>
+                    <h2 class="text-4xl font-extrabold tracking-tighter text-on-surface mb-2" id="dashboard-title">
+                        Librería</h2>
+                    <p class="text-on-surface-variant text-lg font-medium opacity-70" id="dashboard-subtitle">Todas tus
+                        libretas</p>
+                </div>
+
+                <!-- Notebook Search (Only in Dashboard) -->
+                <div id="search-notebooks-container" class="relative group block">
+                    <i data-lucide="search"
+                        class="absolute left-3 top-1/2 -translate-y-1/2 text-on-surface-variant text-sm group-focus-within:text-primary transition-colors"></i>
+                    <input type="text" id="search-notebooks"
+                        class="pl-10 pr-4 py-2.5 bg-surface-container-high border-none rounded-xl text-sm w-72 focus:ring-2 focus:ring-primary/20 transition-all placeholder:text-on-surface-variant/50 outline-none shadow-sm"
+                        placeholder="Buscar libreta...">
+                </div>
+            </div>
+
+            <div id="notebook-loader" class="flex justify-center items-center p-12">
+                <div class="dots-loader">
+                    <div></div>
+                    <div></div>
+                    <div></div>
+                </div>
+            </div>
+
+            <div id="notebook-grid"
+                class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6 max-w-7xl mx-auto w-full">
+            </div>
+
+            <!-- Empty state -->
+            <div id="empty-state"
+                class="hidden flex-col items-center justify-center p-20 text-center text-on-surface-variant">
+                <i data-lucide="book-x" class="w-16 h-16 mb-4 opacity-40"></i>
+                <h3 class="text-xl font-bold text-on-surface">No hay libretas aquí</h3>
+                <p class="text-sm mt-2 opacity-80">Empieza creando una nueva libreta.</p>
+                <button onclick="document.getElementById('add-notebook').click()"
+                    class="mt-6 font-semibold text-primary hover:underline">Crear libreta</button>
+            </div>
+        </div>
+
+        <!-- TRASH VIEW -->
+        <div id="trash-view" class="flex-1 overflow-y-auto p-8 custom-scrollbar relative hidden">
+            <div class="mb-12 flex items-end justify-between max-w-7xl mx-auto w-full">
+                <div class="pr-8">
+                    <h2 class="text-4xl font-extrabold tracking-tighter text-on-surface mb-2">Papelera</h2>
+                    <p class="text-on-surface-variant text-lg font-medium opacity-70">Notas eliminadas (se borrarán en
+                        30 días por defecto - Puedes cambiarlo en la configuración)</p>
+                </div>
+                <button id="empty-trash"
+                    class="flex items-center gap-2 px-4 py-2 text-sm font-bold text-error border border-error/20 dark:border-error/40 hover:bg-error-container rounded-xl transition-colors">
+                    <i data-lucide="trash-2" style="width:16px;"></i> Vaciar papelera
+                </button>
+            </div>
+
+            <div id="trash-list"
+                class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6 max-w-7xl mx-auto w-full">
+            </div>
+
+            <!-- Empty state for trash -->
+            <div id="trash-empty-state"
+                class="hidden flex-col items-center justify-center p-20 text-center text-on-surface-variant">
+                <i data-lucide="trash" class="w-16 h-16 mb-4 opacity-40"></i>
+                <h3 class="text-xl font-bold text-on-surface">La papelera está vacía</h3>
+                <p class="text-sm mt-2 opacity-80">Las notas que elimines aparecerán aquí.</p>
+            </div>
+        </div>
+
+        <!-- NOTEBOOK VIEW (Editor + Note List) -->
+        <div id="notebook-view" class="flex-1 flex overflow-hidden" style="display:none;">
+            <!-- Panel 2: Notes List -->
+            <section id="notes-panel"
+                class="w-72 md:w-80 border-r border-outline-variant/10 bg-surface-container-lowest flex flex-col overflow-hidden shrink-0">
+                <div class="p-4 border-b border-outline-variant/10 flex items-center justify-between gap-2">
+                    <h3 id="panel-notebook-name" class="font-bold text-lg text-on-surface truncate">Nombre Libreta</h3>
+                    <button id="panel-add-note" title="Nueva nota"
+                        class="shrink-0 flex items-center justify-center w-8 h-8 rounded-lg bg-primary/10 hover:bg-primary/20 text-primary transition-colors active:scale-95">
+                        <i data-lucide="plus" style="width:16px;height:16px;"></i>
+                    </button>
+                </div>
+                <div class="relative flex-1 overflow-hidden">
+                    <div id="notes-list" class="absolute inset-0 overflow-y-auto custom-scrollbar p-3 space-y-1"></div>
+                    <div id="notes-empty-state"
+                        class="hidden absolute inset-0 flex-col items-center justify-center p-8 text-center text-on-surface-variant pointer-events-none select-none">
+                        <i data-lucide="notebook-pen" class="w-10 h-10 mb-3 opacity-30"></i>
+                        <p class="text-sm font-medium opacity-60">Aún no hay notas,<br>crea una para comenzar.</p>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Panel 3: Editor -->
+            <section id="editor-panel" class="flex-1 bg-surface-container-low flex flex-col overflow-hidden relative">
+
+                <button id="toggle-attachments" title="Ver Adjuntos"
+                    class="absolute top-6 right-8 p-2.5 bg-surface-container/80 backdrop-blur-sm rounded-xl shadow-sm border border-outline-variant/20 text-on-surface-variant hover:text-primary hover:bg-surface-container-high transition-colors z-20">
+                    <i data-lucide="paperclip" class="w-5 h-5"></i>
+                </button>
+                <div id="editor-container" class="flex-1 overflow-y-auto p-8 md:p-12 xl:px-16 w-full mb-20">
+                    <input type="text" id="note-title" placeholder="Título de la nota..."
+                        class="text-4xl font-extrabold tracking-tight text-on-surface bg-transparent border-none outline-none mb-6 w-full placeholder:text-on-surface-variant/30 leading-tight">
+                    <div id="editor" contenteditable="true" placeholder="Escribe tus apuntes aquí..."
+                        class="text-lg text-on-surface leading-relaxed outline-none min-h-[50vh]"></div>
+                </div>
+
+                <div
+                    class="absolute bottom-6 right-8 flex items-center bg-surface-container-lowest border border-outline-variant/20 rounded-full px-4 py-2 shadow-lg gap-3 z-20">
+                    <div class="flex items-center gap-1.5 px-3 border-r border-outline-variant/20 mr-1">
+                        <i data-lucide="type" class="w-4 h-4 text-primary"></i>
+                        <span id="word-count" class="text-sm font-semibold text-on-surface-variant">0 palabras</span>
+                    </div>
+                    <button id="zoom-out" title="Alejar"
+                        class="text-on-surface-variant hover:text-primary transition-colors"><i
+                            data-lucide="minus"></i></button>
+                    <input type="range" id="zoom-slider" min="50" max="200" value="100" step="10"
+                        class="w-24 accent-primary">
+                    <button id="zoom-in" title="Acercar"
+                        class="text-on-surface-variant hover:text-primary transition-colors"><i
+                            data-lucide="plus"></i></button>
+                    <span id="zoom-label"
+                        class="text-sm font-semibold min-w-[3ch] text-right text-on-surface-variant">100%</span>
+                </div>
+            </section>
+
+            <!-- Panel 4: Attachments -->
+            <section id="attachments-panel"
+                class="w-72 border-l border-outline-variant/10 bg-surface-container-lowest hidden flex-col overflow-hidden shrink-0 transition-all duration-300">
+                <div
+                    class="p-4 border-b border-outline-variant/10 flex justify-between items-center bg-surface/50 backdrop-blur-sm shrink-0">
+                    <h3 class="font-bold text-sm text-on-surface flex items-center gap-2 uppercase tracking-wide"><i
+                            data-lucide="paperclip" class="w-4 h-4 text-primary"></i> Adjuntos</h3>
+                    <button id="close-attachments"
+                        class="text-on-surface-variant hover:text-error hover:bg-error-container rounded-lg p-1.5 transition-colors"><i
+                            data-lucide="x" class="w-4 h-4"></i></button>
+                </div>
+                <div class="px-4 py-3 border-b border-outline-variant/10 shrink-0">
+                    <div class="relative group">
+                        <i data-lucide="search"
+                            class="absolute left-3 top-1/2 -translate-y-1/2 text-on-surface-variant w-4 h-4 group-focus-within:text-primary transition-colors"></i>
+                        <input type="text" id="search-attachments"
+                            class="w-full pl-9 pr-3 py-2 bg-surface-container border-none rounded-lg text-sm focus:ring-2 focus:ring-primary/20 transition-all outline-none placeholder:text-on-surface-variant/60"
+                            placeholder="Buscar imágenes...">
+                    </div>
+                </div>
+                <div id="attachments-list" class="flex-1 overflow-y-auto custom-scrollbar p-3 space-y-2">
+                    <!-- Dynamic rendering -->
+                </div>
+            </section>
+
+
+        </div>
+
+    </main>
+
+    <!-- Modal Layout Refactor with Tailwind -->
+    <div id="settings-modal"
+        class="fixed inset-0 bg-black/40 backdrop-blur-sm hidden items-center justify-center z-50 transition-opacity">
+        <div class="bg-surface-container-lowest p-6 rounded-2xl w-[400px] shadow-2xl animate-[fadeIn_0.2s_ease-out]">
+            <h4 class="text-xl font-bold mb-6 text-on-surface flex items-center gap-2"><i data-lucide="settings"></i>
+                Ajustes</h4>
+            <div class="mb-4">
+                <label class="block text-sm font-semibold text-on-surface-variant mb-2">Tema de la aplicación:</label>
+                <select id="theme-input"
+                    class="w-full bg-indigo-100/80 dark:bg-black/20 border border-indigo-200 dark:border-white/10 rounded-xl px-4 py-3 text-on-surface outline-none focus:ring-2 focus:ring-primary/20 shadow-sm transition-all">
+                    <option value="system">Tema del Sistema</option>
+                    <option value="light">Claro</option>
+                    <option value="dark">Oscuro</option>
+                </select>
+            </div>
+            <div class="mb-4">
+                <label class="block text-sm font-semibold text-on-surface-variant mb-2">Días para borrar notas de
+                    papelera:</label>
+                <input type="number" id="trash-retention-input" min="1" max="365" value="30"
+                    class="w-full bg-indigo-100/80 dark:bg-black/20 border border-indigo-200 dark:border-white/10 rounded-xl px-4 py-3 text-on-surface outline-none focus:ring-2 focus:ring-primary/20 shadow-sm transition-all">
+            </div>
+            <div class="mb-4">
+                <label class="block text-sm font-semibold text-on-surface-variant mb-2">Autoguardar cada
+                    (minutos):</label>
+                <input type="number" id="autosave-interval-input" min="1" max="60" value="5"
+                    class="w-full bg-indigo-100/80 dark:bg-black/20 border border-indigo-200 dark:border-white/10 rounded-xl px-4 py-3 text-on-surface outline-none focus:ring-2 focus:ring-primary/20 shadow-sm transition-all">
+            </div>
+            <div class="mb-8">
+                <div
+                    class="flex items-center justify-between bg-indigo-100/80 dark:bg-black/20 border border-indigo-200 dark:border-white/10 rounded-xl p-3.5 shadow-sm">
+                    <div>
+                        <div class="text-sm font-semibold text-on-surface">Reproductor multimedia</div>
+                        <div class="text-xs text-on-surface-variant mt-0.5 opacity-80">Muestra Spotify y otros
+                            reproductores en la barra lateral</div>
+                    </div>
+                    <label class="relative inline-flex items-center cursor-pointer ml-4 shrink-0">
+                        <input type="checkbox" id="media-player-toggle" class="sr-only peer">
+                        <div
+                            class="w-11 h-6 bg-outline-variant/50 dark:bg-outline-variant/80 rounded-full peer peer-checked:bg-primary transition-colors duration-300 after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:rounded-full after:h-5 after:w-5 after:transition-all after:duration-300 peer-checked:after:translate-x-5">
+                        </div>
+                    </label>
+                </div>
+            </div>
+            <div class="flex justify-end gap-3">
+                <button id="settings-cancel"
+                    class="px-5 py-2.5 rounded-lg font-medium text-on-surface-variant hover:bg-surface-container-high transition-colors">Cancelar</button>
+                <button id="settings-confirm"
+                    class="px-5 py-2.5 rounded-lg font-bold bg-primary text-on-primary shadow-md hover:bg-indigo-700 transition-colors">Guardar</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- General Input Modal Refactor with Tailwind -->
+    <div id="custom-modal"
+        class="fixed inset-0 bg-black/40 backdrop-blur-sm hidden items-center justify-center z-[60] transition-opacity">
+        <div class="bg-surface-container-lowest p-6 rounded-2xl w-[400px] shadow-2xl animate-[fadeIn_0.2s_ease-out]">
+            <h4 id="modal-title" class="text-xl font-bold mb-2 text-on-surface">Nueva entrada</h4>
+            <input type="text" id="modal-input" placeholder="Escribe aquí..."
+                class="w-full bg-surface-container-high border border-outline-variant/30 rounded-lg px-4 py-3 text-on-surface outline-none focus:ring-2 focus:ring-primary/20 mb-1 font-semibold text-lg">
+            <p id="modal-error" class="text-xs text-red-500 font-semibold mb-3 hidden">El nombre no puede estar vacío.
+            </p>
+
+            <div id="notebook-extra-fields" style="display: none;">
+                <div class="mb-4 flex gap-4 p-1 bg-surface-container-high rounded-lg w-fit">
+                    <label
+                        class="cursor-pointer px-4 py-1.5 rounded-md font-medium text-sm transition-colors data-[active=true]:bg-surface-container-lowest data-[active=true]:shadow-sm text-on-surface-variant"
+                        data-mode-label="color">
+                        <input type="radio" name="cover-mode" value="color" checked class="hidden">
+                        <span class="flex items-center gap-1.5"><i data-lucide="palette" style="width:14px;"></i>
+                            Color</span>
+                    </label>
+                    <label
+                        class="cursor-pointer px-4 py-1.5 rounded-md font-medium text-sm transition-colors data-[active=true]:bg-surface-container-lowest data-[active=true]:shadow-sm text-on-surface-variant opacity-60"
+                        data-mode-label="image">
+                        <input type="radio" name="cover-mode" value="image" class="hidden">
+                        <span class="flex items-center gap-1.5"><i data-lucide="image" style="width:14px;"></i>
+                            Imagen</span>
+                    </label>
+                </div>
+
+                <div id="cover-color-section" class="mb-4">
+                    <input type="color" id="modal-color" value="#4338ca"
+                        class="w-full h-12 cursor-pointer border-0 rounded-lg p-0 overflow-hidden outline-none bg-transparent">
+                </div>
+
+                <div id="cover-image-section" style="display: none;" class="mb-4">
+                    <input type="file" id="modal-image-file" accept="image/*"
+                        class="w-full text-sm text-on-surface-variant file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-indigo-50 file:text-primary hover:file:bg-indigo-100 transition-all cursor-pointer">
+                    <p id="current-image-name" class="text-xs text-on-surface-variant mt-2 font-medium"></p>
+                </div>
+            </div>
+
+            <div class="flex justify-end gap-3 mt-6">
+                <button id="modal-cancel"
+                    class="px-5 py-2.5 rounded-lg font-medium text-on-surface-variant hover:bg-surface-container-high transition-colors">Cancelar</button>
+                <button id="modal-confirm"
+                    class="px-5 py-2.5 rounded-lg font-bold bg-primary text-on-primary shadow-md hover:bg-indigo-700 transition-colors">Aceptar</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Hidden native color picker -->
+    <input type="color" id="text-color-picker"
+        class="opacity-0 absolute w-0 h-0 p-0 m-0 cursor-pointer pointer-events-none" style="display:none;">
+
+    <!-- Custom Context Menu -->
+    <div id="custom-context-menu"
+        class="fixed hidden z-[100] bg-surface-container-lowest/90 dark:bg-slate-900/95 backdrop-blur-xl border border-outline-variant/30 dark:border-white/10 rounded-2xl shadow-2xl min-w-[220px] py-2 animate-[fadeIn_0.15s_ease-out]">
+        <div class="flex flex-col">
+            <button data-action="bold"
+                class="menu-item flex items-center justify-between px-4 py-2 hover:bg-primary/10 dark:hover:bg-primary/20 transition-colors text-sm font-medium text-on-surface dark:text-slate-200">
+                <div class="flex items-center gap-3"><i data-lucide="bold" class="w-4 h-4 text-primary"></i> Negrita
+                </div>
+                <span class="text-[10px] opacity-40 font-bold">Ctrl+B</span>
+            </button>
+            <button data-action="italic"
+                class="menu-item flex items-center justify-between px-4 py-2 hover:bg-primary/10 dark:hover:bg-primary/20 transition-colors text-sm font-medium text-on-surface dark:text-slate-200">
+                <div class="flex items-center gap-3"><i data-lucide="italic" class="w-4 h-4 text-primary"></i> Cursiva
+                </div>
+                <span class="text-[10px] opacity-40 font-bold">Ctrl+I</span>
+            </button>
+            <button data-action="underline"
+                class="menu-item flex items-center justify-between px-4 py-2 hover:bg-primary/10 dark:hover:bg-primary/20 transition-colors text-sm font-medium text-on-surface dark:text-slate-200">
+                <div class="flex items-center gap-3"><i data-lucide="underline" class="w-4 h-4 text-primary"></i>
+                    Subrayado</div>
+                <span class="text-[10px] opacity-40 font-bold">Ctrl+U</span>
+            </button>
+
+            <div class="h-px bg-outline-variant/10 dark:bg-white/5 my-1 mx-2"></div>
+
+            <div class="group/sub relative">
+                <div
+                    class="menu-item flex items-center justify-between px-4 py-2 hover:bg-primary/10 dark:hover:bg-primary/20 transition-colors text-sm font-medium text-on-surface dark:text-slate-200 cursor-default">
+                    <div class="flex items-center gap-3"><i data-lucide="text-quote" class="w-4 h-4 text-primary"></i>
+                        Tamaño de fuente</div>
+                    <i data-lucide="chevron-right" class="w-3 h-3 opacity-40"></i>
+                </div>
+                <!-- Submenu: Se muestra al hacer hover sobre el grupo -->
+                <div
+                    class="invisible opacity-0 group-hover/sub:visible group-hover/sub:opacity-100 transition-all duration-200 flex flex-col absolute left-full top-0 ml-[-2px] bg-surface-container-lowest/95 dark:bg-slate-900/98 backdrop-blur-xl border border-outline-variant/30 dark:border-white/10 rounded-2xl shadow-2xl min-w-[160px] py-2">
+                    <button data-action="fontSize" data-value="12px"
+                        class="px-4 py-2 hover:bg-primary/10 dark:hover:bg-primary/20 text-xs font-medium text-on-surface dark:text-slate-200 text-left">Pequeño
+                        (12px)</button>
+                    <button data-action="fontSize" data-value="18px"
+                        class="px-4 py-2 hover:bg-primary/10 dark:hover:bg-primary/20 text-xs font-medium text-on-surface dark:text-slate-200 text-left">Normal
+                        (18px)</button>
+                    <button data-action="fontSize" data-value="20px"
+                        class="px-4 py-2 hover:bg-primary/10 dark:hover:bg-primary/20 text-xs font-medium text-on-surface dark:text-slate-200 text-left">Mediano
+                        (20px)</button>
+                    <button data-action="fontSize" data-value="28px"
+                        class="px-4 py-2 hover:bg-primary/10 dark:hover:bg-primary/20 text-xs font-medium text-on-surface dark:text-slate-200 text-left">Grande
+                        (28px)</button>
+                    <button data-action="fontSize" data-value="36px"
+                        class="px-4 py-2 hover:bg-primary/10 dark:hover:bg-primary/20 text-xs font-medium text-on-surface dark:text-slate-200 text-left">Extra
+                        Grande (36px)</button>
+                </div>
+            </div>
+
+            <div class="group/sub relative">
+                <div
+                    class="menu-item flex items-center justify-between px-4 py-2 hover:bg-primary/10 dark:hover:bg-primary/20 transition-colors text-sm font-medium text-on-surface dark:text-slate-200 cursor-default">
+                    <div class="flex items-center gap-3"><i data-lucide="highlighter" class="w-4 h-4 text-primary"></i>
+                        Resaltar texto</div>
+                    <i data-lucide="chevron-right" class="w-3 h-3 opacity-40"></i>
+                </div>
+                <div
+                    class="invisible opacity-0 group-hover/sub:visible group-hover/sub:opacity-100 transition-all duration-200 flex flex-col absolute left-full top-0 ml-[-2px] bg-surface-container-lowest/95 dark:bg-slate-900/98 backdrop-blur-xl border border-outline-variant/30 dark:border-white/10 rounded-2xl shadow-2xl min-w-[160px] py-2">
+                    <button data-action="highlight" data-value="yellow"
+                        class="flex items-center gap-2 px-4 py-2 hover:bg-primary/10 dark:hover:bg-primary/20 text-xs font-medium text-on-surface dark:text-slate-200 text-left">
+                        <div class="w-3 h-3 rounded-full bg-[#fef08a] border border-black/10"></div> Amarillo
+                    </button>
+                    <button data-action="highlight" data-value="green"
+                        class="flex items-center gap-2 px-4 py-2 hover:bg-primary/10 dark:hover:bg-primary/20 text-xs font-medium text-on-surface dark:text-slate-200 text-left">
+                        <div class="w-3 h-3 rounded-full bg-[#86efac] border border-black/10"></div> Verde
+                    </button>
+                    <button data-action="highlight" data-value="blue"
+                        class="flex items-center gap-2 px-4 py-2 hover:bg-primary/10 dark:hover:bg-primary/20 text-xs font-medium text-on-surface dark:text-slate-200 text-left">
+                        <div class="w-3 h-3 rounded-full bg-[#bfdbfe] border border-black/10"></div> Azul
+                    </button>
+                    <button data-action="highlight" data-value="red"
+                        class="flex items-center gap-2 px-4 py-2 hover:bg-primary/10 dark:hover:bg-primary/20 text-xs font-medium text-on-surface dark:text-slate-200 text-left">
+                        <div class="w-3 h-3 rounded-full bg-[#fecaca] border border-black/10"></div> Rojo
+                    </button>
+                    <button data-action="highlight" data-value="none"
+                        class="flex items-center gap-2 px-4 py-2 hover:bg-primary/10 dark:hover:bg-primary/20 text-xs font-medium text-on-surface dark:text-slate-200 text-left"><i
+                            data-lucide="eraser" class="w-3 h-3"></i> Quitar resaltado</button>
+                </div>
+            </div>
+
+            <div class="group/sub relative">
+                <div
+                    class="menu-item flex items-center justify-between px-4 py-2 hover:bg-primary/10 dark:hover:bg-primary/20 transition-colors text-sm font-medium text-on-surface dark:text-slate-200 cursor-default">
+                    <div class="flex items-center gap-3"><i data-lucide="palette" class="w-4 h-4 text-primary"></i>
+                        Color de texto</div>
+                    <i data-lucide="chevron-right" class="w-3 h-3 opacity-40"></i>
+                </div>
+                <div
+                    class="invisible opacity-0 group-hover/sub:visible group-hover/sub:opacity-100 transition-all duration-200 flex flex-col absolute left-full top-0 ml-[-2px] bg-surface-container-lowest/95 dark:bg-slate-900/98 backdrop-blur-xl border border-outline-variant/30 dark:border-white/10 rounded-2xl shadow-2xl min-w-[160px] py-2">
+                    <button data-action="foreColor" data-value="#e74c3c"
+                        class="flex items-center gap-2 px-4 py-2 hover:bg-primary/10 dark:hover:bg-primary/20 text-xs font-medium text-on-surface dark:text-slate-200 text-left">
+                        <div class="w-3 h-3 rounded-full bg-[#e74c3c]"></div> Rojo
+                    </button>
+                    <button data-action="foreColor" data-value="#2383e2"
+                        class="flex items-center gap-2 px-4 py-2 hover:bg-primary/10 dark:hover:bg-primary/20 text-xs font-medium text-on-surface dark:text-slate-200 text-left">
+                        <div class="w-3 h-3 rounded-full bg-[#2383e2]"></div> Azul
+                    </button>
+                    <button data-action="foreColor" data-value="#2ecc71"
+                        class="flex items-center gap-2 px-4 py-2 hover:bg-primary/10 dark:hover:bg-primary/20 text-xs font-medium text-on-surface dark:text-slate-200 text-left">
+                        <div class="w-3 h-3 rounded-full bg-[#2ecc71]"></div> Verde
+                    </button>
+                    <button data-action="foreColor" data-value="#f39c12"
+                        class="flex items-center gap-2 px-4 py-2 hover:bg-primary/10 dark:hover:bg-primary/20 text-xs font-medium text-on-surface dark:text-slate-200 text-left">
+                        <div class="w-3 h-3 rounded-full bg-[#f39c12]"></div> Naranja
+                    </button>
+                    <button data-action="pick-custom-color"
+                        class="flex items-center gap-2 px-4 py-2 hover:bg-primary/10 dark:hover:bg-primary/20 text-xs font-medium text-on-surface dark:text-slate-200 text-left"><i
+                            data-lucide="pipette" class="w-3 h-3"></i> Personalizado...</button>
+                    <button data-action="removeColor"
+                        class="flex items-center gap-2 px-4 py-2 hover:bg-primary/10 dark:hover:bg-primary/20 text-xs font-medium text-on-surface dark:text-slate-200 text-left"><i
+                            data-lucide="undo" class="w-3 h-3"></i> Quitar color</button>
+                </div>
+            </div>
+
+            <div class="h-px bg-outline-variant/10 dark:bg-white/5 my-1 mx-2"></div>
+
+            <button data-action="removeFormat"
+                class="menu-item flex items-center gap-3 px-4 py-2.5 hover:bg-red-500/10 dark:hover:bg-red-500/20 transition-colors text-sm font-bold text-red-500 dark:text-red-400">
+                <i data-lucide="eraser" class="w-4 h-4"></i> Limpiar todo el formato
+            </button>
+        </div>
+    </div>
+
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <script type="module" src="renderer.js"></script>
+</body>
+
+</html>

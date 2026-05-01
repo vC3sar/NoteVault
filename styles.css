@@ -1,0 +1,516 @@
+/* Pantalla de Carga (Tres puntos) */
+.dots-loader {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 8px;
+    padding: 20px;
+}
+
+.dots-loader div {
+    width: 14px;
+    height: 14px;
+    background-color: var(--primary, #4338ca);
+    border-radius: 50%;
+    animation: bounce 1.4s infinite ease-in-out both;
+}
+
+.dots-loader div:nth-child(1) {
+    animation-delay: -0.32s;
+}
+
+.dots-loader div:nth-child(2) {
+    animation-delay: -0.16s;
+}
+
+@keyframes bounce {
+
+    0%,
+    80%,
+    100% {
+        transform: scale(0);
+        opacity: 0.5;
+    }
+
+    40% {
+        transform: scale(1);
+        opacity: 1;
+    }
+}
+
+/* Animaciones Globales */
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(10px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+@keyframes gold-letter-anim {
+    0% {
+        color: inherit;
+    }
+
+    50% {
+        color: #daa520;
+    }
+
+    100% {
+        color: inherit;
+    }
+}
+
+.gold-letter {
+    display: inline-block;
+    animation: gold-letter-anim 1s ease-in-out;
+}
+
+#notebook-view {
+    animation: fadeIn 0.3s ease-out;
+}
+
+#dashboard {
+    animation: fadeIn 0.3s ease-out;
+}
+
+/* Estilos base para iconos Lucide */
+[data-lucide] {
+    width: 18px;
+    height: 18px;
+    stroke-width: 2px;
+    flex-shrink: 0;
+}
+
+/* Editor Enriquecido */
+#editor {
+    outline: none;
+    font-size: 18px !important;
+    line-height: 1.6;
+}
+
+.dark #editor,
+.dark #note-title {
+    color: #ffffff !important;
+}
+
+[contenteditable]:empty:before {
+    content: attr(placeholder);
+    color: #a1a1aa;
+    pointer-events: none;
+    display: block;
+}
+
+/* Fix background for active note/notebook selection */
+.nav-item.active {
+    background-color: #eef2ff !important;
+    color: #4338ca !important;
+    font-weight: 600;
+}
+
+.dark .nav-item.active {
+    background-color: rgba(49, 46, 129, 0.3) !important;
+    color: #a5b4fc !important;
+}
+
+/* Custom Scrollbar */
+.custom-scrollbar::-webkit-scrollbar {
+    width: 6px;
+    height: 6px;
+}
+
+.custom-scrollbar::-webkit-scrollbar-track {
+    background: transparent;
+}
+
+.custom-scrollbar::-webkit-scrollbar-thumb {
+    background-color: rgba(156, 163, 175, 0.4);
+    border-radius: 10px;
+}
+
+.custom-scrollbar::-webkit-scrollbar-thumb:hover {
+    background-color: rgba(107, 114, 128, 0.6);
+}
+
+/* Hide input color default picker UI */
+input[type="color"]::-webkit-color-swatch-wrapper {
+    padding: 0;
+}
+
+input[type="color"]::-webkit-color-swatch {
+    border: none;
+    border-radius: 0.5rem;
+}
+
+/* Notebook spine / spiral binding */
+.notebook-spine {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 14px;
+    height: 100%;
+    z-index: 10;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    box-shadow: 2px 0 6px rgba(0, 0, 0, 0.12);
+}
+
+.notebook-ring {
+    position: absolute;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+    background: rgba(255, 255, 255, 0.85);
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.25), inset 0 1px 2px rgba(0, 0, 0, 0.15);
+    border: 1.5px solid rgba(255, 255, 255, 0.5);
+}
+
+/* Dark Mode Graphite */
+:root {
+    --surface-container-lowest: #f8f9fa;
+}
+
+.dark {
+    --surface-container-lowest: #1e1f22;
+}
+
+.dark .bg-surface {
+    background-color: #27282c !important;
+}
+
+.dark .text-on-surface {
+    color: #ffffff !important;
+}
+
+.dark .bg-surface-container-low {
+    background-color: #232428 !important;
+}
+
+.dark .bg-surface-container {
+    background-color: #2b2d30 !important;
+}
+
+.dark .bg-surface-container-high {
+    background-color: #313338 !important;
+}
+
+.dark .bg-surface-container-highest {
+    background-color: #383a40 !important;
+}
+
+.dark .bg-surface-container-lowest {
+    background-color: #1e1f22 !important;
+}
+
+.dark .bg-surface-bright {
+    background-color: #3f4148 !important;
+}
+
+.dark .text-on-surface-variant {
+    color: #e0e0e0 !important;
+}
+
+.dark .bg-surface-variant {
+    background-color: #43454a !important;
+}
+
+.dark .hover\:bg-surface:hover {
+    background-color: #27282c !important;
+}
+
+.dark .hover\:bg-surface-container-low:hover {
+    background-color: #232428 !important;
+}
+
+.dark .hover\:bg-surface-container:hover {
+    background-color: #2b2d30 !important;
+}
+
+.dark .hover\:bg-surface-container-high:hover {
+    background-color: #313338 !important;
+}
+
+.dark .hover\:bg-surface-container-highest:hover {
+    background-color: #383a40 !important;
+}
+
+.dark .hover\:bg-surface-container-lowest:hover {
+    background-color: #1e1f22 !important;
+}
+
+.dark .hover\:bg-surface-bright:hover {
+    background-color: #3f4148 !important;
+}
+
+.dark .hover\:bg-surface-variant:hover {
+    background-color: #43454a !important;
+}
+
+.dark .border-outline-variant\/5 {
+    border-color: rgba(224, 224, 224, 0.05) !important;
+}
+
+.dark .border-outline-variant\/10 {
+    border-color: rgba(224, 224, 224, 0.1) !important;
+}
+
+.dark .border-outline-variant\/20 {
+    border-color: rgba(224, 224, 224, 0.2) !important;
+}
+
+.dark .border-outline-variant\/30 {
+    border-color: rgba(224, 224, 224, 0.3) !important;
+}
+
+.dark .text-on-surface-variant\/30 {
+    color: rgba(224, 224, 224, 0.3) !important;
+}
+
+.dark .text-on-surface-variant\/50 {
+    color: rgba(224, 224, 224, 0.5) !important;
+}
+
+.dark .text-on-surface-variant\/60 {
+    color: rgba(224, 224, 224, 0.6) !important;
+}
+
+.dark .bg-surface-container\/80 {
+    background-color: rgba(43, 45, 48, 0.8) !important;
+}
+
+.dark .hover\:bg-surface-container\/80:hover {
+    background-color: rgba(43, 45, 48, 0.8) !important;
+}
+
+.dark .hover\:bg-surface-container\/50:hover {
+    background-color: rgba(43, 45, 48, 0.5) !important;
+}
+
+.dark .hover\:bg-surface\/50:hover {
+    background-color: rgba(39, 40, 44, 0.5) !important;
+}
+
+.dark .bg-surface-container\/50 {
+    background-color: rgba(43, 45, 48, 0.5) !important;
+}
+
+.dark .bg-surface\/50 {
+    background-color: rgba(39, 40, 44, 0.5) !important;
+}
+
+.dark input, .dark select, .dark textarea {
+    color: #ffffff;
+}
+
+.dark select option {
+    background-color: #1c1d21 !important;
+    color: #ffffff !important;
+}
+
+.dark ::placeholder {
+    color: rgba(224, 224, 224, 0.5) !important;
+}
+
+.dark .text-primary {
+    color: #a5b4fc !important;
+}
+
+.dark .bg-primary {
+    background-color: #a5b4fc !important;
+}
+
+.dark .text-on-primary {
+    color: #1e1e2e !important;
+}
+
+.dark .border-primary {
+    border-color: #a5b4fc !important;
+}
+
+.dark .accent-primary {
+    accent-color: #a5b4fc !important;
+}
+
+.dark .group-focus-within\:text-primary:focus-within {
+    color: #a5b4fc !important;
+}
+
+.dark .group-hover\:text-primary:hover {
+    color: #a5b4fc !important;
+}
+
+.dark .hover\:text-primary:hover {
+    color: #a5b4fc !important;
+}
+
+.dark .focus\:ring-primary\/20:focus {
+    --tw-ring-color: rgba(165, 180, 252, 0.2) !important;
+}
+
+.dark .bg-primary\/5 {
+    background-color: rgba(165, 180, 252, 0.05) !important;
+}
+
+.dark .bg-primary\/10 {
+    background-color: rgba(165, 180, 252, 0.1) !important;
+}
+
+.dark .bg-primary\/20 {
+    background-color: rgba(165, 180, 252, 0.2) !important;
+}
+
+.dark .border-primary\/10 {
+    border-color: rgba(165, 180, 252, 0.1) !important;
+}
+
+.dark .border-primary\/20 {
+    border-color: rgba(165, 180, 252, 0.2) !important;
+}
+
+.dark .shadow-primary\/20 {
+    --tw-shadow-color: rgba(165, 180, 252, 0.2) !important;
+}
+
+/* execCommand genera font tags con colores oscuros en dark mode */
+.dark #editor font[color="#37352f"],
+.dark #editor font[color="#000000"] {
+    color: #f1f5f9 !important;
+}
+
+/* ===== Tamaños de fuente (Mapeo de execCommand 1-7) ===== */
+#editor font[size="1"] {
+    font-size: 12px !important;
+}
+
+#editor font[size="2"] {
+    font-size: 14px !important;
+}
+
+#editor font[size="3"] {
+    font-size: 18px !important;
+}
+
+#editor font[size="4"] {
+    font-size: 20px !important;
+}
+
+#editor font[size="5"] {
+    font-size: 28px !important;
+}
+
+#editor font[size="6"] {
+    font-size: 36px !important;
+}
+
+#editor font[size="7"] {
+    font-size: 48px !important;
+}
+
+/* ===== Resaltados: Efecto marcador (Background) ===== */
+/* Soporta tanto mis clases como el estilo generado por execCommand('backColor') */
+.highlight-yellow,
+[style*="background-color: #fef08a"],
+[style*="background-color: rgb(254, 240, 138)"] {
+    background-color: #fef08a !important;
+    color: #1a1a1a !important;
+    border-radius: 4px;
+    padding: 1px 2px;
+    box-decoration-break: clone;
+    -webkit-box-decoration-break: clone;
+}
+
+.highlight-blue,
+[style*="background-color: #bfdbfe"],
+[style*="background-color: rgb(191, 219, 254)"] {
+    background-color: #bfdbfe !important;
+    color: #1a1a1a !important;
+    border-radius: 4px;
+    padding: 1px 2px;
+    box-decoration-break: clone;
+    -webkit-box-decoration-break: clone;
+}
+
+.highlight-green,
+[style*="background-color: #4ade80"],
+[style*="background-color: rgb(74, 222, 128)"] {
+    background-color: #4ade80 !important;
+    color: #1a1a1a !important;
+    border-radius: 4px;
+    padding: 1px 2px;
+    box-decoration-break: clone;
+    -webkit-box-decoration-break: clone;
+}
+
+.highlight-red,
+[style*="background-color: #fecaca"],
+[style*="background-color: rgb(254, 202, 202)"] {
+    background-color: #fecaca !important;
+    color: #1a1a1a !important;
+    border-radius: 4px;
+    padding: 1px 2px;
+    box-decoration-break: clone;
+    -webkit-box-decoration-break: clone;
+}
+
+.dark .highlight-yellow,
+.dark [style*="background-color: #eab308"],
+.dark [style*="background-color: rgb(234, 179, 8)"] {
+    background-color: #eab308 !important;
+    color: #000000 !important;
+}
+
+.dark .highlight-blue,
+.dark [style*="background-color: #3b82f6"],
+.dark [style*="background-color: rgb(59, 130, 246)"] {
+    background-color: #3b82f6 !important;
+    color: #ffffff !important;
+}
+
+.dark .highlight-green,
+.dark [style*="background-color: #16a34a"],
+.dark [style*="background-color: rgb(22, 163, 74)"] {
+    background-color: #16a34a !important;
+    color: #ffffff !important;
+}
+
+/* ===== Custom Context Menu Dark Mode Fix ===== */
+.dark #custom-context-menu,
+.dark #custom-context-menu div.absolute {
+    background-color: rgba(15, 23, 42, 0.98) !important;
+    border-color: rgba(255, 255, 255, 0.1) !important;
+    color: #e2e8f0 !important;
+}
+
+.dark #custom-context-menu .menu-item:hover,
+.dark #custom-context-menu button:hover {
+    background-color: rgba(67, 56, 202, 0.2) !important;
+    color: #ffffff !important;
+}
+
+.dark #custom-context-menu .h-px {
+    background-color: rgba(255, 255, 255, 0.05) !important;
+}
+
+/* ===== Flash al navegar a un destacado ===== */
+.flash-highlight {
+    animation: flashBg 1s ease-out;
+}
+
+@keyframes flashBg {
+
+    0%,
+    100% {
+        opacity: 1;
+    }
+
+    50% {
+        opacity: 0.3;
+    }
+}
