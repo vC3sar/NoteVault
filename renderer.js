@@ -1,5 +1,5 @@
 import { state, saveAll } from './js/state.js';
-import { applyTheme, showDashboard, showTrash, updateZoom } from './js/ui.js';
+import { applyTheme, showDashboard, showTrash, updateZoom, refreshSidebarState } from './js/ui.js';
 import { setupIPC } from './js/ipc.js';
 import { setupEventListeners } from './js/events.js';
 import { cleanupTrash, selectNote, addNote, restoreNote, permanentlyDeleteNote } from './js/notes.js';
@@ -30,6 +30,7 @@ window.addEventListener('DOMContentLoaded', async () => {
     }
 
     applyTheme(state.settings.theme);
+    refreshSidebarState();
 
     const loader = document.getElementById('notebook-loader');
     if (loader) loader.style.display = 'none';

@@ -1,4 +1,4 @@
-import { state } from './state.js';
+import { state, saveAll } from './state.js';
 import { refreshIcons } from './utils.js';
 import { renderNotebookGrid, renderSidebar } from './notebooks.js';
 import { renderTrashList, cleanupOrphans, cleanupTrash } from './notes.js';
@@ -58,15 +58,21 @@ export function showDashboard(view = state.currentView) {
     if (addNoteBtn) addNoteBtn.style.display = 'none';
 
     document.querySelectorAll('.nav-item').forEach(el => el.classList.remove('active'));
+
+    const navbarInfo = document.getElementById('navbar-view-info');
+    const navbarSubtitle = document.getElementById('navbar-subtitle');
+
     if (view === 'all') {
         document.getElementById('nav-library').classList.add('active');
-        document.getElementById('dashboard-title').textContent = 'Librería';
-        document.getElementById('dashboard-subtitle').textContent = 'Todas tus libretas';
+        if (navbarInfo) navbarInfo.classList.remove('hidden');
+        if (navbarSubtitle) navbarSubtitle.textContent = 'Todas tus libretas';
     } else if (view === 'favorites') {
         document.getElementById('nav-favorites').classList.add('active');
-        document.getElementById('dashboard-title').textContent = 'Favoritos';
-        document.getElementById('dashboard-subtitle').textContent = 'Tus libretas destacadas';
+        if (navbarInfo) navbarInfo.classList.add('hidden');
     }
+
+    const dashboardActions = document.getElementById('dashboard-actions');
+    if (dashboardActions) dashboardActions.style.display = 'flex';
 
     renderNotebookGrid();
     renderSidebar();
@@ -104,12 +110,18 @@ export function showTrash() {
     const searchContainer = document.getElementById('search-container');
     if (searchContainer) searchContainer.classList.add('hidden');
 
+    const dashboardActions = document.getElementById('dashboard-actions');
+    if (dashboardActions) dashboardActions.style.display = 'none';
+
     const addNoteBtn = document.getElementById('add-note');
     if (addNoteBtn) addNoteBtn.style.display = 'none';
 
     document.querySelectorAll('.nav-item').forEach(el => el.classList.remove('active'));
     const navTrash = document.getElementById('nav-trash');
     if (navTrash) navTrash.classList.add('active');
+
+    const navbarInfo = document.getElementById('navbar-view-info');
+    if (navbarInfo) navbarInfo.classList.add('hidden');
 
     cleanupTrash(); // Proactive cleanup when entering trash
     renderTrashList();
@@ -127,4 +139,38 @@ export function updateZoom(newZoom) {
     if (zoomSlider) zoomSlider.value = currentZoom;
     if (zoomLabel) zoomLabel.textContent = `${currentZoom}%`;
     if (editorContainer) editorContainer.style.zoom = currentZoom / 100;
+}
+
+export function toggleSidebar() {
+    const sidebar = document.getElementById('sidebar');
+    if (!sidebar) return;
+    
+    sidebar.classList.toggle('collapsed');
+    state.settings.sidebarCollapsed = sidebar.classList.contains('collapsed');
+    
+    const toggleBtn = document.getElementById('toggle-sidebar');
+    if (toggleBtn) {
+        const icon = toggleBtn.querySelector('i');
+        if (icon) {
+            if (state.settings.sidebarCollapsed) {
+                icon.setAttribute('data-lucide', 'panel-left-close');
+            } else {
+                icon.setAttribute('data-lucide', 'panel-left');
+            }
+            refreshIcons();
+        }
+    }
+    
+    saveAll();
+}
+
+export function refreshSidebarState() {
+    const sidebar = document.getElementById('sidebar');
+    if (!sidebar) return;
+    
+    if (state.settings.sidebarCollapsed) {
+        sidebar.classList.add('collapsed');
+    } else {
+        sidebar.classList.remove('collapsed');
+    }
 }

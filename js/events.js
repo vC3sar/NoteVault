@@ -1,5 +1,5 @@
 import { state, saveAll } from './state.js';
-import { applyTheme, showDashboard, showTrash, updateZoom, currentZoom } from './ui.js';
+import { applyTheme, showDashboard, showTrash, updateZoom, currentZoom, toggleSidebar, refreshSidebarState } from './ui.js';
 import { addNotebook, renderNotebookGrid } from './notebooks.js';
 import { addNote, renderNotesList, selectNote, renderTrashList } from './notes.js';
 import { executeEditAction, setupEditor } from './editor.js';
@@ -131,15 +131,7 @@ export function setupEventListeners() {
     document.getElementById('zoom-out')?.addEventListener('click', () => updateZoom(currentZoom - 10));
     document.getElementById('zoom-slider')?.addEventListener('input', (e) => updateZoom(parseInt(e.target.value)));
 
-    document.getElementById('toggle-sidebar')?.addEventListener('click', () => {
-        const sidebar = document.getElementById('sidebar');
-        if (sidebar && sidebar.classList.contains('-ml-64')) {
-            sidebar.classList.remove('-ml-64');
-            sidebar.classList.remove('hidden');
-        } else if (sidebar) {
-            sidebar.classList.add('-ml-64');
-        }
-    });
+    document.getElementById('toggle-sidebar')?.addEventListener('click', toggleSidebar);
 
     document.getElementById('toggle-attachments')?.addEventListener('click', () => {
         const panel = document.getElementById('attachments-panel');

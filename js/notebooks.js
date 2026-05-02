@@ -101,10 +101,13 @@ export function renderSidebar() {
         const favIcon = nb.isFavorite ? `<i data-lucide="star" class="w-3 h-3 text-amber-400" style="fill:currentColor;"></i>` : '';
         const colorIndicator = nb.coverType === 'color' ? `<div class="w-2 h-2 rounded-full" style="background-color: ${nb.coverValue || '#2b2d2e'}"></div>` : `<i data-lucide="image" class="w-3 h-3"></i>`;
 
+        item.title = nb.name;
+        if (nb.isFavorite) item.classList.add('is-favorite');
+
         item.innerHTML = `
-            ${colorIndicator}
-            <span class="truncate flex-1">${nb.name}</span>
-            ${favIcon}
+            <div class="shrink-0 flex items-center justify-center">${colorIndicator}</div>
+            <span class="truncate flex-1 sidebar-text transition-opacity duration-300">${nb.name}</span>
+            <div class="shrink-0 notebook-fav-icon">${favIcon}</div>
         `;
 
         item.onclick = (e) => {
@@ -154,7 +157,13 @@ export function selectNotebook(id) {
     const searchNotes = document.getElementById('search-notes');
     if (searchNotes) searchNotes.value = '';
 
+    const dashboardActions = document.getElementById('dashboard-actions');
+    if (dashboardActions) dashboardActions.style.display = 'none';
+
     document.getElementById('add-note').style.display = 'flex';
+
+    const navbarInfo = document.getElementById('navbar-view-info');
+    if (navbarInfo) navbarInfo.classList.add('hidden');
 
     renderSidebar();
     renderNotesList();
