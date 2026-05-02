@@ -1,113 +1,207 @@
-# 📔 NoteVault - University Manager
-> Pro Edition | Versión 1.1.0-beta
+<div align="center">
 
-![NoteVault Hero Mockup](C:\Users\vCesar\.gemini\antigravity\brain\eb6d07f3-c281-488a-9645-62a058148616\notevault_hero_mockup_1777654982544.png)
+<img src="https://img.shields.io/badge/version-1.1.0--beta-e8ff47?style=for-the-badge&labelColor=111111" alt="Version"/>
+<img src="https://img.shields.io/badge/platform-Windows-4a9eff?style=for-the-badge&logo=windows&logoColor=white&labelColor=111111" alt="Platform"/>
+<img src="https://img.shields.io/badge/Electron-JS-47b4e8?style=for-the-badge&logo=electron&logoColor=white&labelColor=111111" alt="Electron"/>
+<img src="https://img.shields.io/badge/license-MIT-3ecf8e?style=for-the-badge&labelColor=111111" alt="License"/>
 
-**NoteVault** es una aplicación de escritorio moderna y minimalista diseñada para la gestión eficiente de notas y apuntes académicos. Construida con una arquitectura modular sobre **Electron**, ofrece una experiencia fluida con un diseño premium inspirado en interfaces OLED y principios de glassmorphism.
+<br/><br/>
+
+```
+███╗   ██╗ ██████╗ ████████╗███████╗██╗   ██╗ █████╗ ██╗   ██╗██╗  ████████╗
+████╗  ██║██╔═══██╗╚══██╔══╝██╔════╝██║   ██║██╔══██╗██║   ██║██║  ╚══██╔══╝
+██╔██╗ ██║██║   ██║   ██║   █████╗  ██║   ██║███████║██║   ██║██║     ██║   
+██║╚██╗██║██║   ██║   ██║   ██╔══╝  ╚██╗ ██╔╝██╔══██║██║   ██║██║     ██║   
+██║ ╚████║╚██████╔╝   ██║   ███████╗ ╚████╔╝ ██║  ██║╚██████╔╝███████╗██║   
+╚═╝  ╚═══╝ ╚═════╝    ╚═╝   ╚══════╝  ╚═══╝  ╚═╝  ╚═╝ ╚═════╝ ╚══════╝╚═╝   
+```
+
+### 📔 University Manager · Pro Edition
+
+**Tu bóveda personal de conocimiento académico.**  
+Aplicación de escritorio moderna construida sobre Electron con estética OLED premium y glassmorphism.
+
+<br/>
+
+[🚀 Instalación rápida](#-instalación) · [✨ Características](#-características) · [⌨️ Shortcuts](#️-atajos-de-teclado) · [⚙️ Configuración](#️-configuración)
+
+</div>
 
 ---
 
-## ✨ Características Principales
+## ✨ Características
+
+<table>
+<tr>
+<td width="50%" valign="top">
 
 ### 📁 Organización Inteligente
-- **Libretas Personalizadas**: Organiza tus notas en libretas con colores personalizados o portadas de imagen.
-- **Buscador Avanzado**: Localiza rápidamente cualquier libreta desde el dashboard principal.
-- **Sección de Favoritos**: Acceso rápido a tus libretas más importantes.
-- **Gestión de Papelera**: Sistema de retención de notas eliminadas por 30 días (configurable) con limpieza automática.
+- **Libretas personalizadas** con colores o portadas de imagen
+- **Buscador avanzado** desde el dashboard principal
+- **Sección de Favoritos** para acceso rápido
+- **Papelera con retención configurable** (30 días por defecto) y limpieza automática
+
+</td>
+<td width="50%" valign="top">
 
 ### ✍️ Editor de Texto Enriquecido
-- **Formato Completo**: Negrita, cursiva, subrayado, colores de texto y resaltados.
-- **Listas de Tareas Interactivas**: Crea checkboxes que puedes marcar y desmarcar directamente en el editor.
-- **Control de Zoom**: Ajusta el tamaño de la interfaz de escritura para mayor comodidad visual.
-- **Contador de Palabras en Tiempo Real**: Ideal para llevar el control de tus ensayos y tareas.
+- **Formato completo**: negrita, cursiva, subrayado, colores y resaltados
+- **Listas de tareas interactivas** con checkboxes funcionales
+- **Control de zoom** para mayor comodidad visual
+- **Contador de palabras en tiempo real**
 
-### 🖼️ Gestión de Multimedia
-- **Panel de Adjuntos**: Visualiza y busca todas las imágenes y enlaces insertados en tus notas.
-- **Redimensionado de Imágenes**: Ajusta el tamaño de tus imágenes (25%, 50%, 75%, 100%) y su alineación.
-- **Integración Multimedia**: Controla tu música (Spotify, etc.) directamente desde la barra lateral de NoteVault.
+</td>
+</tr>
+<tr>
+<td width="50%" valign="top">
+
+### 🖼️ Gestión Multimedia
+- **Panel de adjuntos**: visualiza y busca imágenes y enlaces insertados
+- **Redimensionado de imágenes**: 25% / 50% / 75% / 100% con control de alineación
+- **Integración con reproductores** (Spotify y otros) desde la barra lateral
+
+</td>
+<td width="50%" valign="top">
 
 ### 🎨 Estética Premium
-- **Modo OLED Dark**: Interfaz optimizada para pantallas modernas con negros profundos y acentos vibrantes.
-- **Efectos de Transparencia**: Uso extensivo de `backdrop-blur` para una sensación de profundidad y elegancia.
-- **Tipografía Moderna**: Basado en la fuente **Inter** para una legibilidad superior.
+- **Modo OLED Dark** con negros profundos y acentos vibrantes
+- **Efectos de transparencia** (`backdrop-blur`) para sensación de profundidad
+- **Tipografía Inter** optimizada para pantallas de alta resolución
+
+</td>
+</tr>
+</table>
 
 ---
 
-## ⌨️ Atajos de Teclado (Shortcuts)
+## 🚀 Instalación
 
-| Comando | Acción |
-| :--- | :--- |
-| `Ctrl + L` | Ir a la Librería |
-| `Ctrl + T` | Ir a la Papelera |
-| `Ctrl + F` | Ir a Favoritos |
-| `Ctrl + B` | Negrita (Bold) |
-| `Ctrl + I` | Cursiva (Italic) |
-| `Ctrl + U` | Subrayado (Underline) |
-| `Ctrl + R` | Recargar Aplicación (Solo Debug) |
-| `F12` | Abrir DevTools (Solo Debug) |
+### Requisitos previos
 
----
-
-## ⚙️ Configuración y Opciones
-
-NoteVault permite una personalización profunda desde el panel de **Ajustes**:
-
-- **Temas**: Cambia entre Tema del Sistema, Claro, Oscuro o el exclusivo modo OLED.
-- **Retención de Papelera**: Define cuántos días deben permanecer las notas antes de su borrado definitivo.
-- **Autoguardado**: Configura el intervalo de guardado automático (en minutos) para no perder nunca tu progreso.
-- **Reproductor Multimedia**: Activa o desactiva la visibilidad del controlador de música en la sidebar.
-
----
-
-## 🚀 Instrucciones de Instalación
-
-### Requisitos Previos
-- [Node.js](https://nodejs.org/) (versión LTS recomendada)
-- npm (incluido con Node.js)
+| Herramienta | Versión recomendada | Enlace |
+|---|---|---|
+| Node.js | LTS | [nodejs.org](https://nodejs.org/) |
+| npm | incluido con Node | — |
 
 ### Pasos
-1. **Clonar el repositorio**:
-   ```bash
-   git clone https://github.com/vC3sar/NoteVault.git
-   ```
-2. **Instalar dependencias**:
-   ```bash
-   npm install
-   ```
-3. **Ejecutar en modo desarrollo**:
-   ```bash
-   npm start
-   ```
-4. **Construir ejecutable para producción**:
-   ```bash
-   npm run build
-   ```
+
+```bash
+# 1 · Clonar el repositorio
+git clone https://github.com/vC3sar/NoteVault.git
+cd NoteVault
+
+# 2 · Instalar dependencias
+npm install
+
+# 3 · Ejecutar en modo desarrollo
+npm start
+
+# 4 · Construir ejecutable para producción
+npm run build
+```
+
+> **Tip:** Para desarrollo, `npm start` abre NoteVault con DevTools disponible via `F12`.
 
 ---
 
-## 🛠️ Tecnologías Utilizadas
+## ⌨️ Atajos de Teclado
 
-- **Core**: JavaScript (ES6+), Node.js, Electron.
-- **Estilos**: Tailwind CSS (JIT mode), CSS3 Custom Properties.
-- **Iconografía**: Lucide Icons.
-- **Almacenamiento**: Sistema de archivos local (JSON + HTML).
-- **Librerías Extra**: `win-media-control` para integración nativa con Windows.
+### Editor
+
+| Atajo | Acción |
+|---|---|
+| `Ctrl + B` | **Negrita** |
+| `Ctrl + I` | *Cursiva* |
+| `Ctrl + U` | Subrayado |
+
+### Navegación
+
+| Atajo | Acción |
+|---|---|
+| `Ctrl + L` | Ir a la Librería |
+| `Ctrl + F` | Ir a Favoritos |
+| `Ctrl + T` | Ir a la Papelera |
+
+### Debug
+
+| Atajo | Acción |
+|---|---|
+| `Ctrl + R` | Recargar aplicación |
+| `F12` | Abrir DevTools |
 
 ---
 
-## 👤 Créditos del Autor
+## ⚙️ Configuración
 
-Proyecto desarrollado con ❤️ por **vC3sar**.
+Accede al panel de **Ajustes** desde la barra lateral para personalizar:
 
-- **Sitio Web**: [vazquezsg.ovh](https://vazquezsg.ovh)
-- **Organización**: Vazquezsg.ovh
-- **Propósito**: Herramienta de gestión académica y personal.
+```
+Ajustes
+├── 🎨 Temas ............... Sistema / Claro / Oscuro / OLED
+├── 🗑️ Retención papelera .. Días antes del borrado definitivo
+├── 💾 Autoguardado ........ Intervalo en minutos
+└── 🎵 Reproductor ......... Mostrar / ocultar en la sidebar
+```
+
+---
+
+## 🛠️ Stack Tecnológico
+
+```
+NoteVault
+├── Core
+│   ├── JavaScript (ES6+)
+│   ├── Node.js
+│   └── Electron
+├── Estilos
+│   ├── Tailwind CSS (JIT mode)
+│   └── CSS3 Custom Properties
+├── UI
+│   └── Lucide Icons
+├── Almacenamiento
+│   └── Sistema de archivos local (JSON + HTML)
+└── Integraciones
+    └── win-media-control (Windows Media Session API)
+```
+
+---
+
+## 📁 Estructura del Proyecto
+
+```
+NoteVault/
+├── main.js              ← Proceso principal de Electron
+├── preload.js           ← Bridge renderer ↔ main
+├── package.json
+├── src/
+│   ├── renderer/        ← UI (HTML + JS + CSS)
+│   ├── components/      ← Componentes reutilizables
+│   └── styles/          ← Tailwind + estilos globales
+├── assets/
+│   └── icons/
+└── data/                ← Almacenamiento local (generado en runtime)
+    ├── notebooks/
+    └── settings.json
+```
+
+> **Nota:** La carpeta `data/` se genera automáticamente en el primer arranque.
 
 ---
 
 ## 📄 Licencia
 
-Este proyecto está bajo la Licencia MIT. Consulta el archivo `LICENSE` para más detalles.
+```
+MIT License · Copyright (c) 2025 vC3sar · vazquezsg.ovh
+```
+
+Consulta el archivo [`LICENSE`](LICENSE) para los términos completos.
 
 ---
-*NoteVault - Tu bóveda personal de conocimiento.*
+
+<div align="center">
+
+Hecho con ❤️ por **[vC3sar](https://vazquezsg.ovh)** · Vazquezsg.ovh
+
+*NoteVault — Tu bóveda personal de conocimiento.*
+
+</div>
