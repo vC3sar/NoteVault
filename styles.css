@@ -570,7 +570,17 @@ input[type="color"]::-webkit-color-swatch {
     justify-content: center;
 }
 
+#sidebar.collapsed .mt-auto.pt-4.border-t {
+    padding-left: 0;
+    padding-right: 0;
+    display: flex;
+    justify-content: center;
+}
+
 #sidebar.collapsed .notebook-item {
+    justify-content: center;
+}
+#sidebar.collapsed #notebook-list {
     justify-content: center;
 }
 #sidebar.collapsed #notebook-list { margin: 0; padding: 0; }
