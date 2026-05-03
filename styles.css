@@ -151,13 +151,23 @@ input[type="color"]::-webkit-color-swatch {
     position: absolute;
     top: 0;
     left: 0;
-    width: 14px;
+    width: 16px;
     height: 100%;
     z-index: 10;
     display: flex;
     flex-direction: column;
     align-items: center;
     box-shadow: 2px 0 6px rgba(0, 0, 0, 0.12);
+    background: var(--notebook-spine-overlay);
+    backdrop-filter: blur(2px);
+}
+
+.notebook-spine::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(to right, rgba(0,0,0,0.1), transparent 40%, rgba(255,255,255,0.05));
+    pointer-events: none;
 }
 
 .notebook-ring {
@@ -167,18 +177,27 @@ input[type="color"]::-webkit-color-swatch {
     width: 10px;
     height: 10px;
     border-radius: 50%;
-    background: rgba(255, 255, 255, 0.85);
+    background: #e2e8f0;
     box-shadow: 0 1px 3px rgba(0, 0, 0, 0.25), inset 0 1px 2px rgba(0, 0, 0, 0.15);
     border: 1.5px solid rgba(255, 255, 255, 0.5);
+    z-index: 11;
+}
+
+.dark .notebook-ring {
+    background: #475569;
+    border-color: rgba(255, 255, 255, 0.1);
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.5), inset 0 1px 1px rgba(255, 255, 255, 0.1);
 }
 
 /* Dark Mode Graphite */
 :root {
     --surface-container-lowest: #f8f9fa;
+    --notebook-spine-overlay: rgba(255, 255, 255, 0.25);
 }
 
 .dark {
     --surface-container-lowest: #1e1f22;
+    --notebook-spine-overlay: rgba(0, 0, 0, 0.4);
 }
 
 .dark .bg-surface {
@@ -574,6 +593,8 @@ input[type="color"]::-webkit-color-swatch {
     padding-left: 0;
     padding-right: 0;
     display: flex;
+    flex-direction: column;
+    align-items: center;
     justify-content: center;
 }
 

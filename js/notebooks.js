@@ -42,18 +42,17 @@ export function renderNotebookGrid(searchQuery = '') {
         let visualStyle = '';
         let cardBgStyle = '';
         if (nb.coverType === 'image') {
-            const spineColor = 'rgba(255,255,255,0.25)';
             visualStyle = `
                 <div class="absolute inset-0 z-0">
                     <img src="file://${nb.coverValue.replace(/\\/g, '/')}" class="w-full h-full object-cover group-hover:scale-105 transition-all duration-700">
                     <div class="absolute inset-0 bg-gradient-to-t from-black/60 via-black/10 to-transparent pointer-events-none"></div>
                 </div>
-                <div class="notebook-spine" style="background:${spineColor};">${spineRings}</div>
+                <div class="notebook-spine">${spineRings}</div>
             `;
         } else {
             const color = nb.coverValue || '#2b2d2e';
             cardBgStyle = `background-color:${color};`;
-            visualStyle = `<div class="notebook-spine" style="background-color:${color};">${spineRings}</div>`;
+            visualStyle = `<div class="notebook-spine" style="background-color: ${color}">${spineRings}</div>`;
         }
 
         const favHtml = nb.isFavorite ? `<i data-lucide="star" style="fill: currentColor;" class="text-amber-400 w-4 h-4 absolute top-4 right-12 z-20"></i>` : '';
@@ -66,7 +65,7 @@ export function renderNotebookGrid(searchQuery = '') {
             <button class="card-options absolute top-3 right-3 p-1.5 bg-surface-container/50 hover:bg-surface-container/80 backdrop-blur-sm rounded-lg opacity-0 group-hover:opacity-100 transition-all z-20">
                 <i data-lucide="more-vertical" class="text-on-surface w-5 h-5"></i>
             </button>
-            <div class="relative z-10 bg-white/10 dark:bg-black/20 backdrop-blur-md p-2.5 ml-5 mr-2 mb-2 rounded-xl shadow-sm border border-white/20 transition-all">
+            <div class="relative z-10 bg-white/10 dark:bg-black/20 backdrop-blur-md p-2.5 ml-6 mr-2 mb-2 rounded-xl shadow-sm border border-white/20 transition-all">
                 <h3 class="text-lg font-bold text-white drop-shadow-md mb-0.5 break-words leading-tight">${nb.name}</h3>
                 <p class="text-[10px] text-white/80 font-bold uppercase tracking-wide drop-shadow-md mt-1">${nb.notes.length} Notas</p>
             </div>
