@@ -443,7 +443,7 @@ function setupMenu() {
           label: 'Visitar Sitio Web',
           click: () => {
             const { shell } = require('electron');
-            shell.openExternal('https://Vazquezsg.ovh');
+            shell.openExternal('https://vazquezsg.ovh');
           }
         },
         { type: 'separator' },
