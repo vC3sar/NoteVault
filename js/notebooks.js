@@ -1,6 +1,7 @@
 import { state, saveAll } from './state.js';
 import { refreshIcons, showModal } from './utils.js';
 import { renderNotesList } from './notes.js';
+import { updateGreeting } from './ui.js';
 
 export function renderNotebookGrid(searchQuery = '') {
     const grid = document.getElementById('notebook-grid');
@@ -167,6 +168,7 @@ export function selectNotebook(id) {
 
     renderSidebar();
     renderNotesList();
+    updateGreeting();
 }
 
 export async function addNotebook() {

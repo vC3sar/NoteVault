@@ -1,9 +1,10 @@
 import { state, saveAll } from './js/state.js';
-import { applyTheme, showDashboard, showTrash, updateZoom, refreshSidebarState } from './js/ui.js';
+import { applyTheme, showDashboard, showTrash, updateZoom, refreshSidebarState, updateGreeting } from './js/ui.js';
 import { setupIPC } from './js/ipc.js';
 import { setupEventListeners } from './js/events.js';
 import { cleanupTrash, selectNote, addNote, restoreNote, permanentlyDeleteNote } from './js/notes.js';
 import { selectNotebook, addNotebook } from './js/notebooks.js';
+import { refreshIcons } from './js/utils.js';
 
 // Expose functions to window for HTML compatibility (onclick handlers)
 window.showDashboard = showDashboard;
@@ -29,8 +30,16 @@ window.addEventListener('DOMContentLoaded', async () => {
         state.settings = { autosaveMinutes: 5, theme: 'system', trashRetentionDays: 30 };
     }
 
+    if (savedData.profile) {
+        state.profile = { name: '', email: '', lang: 'es', ...savedData.profile };
+    } else {
+        state.profile = { name: '', email: '', lang: 'es' };
+    }
+
     applyTheme(state.settings.theme);
     refreshSidebarState();
+    updateGreeting();
+    refreshIcons();
 
     const loader = document.getElementById('notebook-loader');
     if (loader) loader.style.display = 'none';

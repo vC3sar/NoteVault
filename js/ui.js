@@ -68,14 +68,20 @@ export function showDashboard(view = state.currentView) {
         if (navbarSubtitle) navbarSubtitle.textContent = 'Todas tus libretas';
     } else if (view === 'favorites') {
         document.getElementById('nav-favorites').classList.add('active');
-        if (navbarInfo) navbarInfo.classList.add('hidden');
+        if (navbarInfo) navbarInfo.classList.remove('hidden');
+        if (navbarSubtitle) navbarSubtitle.textContent = 'Mis Favoritos';
     }
 
     const dashboardActions = document.getElementById('dashboard-actions');
     if (dashboardActions) dashboardActions.style.display = 'flex';
 
+    state.activeNotebookId = null;
+    state.activeNoteId = null;
+    state.currentView = view;
+
     renderNotebookGrid();
     renderSidebar();
+    updateGreeting();
 }
 
 export function showTrash() {
@@ -98,7 +104,7 @@ export function showTrash() {
     if (trashView) {
         trashView.classList.remove('hidden');
         trashView.classList.add('block');
-        
+
         // Update subtitle with current retention days
         const subtitle = trashView.querySelector('p');
         if (subtitle) {
@@ -121,11 +127,14 @@ export function showTrash() {
     if (navTrash) navTrash.classList.add('active');
 
     const navbarInfo = document.getElementById('navbar-view-info');
-    if (navbarInfo) navbarInfo.classList.add('hidden');
+    const navbarSubtitle = document.getElementById('navbar-subtitle');
+    if (navbarInfo) navbarInfo.classList.remove('hidden');
+    if (navbarSubtitle) navbarSubtitle.textContent = 'NOTAS ELIMINADAS';
 
     cleanupTrash(); // Proactive cleanup when entering trash
     renderTrashList();
     renderSidebar();
+    updateGreeting();
 }
 
 export let currentZoom = 100;
@@ -144,10 +153,10 @@ export function updateZoom(newZoom) {
 export function toggleSidebar() {
     const sidebar = document.getElementById('sidebar');
     if (!sidebar) return;
-    
+
     sidebar.classList.toggle('collapsed');
     state.settings.sidebarCollapsed = sidebar.classList.contains('collapsed');
-    
+
     const toggleBtn = document.getElementById('toggle-sidebar');
     if (toggleBtn) {
         const icon = toggleBtn.querySelector('i');
@@ -160,17 +169,35 @@ export function toggleSidebar() {
             refreshIcons();
         }
     }
-    
+
     saveAll();
 }
 
 export function refreshSidebarState() {
     const sidebar = document.getElementById('sidebar');
     if (!sidebar) return;
-    
+
     if (state.settings.sidebarCollapsed) {
         sidebar.classList.add('collapsed');
     } else {
         sidebar.classList.remove('collapsed');
     }
+}export function updateGreeting() {
+    const greetingContainer = document.getElementById('user-greeting');
+    const greetingTextEl = document.getElementById('user-greeting-text');
+    if (!greetingContainer || !greetingTextEl) return;
+
+    // Only show in Library view ('all'), if no notebook is active, and if name is defined
+    if (state.currentView !== 'all' || state.activeNotebookId || !state.profile || !state.profile.name) {
+        greetingContainer.classList.add('hidden');
+        return;
+    }
+
+    const hours = new Date().getHours();
+    let greeting = "Buenas noches";
+    if (hours >= 6 && hours < 12) greeting = "Buenos días";
+    else if (hours >= 12 && hours < 20) greeting = "Buenas tardes";
+
+    greetingTextEl.textContent = `${greeting}, ${state.profile.name.split(' ')[0]}`;
+    greetingContainer.classList.remove('hidden');
 }

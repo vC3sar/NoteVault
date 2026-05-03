@@ -1,5 +1,5 @@
 import { state, saveAll } from './state.js';
-import { applyTheme, showDashboard, showTrash, updateZoom, currentZoom, toggleSidebar, refreshSidebarState } from './ui.js';
+import { applyTheme, showDashboard, showTrash, updateZoom, currentZoom, toggleSidebar, refreshSidebarState, updateGreeting } from './ui.js';
 import { addNotebook, renderNotebookGrid } from './notebooks.js';
 import { addNote, renderNotesList, selectNote, renderTrashList } from './notes.js';
 import { executeEditAction, setupEditor } from './editor.js';
@@ -181,6 +181,36 @@ export function setupEventListeners() {
             proEdition.textContent = text;
             proEdition.dataset.animating = 'false';
         }, (text.length * 0.08 + 1) * 1000);
+    });
+
+    document.getElementById('profile-btn')?.addEventListener('click', () => {
+        document.getElementById('profile-name-input').value = state.profile?.name || '';
+        document.getElementById('profile-email-input').value = state.profile?.email || '';
+        document.getElementById('profile-lang-input').value = state.profile?.lang || 'es';
+        const modal = document.getElementById('profile-modal');
+        modal.classList.remove('hidden');
+        modal.classList.add('flex');
+    });
+
+    document.getElementById('profile-cancel')?.addEventListener('click', () => {
+        const modal = document.getElementById('profile-modal');
+        modal.classList.add('hidden');
+        modal.classList.remove('flex');
+    });
+
+    document.getElementById('profile-confirm')?.addEventListener('click', async () => {
+        state.profile = {
+            name: document.getElementById('profile-name-input').value,
+            email: document.getElementById('profile-email-input').value,
+            lang: document.getElementById('profile-lang-input').value
+        };
+
+        const modal = document.getElementById('profile-modal');
+        modal.classList.add('hidden');
+        modal.classList.remove('flex');
+
+        updateGreeting();
+        await saveAll();
     });
 
     document.getElementById('empty-trash')?.addEventListener('click', async () => {

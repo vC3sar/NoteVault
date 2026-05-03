@@ -7,7 +7,7 @@
     <meta http-equiv="Content-Security-Policy"
         content="default-src 'self'; script-src 'self' 'unsafe-inline' https://cdn.tailwindcss.com https://unpkg.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com; img-src 'self' data: file: blob:;">
     <title>NoteVault - University Manager</title>
-    <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+    <script src="lib/tailwind.min.js"></script>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap"
         rel="stylesheet" />
     <link rel="stylesheet" href="styles.css">
@@ -155,9 +155,11 @@
                         class="absolute inset-0 bg-gradient-to-br from-indigo-500/20 to-transparent pointer-events-none">
                     </div>
                     <div class="relative z-10 overflow-hidden">
-                        <div class="truncate text-sm font-extrabold text-white drop-shadow-sm sidebar-text transition-opacity duration-300" id="media-title">Sin
+                        <div class="truncate text-sm font-extrabold text-white drop-shadow-sm sidebar-text transition-opacity duration-300"
+                            id="media-title">Sin
                             reproducción</div>
-                        <div class="truncate text-xs text-slate-400 font-medium mt-0.5 sidebar-text transition-opacity duration-300" id="media-artist">...</div>
+                        <div class="truncate text-xs text-slate-400 font-medium mt-0.5 sidebar-text transition-opacity duration-300"
+                            id="media-artist">...</div>
                         <div class="flex items-center justify-center gap-4 mt-4">
                             <button onclick="window.api.mediaPrev()"
                                 class="p-1 text-slate-400 hover:text-white transition-colors active:scale-95"><i
@@ -176,11 +178,16 @@
 
         </nav>
 
-        <div class="mt-auto pt-4 border-t border-outline-variant/10">
+        <div class="mt-auto pt-4 border-t border-outline-variant/10 space-y-1">
             <a id="settings-btn" title="Configuración"
                 class="nav-item text-slate-600 dark:text-slate-400 hover:bg-slate-200/40 dark:hover:bg-slate-800/40 rounded-lg flex items-center gap-3 px-3 py-2.5 cursor-pointer active:scale-95 transition-colors duration-200 font-medium text-sm overflow-hidden">
                 <i data-lucide="settings" class="shrink-0"></i>
                 <span class="sidebar-text whitespace-nowrap transition-opacity duration-300">Configuración</span>
+            </a>
+            <a id="profile-btn" title="Perfil"
+                class="nav-item text-slate-600 dark:text-slate-400 hover:bg-slate-200/40 dark:hover:bg-slate-800/40 rounded-lg flex items-center gap-3 px-3 py-2.5 cursor-pointer active:scale-95 transition-colors duration-200 font-medium text-sm overflow-hidden">
+                <i data-lucide="user" class="shrink-0"></i>
+                <span class="sidebar-text whitespace-nowrap transition-opacity duration-300">Perfil</span>
             </a>
         </div>
     </aside>
@@ -199,7 +206,9 @@
                 </button>
 
                 <div id="navbar-view-info" class="hidden">
-                    <span id="navbar-subtitle" class="text-xs font-black text-indigo-700 dark:text-indigo-400 uppercase tracking-[0.2em]">Todas tus libretas</span>
+                    <span id="navbar-subtitle"
+                        class="text-xs font-black text-indigo-700 dark:text-indigo-400 uppercase tracking-[0.2em]">Todas
+                        tus libretas</span>
                 </div>
 
                 <!-- Search Note (Visible generally for aesthetics, hooks up to note searching) -->
@@ -236,7 +245,12 @@
         </header>
 
         <!-- DASHBOARD VIEW -->
-        <div id="dashboard" class="flex-1 overflow-y-auto p-8 custom-scrollbar relative">
+        <div id="dashboard" class="flex-1 overflow-y-auto p-10 custom-scrollbar relative">
+            <!-- Personalized Greeting -->
+            <div id="user-greeting" class="hidden mb-12 animate-[fadeIn_0.5s_ease-out] max-w-7xl mx-auto w-full">
+                <h1 id="user-greeting-text" class="text-4xl font-black text-on-surface tracking-tighter"></h1>
+                <div class="h-1.5 w-24 bg-indigo-500 mt-3 rounded-full opacity-60"></div>
+            </div>
             <!-- Loader -->
 
             <div id="notebook-loader" class="flex justify-center items-center p-12">
@@ -375,6 +389,7 @@
     </main>
 
     <!-- Modal Layout Refactor with Tailwind -->
+    <!-- Settings Modal -->
     <div id="settings-modal"
         class="fixed inset-0 bg-black/40 backdrop-blur-sm hidden items-center justify-center z-50 transition-opacity">
         <div class="bg-surface-container-lowest p-6 rounded-2xl w-[400px] shadow-2xl animate-[fadeIn_0.2s_ease-out]">
@@ -422,6 +437,78 @@
                     class="px-5 py-2.5 rounded-lg font-medium text-on-surface-variant hover:bg-surface-container-high transition-colors">Cancelar</button>
                 <button id="settings-confirm"
                     class="px-5 py-2.5 rounded-lg font-bold bg-primary text-on-primary shadow-md hover:bg-indigo-700 transition-colors">Guardar</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Profile Modal (Perfil) -->
+    <div id="profile-modal"
+        class="fixed inset-0 bg-black/60 backdrop-blur-md hidden items-center justify-center z-50 transition-opacity">
+        <div
+            class="bg-surface-container-lowest rounded-[2rem] w-[480px] shadow-[0_32px_80px_-16px_rgba(0,0,0,0.3)] animate-[fadeIn_0.3s_ease-out] overflow-hidden border border-white/10">
+            <div class="p-10">
+                <!-- Top Section: Minimalist Avatar & Title -->
+                <div class="flex items-center gap-6 mb-10">
+                    <div
+                        class="w-16 h-16 bg-indigo-500/10 rounded-2xl flex items-center justify-center border border-indigo-500/20 shadow-inner">
+                        <i data-lucide="user" class="w-8 h-8 text-indigo-600 dark:text-indigo-400"></i>
+                    </div>
+                    <div>
+                        <h4 class="text-2xl font-black text-on-surface tracking-tight leading-tight">Configuración del
+                            Perfil</h4>
+                        <p class="text-xs font-bold text-on-surface-variant/50 uppercase tracking-widest mt-1">
+                            Personalización</p>
+                    </div>
+                </div>
+
+                <div class="space-y-8">
+                    <!-- Name Input -->
+                    <div class="relative group">
+                        <div
+                            class="absolute -top-2.5 left-4 px-1.5 bg-surface-container-lowest text-[10px] font-black text-indigo-600 dark:text-indigo-400 uppercase tracking-widest transition-all group-focus-within:text-primary z-10">
+                            Nombre Completo
+                        </div>
+                        <input type="text" id="profile-name-input" placeholder="¿Cómo te llamas?"
+                            class="w-full bg-transparent border-2 border-outline-variant/20 dark:border-white/10 rounded-2xl px-5 py-4 text-on-surface font-bold outline-none focus:border-indigo-500/50 focus:ring-4 focus:ring-indigo-500/5 transition-all placeholder:font-normal placeholder:opacity-30">
+                    </div>
+
+                    <!-- Email Input -->
+                    <div class="relative group">
+                        <div
+                            class="absolute -top-2.5 left-4 px-1.5 bg-surface-container-lowest text-[10px] font-black text-indigo-600 dark:text-indigo-400 uppercase tracking-widest transition-all group-focus-within:text-primary z-10">
+                            Correo Electrónico
+                        </div>
+                        <input type="email" id="profile-email-input" placeholder="tu@email.com"
+                            class="w-full bg-transparent border-2 border-outline-variant/20 dark:border-white/10 rounded-2xl px-5 py-4 text-on-surface font-bold outline-none focus:border-indigo-500/50 focus:ring-4 focus:ring-indigo-500/5 transition-all placeholder:font-normal placeholder:opacity-30">
+                    </div>
+
+                    <!-- Language Select -->
+                    <div class="relative group">
+                        <div
+                            class="absolute -top-2.5 left-4 px-1.5 bg-surface-container-lowest text-[10px] font-black text-indigo-600 dark:text-indigo-400 uppercase tracking-widest transition-all group-focus-within:text-primary z-10">
+                            Idioma de Preferencia
+                        </div>
+                        <select id="profile-lang-input"
+                            class="w-full bg-transparent border-2 border-outline-variant/20 dark:border-white/10 rounded-2xl px-5 py-4 text-on-surface font-bold outline-none focus:border-indigo-500/50 focus:ring-4 focus:ring-indigo-500/5 appearance-none transition-all cursor-pointer">
+                            <option value="es">Español</option>
+                            <option value="en">English</option>
+                            <option value="fr">Français</option>
+                        </select>
+                        <div
+                            class="absolute right-5 top-1/2 -translate-y-1/2 pointer-events-none text-on-surface-variant/40">
+                            <i data-lucide="chevron-down" class="w-5 h-5"></i>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Actions -->
+                <div class="flex items-center justify-end gap-3 mt-12">
+                    <button id="profile-cancel"
+                        class="px-6 py-3.5 rounded-xl font-bold text-on-surface-variant hover:bg-surface-container-high transition-all active:scale-95 text-sm">Cancelar</button>
+                    <button id="profile-confirm"
+                        class="px-8 py-3.5 rounded-xl font-black bg-indigo-600 text-white shadow-xl shadow-indigo-600/20 hover:bg-indigo-500 hover:scale-[1.02] active:scale-95 transition-all text-sm">Guardar
+                        Cambios</button>
+                </div>
             </div>
         </div>
     </div>
@@ -606,7 +693,7 @@
         </div>
     </div>
 
-    <script src="https://unpkg.com/lucide@latest"></script>
+    <script src="lib/lucide.min.js"></script>
     <script type="module" src="renderer.js"></script>
 </body>
 
