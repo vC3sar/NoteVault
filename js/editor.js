@@ -88,6 +88,7 @@ export const handleInput = () => {
         const titleChanged = note.title !== title;
         note.title = title;
         note.content = content;
+        note.lastEdited = Date.now();
 
         await window.api.saveNoteContent(state.activeNoteId, content);
         await saveAll();

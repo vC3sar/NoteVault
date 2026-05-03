@@ -218,3 +218,73 @@ export async function addNotebook() {
         selectNotebook(newNb.id);
     }
 }
+
+function timeAgo(timestamp) {
+    const now = Date.now();
+    const diff = now - timestamp;
+    const mins = Math.floor(diff / 60000);
+    const hours = Math.floor(diff / 3600000);
+    const days = Math.floor(diff / 86400000);
+    const weeks = Math.floor(diff / (86400000 * 7));
+    const months = Math.floor(diff / (86400000 * 30));
+
+    if (mins < 1) return 'ahora';
+    if (mins < 60) return `hace ${mins}m`;
+    if (hours < 24) return `hace ${hours}h`;
+    if (days < 7) return `hace ${days}d`;
+    if (weeks < 5) return `hace ${weeks}sem`;
+    return `hace ${months}mes`;
+}
+
+export function renderRecentNotes() {
+    const container = document.getElementById('recent-notes-section');
+    if (!container) return;
+
+    // Gather all notes from all notebooks with their notebook context
+    const allNotes = [];
+    state.notebooks.forEach(nb => {
+        (nb.notes || []).forEach(note => {
+            const ts = note.lastEdited || parseInt(note.id) || 0;
+            allNotes.push({ note, notebook: nb, ts });
+        });
+    });
+
+    if (allNotes.length === 0) {
+        container.classList.add('hidden');
+        return;
+    }
+
+    allNotes.sort((a, b) => b.ts - a.ts);
+    const recent = allNotes.slice(0, 3);
+
+    container.classList.remove('hidden');
+    const list = container.querySelector('#recent-notes-list');
+    if (!list) return;
+    list.innerHTML = '';
+
+    recent.forEach(({ note, notebook, ts }) => {
+        const item = document.createElement('div');
+        item.className = 'group flex items-center justify-between gap-4 py-3.5 px-4 rounded-2xl cursor-pointer hover:bg-surface-container transition-colors border border-transparent hover:border-outline-variant/10';
+        item.innerHTML = `
+            <div class="flex items-center gap-3 overflow-hidden">
+                <div class="shrink-0 w-9 h-9 rounded-xl bg-indigo-500/10 dark:bg-indigo-500/20 flex items-center justify-center">
+                    <i data-lucide="file-text" class="w-4 h-4 text-indigo-500 dark:text-indigo-400"></i>
+                </div>
+                <span class="text-sm font-semibold text-on-surface truncate">${note.title || 'Nota sin título'}</span>
+            </div>
+            <div class="shrink-0 flex items-center gap-2 text-right">
+                <span class="text-xs font-bold text-on-surface-variant opacity-60 hidden sm:block truncate max-w-[120px]">${notebook.name}</span>
+                <span class="text-[11px] font-bold text-indigo-500 dark:text-indigo-400 whitespace-nowrap bg-indigo-500/8 dark:bg-indigo-500/15 px-2 py-0.5 rounded-full">${timeAgo(ts)}</span>
+            </div>
+        `;
+        item.onclick = () => {
+            // Navigate to the notebook and note
+            import('./notebooks.js').then(m => m.selectNotebook(notebook.id)).then(() => {
+                import('./notes.js').then(m => m.selectNote(note.id));
+            });
+        };
+        list.appendChild(item);
+    });
+
+    refreshIcons();
+}

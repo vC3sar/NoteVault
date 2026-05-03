@@ -205,6 +205,16 @@
                 <button onclick="document.getElementById('add-notebook').click()"
                     class="mt-6 font-semibold text-primary hover:underline">Crear libreta</button>
             </div>
+
+            <!-- Recent Notes Widget -->
+            <div id="recent-notes-section" class="hidden max-w-7xl mx-auto w-full mt-10 mb-4">
+                <div class="flex items-center gap-3 mb-4">
+                    <i data-lucide="clock" class="w-4 h-4 text-on-surface-variant opacity-50"></i>
+                    <h2 class="text-[11px] font-black uppercase tracking-widest text-on-surface-variant opacity-50">Notas Recientes</h2>
+                </div>
+                <div id="recent-notes-list" class="flex flex-col divide-y divide-outline-variant/10 bg-surface-container-lowest rounded-2xl border border-outline-variant/10 overflow-hidden shadow-sm">
+                </div>
+            </div>
         </div>
 
         <!-- TRASH VIEW -->

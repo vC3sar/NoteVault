@@ -1,6 +1,6 @@
 import { state, saveAll } from './state.js';
 import { refreshIcons } from './utils.js';
-import { renderNotebookGrid, renderSidebar } from './notebooks.js';
+import { renderNotebookGrid, renderSidebar, renderRecentNotes } from './notebooks.js';
 import { renderTrashList, cleanupOrphans, cleanupTrash } from './notes.js';
 
 export function applyTheme(theme) {
@@ -81,6 +81,7 @@ export function showDashboard(view = state.currentView) {
 
     renderNotebookGrid();
     renderSidebar();
+    renderRecentNotes();
     updateGreeting();
 }
 
