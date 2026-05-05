@@ -1,6 +1,6 @@
 <div align="center">
 
-<img src="https://img.shields.io/badge/version-1.1.0--beta-e8ff47?style=for-the-badge&labelColor=111111" alt="Version"/>
+<img src="https://img.shields.io/badge/version-1.2.0--beta-e8ff47?style=for-the-badge&labelColor=111111" alt="Version"/>
 <img src="https://img.shields.io/badge/platform-Windows-4a9eff?style=for-the-badge&logo=windows&logoColor=white&labelColor=111111" alt="Platform"/>
 <img src="https://img.shields.io/badge/Electron-JS-47b4e8?style=for-the-badge&logo=electron&logoColor=white&labelColor=111111" alt="Electron"/>
 <img src="https://img.shields.io/badge/license-MIT-3ecf8e?style=for-the-badge&labelColor=111111" alt="License"/>

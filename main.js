@@ -420,6 +420,11 @@ function setupMenu() {
           label: 'Ir a Favoritos',
           accelerator: 'CmdOrCtrl+F',
           click: () => { mainWindow.webContents.send('menu-action', 'view-favorites'); }
+        },
+        {
+          label: 'Ir al Calendario',
+          accelerator: 'CmdOrCtrl+H',
+          click: () => { mainWindow.webContents.send('menu-action', 'view-calendar'); }
         }
       ]
     },
@@ -434,7 +439,7 @@ function setupMenu() {
               type: 'info',
               title: 'Atajos de Teclado',
               message: 'Comandos rápidos para NoteVault',
-              detail: 'Ctrl + L: Ir a la Librería\nCtrl + T: Ir a la Papelera\nCtrl + F: Ir a Favoritos',
+              detail: 'Ctrl + L: Ir a la Librería\nCtrl + T: Ir a la Papelera\nCtrl + F: Ir a Favoritos\nCtrl + H: Ir al Calendario',
               buttons: ['Cerrar']
             });
           }

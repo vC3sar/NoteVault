@@ -1,5 +1,5 @@
 import { state, saveAll } from './state.js';
-import { applyTheme, showDashboard, showTrash } from './ui.js';
+import { applyTheme, showDashboard, showTrash, showCalendar } from './ui.js';
 import { renderSidebar, renderNotebookGrid, selectNotebook } from './notebooks.js';
 import { renderNotesList, selectNote, cleanupTrash } from './notes.js';
 import { refreshIcons, showModal } from './utils.js';
@@ -165,6 +165,7 @@ export function setupIPC() {
             'view-library':   () => showDashboard('all'),
             'view-favorites': () => showDashboard('favorites'),
             'view-trash':     () => showTrash(),
+            'view-calendar':  () => showCalendar(),
         };
         window.api.onMenuAction((action) => {
             const command = MENU_COMMANDS[action];
