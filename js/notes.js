@@ -122,6 +122,16 @@ export async function selectNote(id) {
     if (editorEl) editorEl.innerHTML = cleanedContent;
     
     if (editorContainer) editorContainer.classList.remove('hidden');
+    
+    const editorEmptyState = document.getElementById('editor-empty-state');
+    if (editorEmptyState) editorEmptyState.classList.add('hidden');
+
+    const editorStatusBar = document.getElementById('editor-status-bar');
+    if (editorStatusBar) editorStatusBar.classList.remove('hidden');
+
+    const toggleAttachments = document.getElementById('toggle-attachments');
+    if (toggleAttachments) toggleAttachments.classList.remove('hidden');
+
     if (tb) tb.classList.remove('hidden');
     
     if (typeof window.updateHighlightsPanel === 'function') window.updateHighlightsPanel();

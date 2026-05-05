@@ -248,12 +248,16 @@
         <div id="notebook-view" class="flex-1 flex overflow-hidden" style="display:none;">
             <!-- Panel 2: Notes List -->
             <section id="notes-panel"
-                class="w-72 md:w-80 border-r border-outline-variant/10 bg-surface-container-lowest flex flex-col overflow-hidden shrink-0">
-                <div class="p-4 border-b border-outline-variant/10 flex items-center justify-between gap-2">
-                    <h3 id="panel-notebook-name" class="font-bold text-lg text-on-surface truncate">Nombre Libreta</h3>
+                class="w-72 md:w-80 border-r border-outline-variant/10 bg-surface-container-lowest flex flex-col overflow-hidden shrink-0 transition-all duration-300">
+                <div class="p-4 border-b border-outline-variant/10 flex items-center justify-between gap-1">
+                    <h3 id="panel-notebook-name" class="font-bold text-lg text-on-surface truncate flex-1">Nombre Libreta</h3>
                     <button id="panel-add-note" title="Nueva nota"
                         class="shrink-0 flex items-center justify-center w-8 h-8 rounded-lg bg-primary/10 hover:bg-primary/20 text-primary transition-colors active:scale-95">
                         <i data-lucide="plus" style="width:16px;height:16px;"></i>
+                    </button>
+                    <button id="collapse-notes-panel" title="Ocultar notas" onclick="window.toggleNotesPanel()"
+                        class="shrink-0 flex items-center justify-center w-8 h-8 rounded-lg hover:bg-surface-container-high text-on-surface-variant transition-colors active:scale-95">
+                        <i data-lucide="panel-left-close" class="w-4 h-4"></i>
                     </button>
                 </div>
                 <div class="relative flex-1 overflow-hidden">
@@ -269,10 +273,22 @@
             <!-- Panel 3: Editor -->
             <section id="editor-panel" class="flex-1 bg-surface-container-low flex flex-col overflow-hidden relative">
 
+                <button id="show-notes-panel-btn" title="Ver Lista de Notas" onclick="window.toggleNotesPanel()"
+                    class="hidden absolute top-6 left-6 md:left-8 p-2.5 bg-surface-container/80 backdrop-blur-sm rounded-xl shadow-sm border border-outline-variant/20 text-on-surface-variant hover:text-primary hover:bg-surface-container-high transition-colors z-20">
+                    <i data-lucide="panel-left" class="w-5 h-5"></i>
+                </button>
+
                 <button id="toggle-attachments" title="Ver Adjuntos"
-                    class="absolute top-6 right-8 p-2.5 bg-surface-container/80 backdrop-blur-sm rounded-xl shadow-sm border border-outline-variant/20 text-on-surface-variant hover:text-primary hover:bg-surface-container-high transition-colors z-20">
+                    class="hidden absolute top-6 right-8 p-2.5 bg-surface-container/80 backdrop-blur-sm rounded-xl shadow-sm border border-outline-variant/20 text-on-surface-variant hover:text-primary hover:bg-surface-container-high transition-colors z-20">
                     <i data-lucide="paperclip" class="w-5 h-5"></i>
                 </button>
+
+                <div id="editor-empty-state" class="absolute inset-0 flex flex-col items-center justify-center p-8 text-center text-on-surface-variant z-10 bg-surface-container-low">
+                    <i data-lucide="file-edit" class="w-16 h-16 mb-4 opacity-40"></i>
+                    <h3 class="text-xl font-bold text-on-surface">Ninguna nota seleccionada</h3>
+                    <p class="text-sm mt-2 opacity-80">Selecciona una nota de la lista o crea una nueva.</p>
+                </div>
+
                 <div id="editor-container" class="flex-1 overflow-y-auto p-8 md:p-12 xl:px-16 w-full mb-20">
                     <input type="text" id="note-title" placeholder="Título de la nota..."
                         class="text-4xl font-extrabold tracking-tight text-on-surface bg-transparent border-none outline-none mb-6 w-full placeholder:text-on-surface-variant/30 leading-tight">
@@ -280,8 +296,8 @@
                         class="text-lg text-on-surface leading-relaxed outline-none min-h-[50vh]"></div>
                 </div>
 
-                <div
-                    class="absolute bottom-6 right-8 flex items-center bg-surface-container-lowest border border-outline-variant/20 rounded-full px-4 py-2 shadow-lg gap-3 z-20">
+                <div id="editor-status-bar"
+                    class="hidden absolute bottom-6 right-8 flex items-center bg-surface-container-lowest border border-outline-variant/20 rounded-full px-4 py-2 shadow-lg gap-3 z-20">
                     <div class="flex items-center gap-1.5 px-3 border-r border-outline-variant/20 mr-1">
                         <i data-lucide="type" class="w-4 h-4 text-primary"></i>
                         <span id="word-count" class="text-sm font-semibold text-on-surface-variant">0 palabras</span>

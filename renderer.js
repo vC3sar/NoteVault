@@ -1,5 +1,5 @@
 import { state, saveAll } from './js/state.js';
-import { applyTheme, showDashboard, showTrash, updateZoom, refreshSidebarState, updateGreeting } from './js/ui.js';
+import { applyTheme, showDashboard, showTrash, updateZoom, refreshSidebarState, updateGreeting, toggleNotesPanel } from './js/ui.js';
 import { setupIPC } from './js/ipc.js';
 import { setupEventListeners } from './js/events.js';
 import { cleanupTrash, selectNote, addNote, restoreNote, permanentlyDeleteNote } from './js/notes.js';
@@ -18,6 +18,7 @@ window.permanentlyDeleteNote = permanentlyDeleteNote;
 window.updateZoom = updateZoom;
 window.applyTheme = applyTheme;
 window.saveAll = saveAll;
+window.toggleNotesPanel = toggleNotesPanel;
 
 // Initialization
 window.addEventListener('DOMContentLoaded', async () => {

@@ -612,3 +612,11 @@ input[type="color"]::-webkit-color-swatch {
 #sidebar.collapsed #notebook-list a.is-favorite::after { content: ''; position: absolute; left: 4px; top: 50%; transform: translateY(-50%); width: 3px; height: 16px; background-color: #fbbf24; border-radius: 0 4px 4px 0; box-shadow: 0 0 8px rgba(251, 191, 36, 0.6); }
 .dark #sidebar.collapsed #notebook-list a.is-favorite { background-color: rgba(251, 191, 36, 0.12) !important; box-shadow: inset 0 0 15px rgba(251, 191, 36, 0.15); }
 #sidebar.collapsed .notebook-fav-icon { display: none !important; }
+
+/* ===== Notes Panel Collapse ===== */
+#notes-panel.collapsed {
+    width: 0 !important;
+    min-width: 0 !important;
+    border: none;
+    opacity: 0;
+}

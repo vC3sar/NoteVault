@@ -152,6 +152,15 @@ export function selectNotebook(id) {
     }
 
     if (editorContainer) editorContainer.classList.add('hidden');
+    
+    const editorEmptyState = document.getElementById('editor-empty-state');
+    if (editorEmptyState) editorEmptyState.classList.remove('hidden');
+
+    const editorStatusBar = document.getElementById('editor-status-bar');
+    if (editorStatusBar) editorStatusBar.classList.add('hidden');
+
+    const toggleAttachments = document.getElementById('toggle-attachments');
+    if (toggleAttachments) toggleAttachments.classList.add('hidden');
 
     document.getElementById('search-container').classList.remove('hidden');
     const searchNotes = document.getElementById('search-notes');

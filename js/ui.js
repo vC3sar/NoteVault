@@ -202,3 +202,18 @@ export function refreshSidebarState() {
     greetingTextEl.textContent = `${greeting}, ${state.profile.name.split(' ')[0]}`;
     greetingContainer.classList.remove('hidden');
 }
+
+export function toggleNotesPanel() {
+    const panel = document.getElementById('notes-panel');
+    const showBtn = document.getElementById('show-notes-panel-btn');
+    if (!panel || !showBtn) return;
+
+    panel.classList.toggle('collapsed');
+    
+    // Si el panel de notas está colapsado, mostramos el botón en el editor
+    if (panel.classList.contains('collapsed')) {
+        showBtn.classList.remove('hidden');
+    } else {
+        showBtn.classList.add('hidden');
+    }
+}
