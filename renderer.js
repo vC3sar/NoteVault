@@ -1,14 +1,17 @@
 import { state, saveAll } from './js/state.js';
-import { applyTheme, showDashboard, showTrash, updateZoom, refreshSidebarState, updateGreeting, toggleNotesPanel } from './js/ui.js';
+import { applyTheme, showDashboard, showTrash, updateZoom, refreshSidebarState, updateGreeting, toggleNotesPanel, showCalendar } from './js/ui.js';
 import { setupIPC } from './js/ipc.js';
 import { setupEventListeners } from './js/events.js';
 import { cleanupTrash, selectNote, addNote, restoreNote, permanentlyDeleteNote } from './js/notes.js';
 import { selectNotebook, addNotebook } from './js/notebooks.js';
 import { refreshIcons } from './js/utils.js';
+import * as calendarEngine from './js/calendar.js';
 
 // Expose functions to window for HTML compatibility (onclick handlers)
 window.showDashboard = showDashboard;
 window.showTrash = showTrash;
+window.showCalendar = showCalendar;
+window.calendarEngine = calendarEngine;
 window.addNotebook = addNotebook;
 window.addNote = addNote;
 window.selectNotebook = selectNotebook;
@@ -35,6 +38,12 @@ window.addEventListener('DOMContentLoaded', async () => {
         state.profile = { name: '', email: '', lang: 'es', ...savedData.profile };
     } else {
         state.profile = { name: '', email: '', lang: 'es' };
+    }
+
+    if (savedData.calendar) {
+        state.calendar = { events: [], schedule: [], ...savedData.calendar };
+    } else {
+        state.calendar = { events: [], schedule: [] };
     }
 
     applyTheme(state.settings.theme);

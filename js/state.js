@@ -5,7 +5,8 @@ export let state = {
     profile: { name: '', email: '', lang: 'es' },
     activeNotebookId: null,
     activeNoteId: null,
-    currentView: 'all' // 'all', 'favorites', or 'trash'
+    currentView: 'all', // 'all', 'favorites', 'trash', or 'calendar'
+    calendar: { events: [], schedule: [] }
 };
 
 export async function saveAll() {
@@ -13,7 +14,8 @@ export async function saveAll() {
         notebooks: state.notebooks,
         trash: state.trash,
         settings: state.settings,
-        profile: state.profile
+        profile: state.profile,
+        calendar: state.calendar
     });
     if (!result.success) console.error("Error al guardar:", result.error);
 }

@@ -30,6 +30,12 @@ export function showDashboard(view = state.currentView) {
     const dashboard = document.getElementById('dashboard');
     const notebookView = document.getElementById('notebook-view');
     const trashView = document.getElementById('trash-view');
+    const calendarView = document.getElementById('calendar-view');
+
+    if (calendarView) {
+        calendarView.classList.remove('block');
+        calendarView.classList.add('hidden');
+    }
 
     if (dashboard) {
         dashboard.classList.remove('hidden');
@@ -93,6 +99,12 @@ export function showTrash() {
     const dashboard = document.getElementById('dashboard');
     const notebookView = document.getElementById('notebook-view');
     const trashView = document.getElementById('trash-view');
+    const calendarView = document.getElementById('calendar-view');
+
+    if (calendarView) {
+        calendarView.classList.remove('block');
+        calendarView.classList.add('hidden');
+    }
 
     if (dashboard) {
         dashboard.classList.remove('block');
@@ -136,6 +148,59 @@ export function showTrash() {
     renderTrashList();
     renderSidebar();
     updateGreeting();
+}
+
+export function showCalendar() {
+    state.activeNotebookId = null;
+    state.activeNoteId = null;
+    state.currentView = 'calendar';
+
+    const dashboard = document.getElementById('dashboard');
+    const notebookView = document.getElementById('notebook-view');
+    const trashView = document.getElementById('trash-view');
+    const calendarView = document.getElementById('calendar-view');
+
+    if (dashboard) {
+        dashboard.classList.remove('block');
+        dashboard.classList.add('hidden');
+    }
+    if (notebookView) {
+        notebookView.classList.remove('flex');
+        notebookView.classList.add('hidden');
+    }
+    if (trashView) {
+        trashView.classList.remove('block');
+        trashView.classList.add('hidden');
+    }
+    if (calendarView) {
+        calendarView.classList.remove('hidden');
+        calendarView.classList.add('block');
+    }
+
+    const searchContainer = document.getElementById('search-container');
+    if (searchContainer) searchContainer.classList.add('hidden');
+
+    const dashboardActions = document.getElementById('dashboard-actions');
+    if (dashboardActions) dashboardActions.style.display = 'none';
+
+    const addNoteBtn = document.getElementById('add-note');
+    if (addNoteBtn) addNoteBtn.style.display = 'none';
+
+    document.querySelectorAll('.nav-item').forEach(el => el.classList.remove('active'));
+    const navCalendar = document.getElementById('nav-calendar');
+    if (navCalendar) navCalendar.classList.add('active');
+
+    const navbarInfo = document.getElementById('navbar-view-info');
+    const navbarSubtitle = document.getElementById('navbar-subtitle');
+    if (navbarInfo) navbarInfo.classList.remove('hidden');
+    if (navbarSubtitle) navbarSubtitle.textContent = 'CALENDARIO Y HORARIO';
+
+    renderSidebar();
+    updateGreeting();
+    
+    if (window.calendarEngine) {
+        window.calendarEngine.initCalendar();
+    }
 }
 
 export let currentZoom = 100;
