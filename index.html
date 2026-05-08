@@ -8,7 +8,8 @@
         content="default-src 'self'; script-src 'self' 'unsafe-inline' https://cdn.tailwindcss.com https://unpkg.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com; img-src 'self' data: file: blob:;">
     <title>NoteVault - University Manager</title>
     <script src="lib/tailwind.min.js"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap"
+    <link
+        href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Plus+Jakarta+Sans:wght@800&display=swap"
         rel="stylesheet" />
     <link rel="stylesheet" href="styles.css">
     <script src="js/tailwind-config.js"></script>
@@ -22,13 +23,16 @@
         id="sidebar">
         <!-- Logo -->
         <div class="mb-8 px-2 cursor-pointer flex items-center gap-3 overflow-hidden" onclick="showDashboard('all')">
-            <i data-lucide="book-marked" class="text-indigo-600 shrink-0"></i>
-            <div class="sidebar-text transition-opacity duration-300">
+            <div
+                class="w-10 h-10 rounded-xl bg-gradient-to-br from-indigo-500 to-indigo-700 flex items-center justify-center shadow-lg shrink-0 border border-indigo-400/20">
+                <i data-lucide="book-marked" class="text-white w-5 h-5 drop-shadow-sm"></i>
+            </div>
+            <div class="sidebar-text transition-opacity duration-300 flex flex-col items-start justify-center">
                 <h1
-                    class="text-xl font-extrabold text-indigo-700 dark:text-indigo-400 tracking-tighter whitespace-nowrap">
+                    class="font-extrabold text-indigo-700 dark:text-indigo-400 whitespace-nowrap logo-font leading-none">
                     NoteVault
                 </h1>
-                <p id="pro-edition"
+                <p style="padding-left: 1px;" id="pro-edition"
                     class="text-[10px] text-on-surface-variant font-bold uppercase tracking-widest mt-1 opacity-70 cursor-pointer select-none">
                     Pro Edition</p>
             </div>
@@ -216,9 +220,11 @@
             <div id="recent-notes-section" class="hidden max-w-7xl mx-auto w-full mt-10 mb-4">
                 <div class="flex items-center gap-3 mb-4">
                     <i data-lucide="clock" class="w-4 h-4 text-on-surface-variant opacity-50"></i>
-                    <h2 class="text-[11px] font-black uppercase tracking-widest text-on-surface-variant opacity-50">Notas Recientes</h2>
+                    <h2 class="text-[11px] font-black uppercase tracking-widest text-on-surface-variant opacity-50">
+                        Notas Recientes</h2>
                 </div>
-                <div id="recent-notes-list" class="flex flex-col divide-y divide-outline-variant/10 bg-surface-container-lowest rounded-2xl border border-outline-variant/10 overflow-hidden shadow-sm">
+                <div id="recent-notes-list"
+                    class="flex flex-col divide-y divide-outline-variant/10 bg-surface-container-lowest rounded-2xl border border-outline-variant/10 overflow-hidden shadow-sm">
                 </div>
             </div>
         </div>
@@ -256,63 +262,98 @@
                 <!-- Main Calendar Grid -->
                 <div class="flex-1 overflow-y-auto custom-scrollbar p-6 md:p-10 flex flex-col">
                     <div class="flex items-center justify-between mb-8">
-                        <h2 id="calendar-month-year" class="text-3xl font-extrabold tracking-tight text-on-surface">Mayo 2026</h2>
+                        <h2 id="calendar-month-year" class="text-3xl font-extrabold tracking-tight text-on-surface">Mayo
+                            2026</h2>
                         <div class="flex items-center gap-2">
-                            <button onclick="window.calendarEngine.navigateMonth(-1)" class="p-2 text-on-surface-variant hover:text-primary transition-colors hover:bg-surface-container-high rounded-lg active:scale-95"><i data-lucide="chevron-left" class="w-5 h-5"></i></button>
-                            <button onclick="window.calendarEngine.goToToday()" class="px-4 py-2 text-sm font-bold text-on-surface-variant hover:text-primary transition-colors hover:bg-surface-container-high rounded-lg active:scale-95">Hoy</button>
-                            <button onclick="window.calendarEngine.navigateMonth(1)" class="p-2 text-on-surface-variant hover:text-primary transition-colors hover:bg-surface-container-high rounded-lg active:scale-95"><i data-lucide="chevron-right" class="w-5 h-5"></i></button>
+                            <button onclick="window.calendarEngine.navigateMonth(-1)"
+                                class="p-2 text-on-surface-variant hover:text-primary transition-colors hover:bg-surface-container-high rounded-lg active:scale-95"><i
+                                    data-lucide="chevron-left" class="w-5 h-5"></i></button>
+                            <button onclick="window.calendarEngine.goToToday()"
+                                class="px-4 py-2 text-sm font-bold text-on-surface-variant hover:text-primary transition-colors hover:bg-surface-container-high rounded-lg active:scale-95">Hoy</button>
+                            <button onclick="window.calendarEngine.navigateMonth(1)"
+                                class="p-2 text-on-surface-variant hover:text-primary transition-colors hover:bg-surface-container-high rounded-lg active:scale-95"><i
+                                    data-lucide="chevron-right" class="w-5 h-5"></i></button>
                         </div>
                     </div>
-                    
-                    <div class="grid grid-cols-7 gap-px bg-outline-variant/20 rounded-2xl overflow-hidden border border-outline-variant/20 flex-1 min-h-[500px]">
+
+                    <div
+                        class="grid grid-cols-7 gap-px bg-outline-variant/20 rounded-2xl overflow-hidden border border-outline-variant/20 flex-1 min-h-[500px]">
                         <!-- Days of Week Headers -->
-                        <div class="bg-surface-container-lowest py-3 text-center text-xs font-black uppercase tracking-widest text-on-surface-variant/70">Lun</div>
-                        <div class="bg-surface-container-lowest py-3 text-center text-xs font-black uppercase tracking-widest text-on-surface-variant/70">Mar</div>
-                        <div class="bg-surface-container-lowest py-3 text-center text-xs font-black uppercase tracking-widest text-on-surface-variant/70">Mié</div>
-                        <div class="bg-surface-container-lowest py-3 text-center text-xs font-black uppercase tracking-widest text-on-surface-variant/70">Jue</div>
-                        <div class="bg-surface-container-lowest py-3 text-center text-xs font-black uppercase tracking-widest text-on-surface-variant/70">Vie</div>
-                        <div class="bg-surface-container-lowest py-3 text-center text-xs font-black uppercase tracking-widest text-on-surface-variant/70">Sáb</div>
-                        <div class="bg-surface-container-lowest py-3 text-center text-xs font-black uppercase tracking-widest text-on-surface-variant/70">Dom</div>
-                        
+                        <div
+                            class="bg-surface-container-lowest py-3 text-center text-xs font-black uppercase tracking-widest text-on-surface-variant/70">
+                            Lun</div>
+                        <div
+                            class="bg-surface-container-lowest py-3 text-center text-xs font-black uppercase tracking-widest text-on-surface-variant/70">
+                            Mar</div>
+                        <div
+                            class="bg-surface-container-lowest py-3 text-center text-xs font-black uppercase tracking-widest text-on-surface-variant/70">
+                            Mié</div>
+                        <div
+                            class="bg-surface-container-lowest py-3 text-center text-xs font-black uppercase tracking-widest text-on-surface-variant/70">
+                            Jue</div>
+                        <div
+                            class="bg-surface-container-lowest py-3 text-center text-xs font-black uppercase tracking-widest text-on-surface-variant/70">
+                            Vie</div>
+                        <div
+                            class="bg-surface-container-lowest py-3 text-center text-xs font-black uppercase tracking-widest text-on-surface-variant/70">
+                            Sáb</div>
+                        <div
+                            class="bg-surface-container-lowest py-3 text-center text-xs font-black uppercase tracking-widest text-on-surface-variant/70">
+                            Dom</div>
+
                         <!-- Grid generated via JS -->
                         <div id="calendar-grid-content" class="contents"></div>
                     </div>
                 </div>
 
                 <!-- Side Panel (Events & Schedule) -->
-                <aside class="w-80 md:w-96 border-l border-outline-variant/10 bg-surface-container-lowest flex flex-col shrink-0 overflow-hidden">
+                <aside
+                    class="w-80 md:w-96 border-l border-outline-variant/10 bg-surface-container-lowest flex flex-col shrink-0 overflow-hidden">
                     <div class="p-6 border-b border-outline-variant/10">
                         <div class="flex items-center justify-between mb-4">
                             <h3 class="font-bold text-xl text-on-surface">Horario Escolar</h3>
-                            <button onclick="window.calendarEngine.showScheduleModal()" title="Gestionar Clases y Horario" class="flex items-center gap-1.5 px-3 py-1.5 bg-primary/10 text-primary hover:bg-primary/20 rounded-lg transition-colors active:scale-95 text-xs font-bold">
+                            <button onclick="window.calendarEngine.showScheduleModal()"
+                                title="Gestionar Clases y Horario"
+                                class="flex items-center gap-1.5 px-3 py-1.5 bg-primary/10 text-primary hover:bg-primary/20 rounded-lg transition-colors active:scale-95 text-xs font-bold">
                                 <i data-lucide="plus-circle" class="w-4 h-4"></i>
                                 Gestionar Clases
                             </button>
                         </div>
-                        
+
                         <div class="bg-surface-container-low rounded-xl p-1 flex">
-                            <button id="tab-schedule-l-v" onclick="window.calendarEngine.setScheduleMode('lv')" class="flex-1 py-1.5 text-xs font-bold rounded-lg text-on-surface bg-surface-container-lowest shadow-sm transition-all">Lunes a Viernes</button>
-                            <button id="tab-schedule-s" onclick="window.calendarEngine.setScheduleMode('s')" class="flex-1 py-1.5 text-xs font-bold rounded-lg text-on-surface-variant hover:text-on-surface transition-all">Solo Sábados</button>
+                            <button id="tab-schedule-l-v" onclick="window.calendarEngine.setScheduleMode('lv')"
+                                class="flex-1 py-1.5 text-xs font-bold rounded-lg text-on-surface bg-surface-container-lowest shadow-sm transition-all">Lunes
+                                a Viernes</button>
+                            <button id="tab-schedule-s" onclick="window.calendarEngine.setScheduleMode('s')"
+                                class="flex-1 py-1.5 text-xs font-bold rounded-lg text-on-surface-variant hover:text-on-surface transition-all">Solo
+                                Sábados</button>
                         </div>
                     </div>
-                    
+
                     <div class="flex-1 overflow-y-auto custom-scrollbar p-6 space-y-6">
                         <!-- Events for selected day -->
                         <div>
                             <div class="flex items-center justify-between mb-3">
-                                <h4 id="selected-day-title" class="text-xs font-black uppercase tracking-widest text-on-surface-variant">Día Seleccionado</h4>
-                                <button onclick="window.calendarEngine.showEventModal()" class="text-primary hover:text-primary/80 transition-colors"><i data-lucide="plus-circle" class="w-4 h-4"></i></button>
+                                <h4 id="selected-day-title"
+                                    class="text-xs font-black uppercase tracking-widest text-on-surface-variant">Día
+                                    Seleccionado</h4>
+                                <button onclick="window.calendarEngine.showEventModal()"
+                                    class="text-primary hover:text-primary/80 transition-colors"><i
+                                        data-lucide="plus-circle" class="w-4 h-4"></i></button>
                             </div>
                             <div id="selected-day-events" class="space-y-2">
                                 <!-- Events injected via JS -->
-                                <div class="text-sm text-on-surface-variant opacity-60 text-center py-4">Selecciona un día</div>
+                                <div class="text-sm text-on-surface-variant opacity-60 text-center py-4">Selecciona un
+                                    día</div>
                             </div>
                         </div>
 
                         <!-- Schedule Items -->
                         <div>
-                            <h4 class="text-xs font-black uppercase tracking-widest text-on-surface-variant mb-3">Horario Recurrente</h4>
-                            <div id="schedule-list" class="space-y-2 relative pl-3 border-l-2 border-outline-variant/20">
+                            <h4 class="text-xs font-black uppercase tracking-widest text-on-surface-variant mb-3">
+                                Horario Recurrente</h4>
+                            <div id="schedule-list"
+                                class="space-y-2 relative pl-3 border-l-2 border-outline-variant/20">
                                 <!-- Schedule injected via JS -->
                             </div>
                         </div>
@@ -327,7 +368,8 @@
             <section id="notes-panel"
                 class="w-72 md:w-80 border-r border-outline-variant/10 bg-surface-container-lowest flex flex-col overflow-hidden shrink-0 transition-all duration-300">
                 <div class="p-4 border-b border-outline-variant/10 flex items-center justify-between gap-1">
-                    <h3 id="panel-notebook-name" class="font-bold text-lg text-on-surface truncate flex-1">Nombre Libreta</h3>
+                    <h3 id="panel-notebook-name" class="font-bold text-lg text-on-surface truncate flex-1">Nombre
+                        Libreta</h3>
                     <button id="panel-add-note" title="Nueva nota"
                         class="shrink-0 flex items-center justify-center w-8 h-8 rounded-lg bg-primary/10 hover:bg-primary/20 text-primary transition-colors active:scale-95">
                         <i data-lucide="plus" style="width:16px;height:16px;"></i>
@@ -360,7 +402,8 @@
                     <i data-lucide="paperclip" class="w-5 h-5"></i>
                 </button>
 
-                <div id="editor-empty-state" class="absolute inset-0 flex flex-col items-center justify-center p-8 text-center text-on-surface-variant z-10 bg-surface-container-low">
+                <div id="editor-empty-state"
+                    class="absolute inset-0 flex flex-col items-center justify-center p-8 text-center text-on-surface-variant z-10 bg-surface-container-low">
                     <i data-lucide="file-edit" class="w-16 h-16 mb-4 opacity-40"></i>
                     <h3 class="text-xl font-bold text-on-surface">Ninguna nota seleccionada</h3>
                     <p class="text-sm mt-2 opacity-80">Selecciona una nota de la lista o crea una nueva.</p>
@@ -596,42 +639,55 @@
         </div>
     </div>
     <!-- Event Modal -->
-    <div id="event-modal-overlay" class="fixed inset-0 bg-black/60 backdrop-blur-sm z-50 flex items-center justify-center p-4 transition-opacity hidden">
+    <div id="event-modal-overlay"
+        class="fixed inset-0 bg-black/60 backdrop-blur-sm z-50 flex items-center justify-center p-4 transition-opacity hidden">
         <div class="bg-surface-container-lowest p-6 rounded-2xl w-[400px] shadow-2xl animate-[fadeIn_0.2s_ease-out]">
             <h4 class="text-xl font-bold mb-4 text-on-surface">Añadir Evento</h4>
-            
+
             <div class="space-y-4">
                 <div>
-                    <label class="block text-xs font-bold uppercase tracking-widest text-on-surface-variant mb-1">Título</label>
-                    <input type="text" id="event-title" placeholder="Ej: Reunión de proyecto" class="w-full bg-surface-container-high border border-outline-variant/30 rounded-lg px-4 py-2.5 text-on-surface outline-none focus:ring-2 focus:ring-primary/20 font-medium">
+                    <label
+                        class="block text-xs font-bold uppercase tracking-widest text-on-surface-variant mb-1">Título</label>
+                    <input type="text" id="event-title" placeholder="Ej: Reunión de proyecto"
+                        class="w-full bg-surface-container-high border border-outline-variant/30 rounded-lg px-4 py-2.5 text-on-surface outline-none focus:ring-2 focus:ring-primary/20 font-medium">
                 </div>
                 <div>
-                    <label class="block text-xs font-bold uppercase tracking-widest text-on-surface-variant mb-1">Descripción</label>
-                    <textarea id="event-desc" rows="3" placeholder="Detalles opcionales..." class="w-full bg-surface-container-high border border-outline-variant/30 rounded-lg px-4 py-2.5 text-on-surface outline-none focus:ring-2 focus:ring-primary/20 font-medium custom-scrollbar"></textarea>
+                    <label
+                        class="block text-xs font-bold uppercase tracking-widest text-on-surface-variant mb-1">Descripción</label>
+                    <textarea id="event-desc" rows="3" placeholder="Detalles opcionales..."
+                        class="w-full bg-surface-container-high border border-outline-variant/30 rounded-lg px-4 py-2.5 text-on-surface outline-none focus:ring-2 focus:ring-primary/20 font-medium custom-scrollbar"></textarea>
                 </div>
                 <div>
-                    <label class="block text-xs font-bold uppercase tracking-widest text-on-surface-variant mb-1">Color</label>
-                    <input type="color" id="event-color" value="#4338ca" class="w-full h-10 cursor-pointer border-0 rounded-lg p-0 overflow-hidden outline-none bg-transparent">
+                    <label
+                        class="block text-xs font-bold uppercase tracking-widest text-on-surface-variant mb-1">Color</label>
+                    <input type="color" id="event-color" value="#4338ca"
+                        class="w-full h-10 cursor-pointer border-0 rounded-lg p-0 overflow-hidden outline-none bg-transparent">
                 </div>
             </div>
 
             <div class="flex justify-end gap-3 mt-8">
-                <button onclick="document.getElementById('event-modal-overlay').classList.add('hidden')" class="px-5 py-2.5 rounded-lg font-medium text-on-surface-variant hover:bg-surface-container-high transition-colors">Cancelar</button>
-                <button onclick="window.calendarEngine.saveEvent()" class="px-5 py-2.5 rounded-lg font-bold bg-primary text-on-primary shadow-md hover:bg-indigo-700 transition-colors">Guardar</button>
+                <button onclick="document.getElementById('event-modal-overlay').classList.add('hidden')"
+                    class="px-5 py-2.5 rounded-lg font-medium text-on-surface-variant hover:bg-surface-container-high transition-colors">Cancelar</button>
+                <button onclick="window.calendarEngine.saveEvent()"
+                    class="px-5 py-2.5 rounded-lg font-bold bg-primary text-on-primary shadow-md hover:bg-indigo-700 transition-colors">Guardar</button>
             </div>
         </div>
     </div>
 
     <!-- Schedule Modal -->
-    <div id="schedule-modal-overlay" class="fixed inset-0 bg-black/60 backdrop-blur-sm z-50 flex items-center justify-center p-4 transition-opacity hidden">
-        <div class="bg-surface-container-lowest p-6 rounded-2xl w-[450px] shadow-2xl animate-[fadeIn_0.2s_ease-out] max-h-[90vh] flex flex-col">
+    <div id="schedule-modal-overlay"
+        class="fixed inset-0 bg-black/60 backdrop-blur-sm z-50 flex items-center justify-center p-4 transition-opacity hidden">
+        <div
+            class="bg-surface-container-lowest p-6 rounded-2xl w-[450px] shadow-2xl animate-[fadeIn_0.2s_ease-out] max-h-[90vh] flex flex-col">
             <h4 class="text-xl font-bold mb-4 text-on-surface">Gestionar Clases y Horario</h4>
-            
+
             <div class="space-y-4 flex-1 overflow-y-auto custom-scrollbar pr-2 mb-4">
                 <div class="grid grid-cols-2 gap-4">
                     <div>
-                        <label class="block text-xs font-bold uppercase tracking-widest text-on-surface-variant mb-1">Día</label>
-                        <select id="schedule-day" class="w-full bg-surface-container-high border border-outline-variant/30 rounded-lg px-4 py-2.5 text-on-surface outline-none focus:ring-2 focus:ring-primary/20 font-medium">
+                        <label
+                            class="block text-xs font-bold uppercase tracking-widest text-on-surface-variant mb-1">Día</label>
+                        <select id="schedule-day"
+                            class="w-full bg-surface-container-high border border-outline-variant/30 rounded-lg px-4 py-2.5 text-on-surface outline-none focus:ring-2 focus:ring-primary/20 font-medium">
                             <option value="1">Lunes</option>
                             <option value="2">Martes</option>
                             <option value="3">Miércoles</option>
@@ -641,40 +697,51 @@
                         </select>
                     </div>
                     <div>
-                        <label class="block text-xs font-bold uppercase tracking-widest text-on-surface-variant mb-1">Color</label>
-                        <input type="color" id="schedule-color" value="#10b981" class="w-full h-[42px] cursor-pointer border-0 rounded-lg p-0 overflow-hidden outline-none bg-transparent">
+                        <label
+                            class="block text-xs font-bold uppercase tracking-widest text-on-surface-variant mb-1">Color</label>
+                        <input type="color" id="schedule-color" value="#10b981"
+                            class="w-full h-[42px] cursor-pointer border-0 rounded-lg p-0 overflow-hidden outline-none bg-transparent">
                     </div>
                 </div>
-                
+
                 <div class="grid grid-cols-2 gap-4">
                     <div>
-                        <label class="block text-xs font-bold uppercase tracking-widest text-on-surface-variant mb-1">Inicio</label>
-                        <input type="time" id="schedule-start" class="w-full bg-surface-container-high border border-outline-variant/30 rounded-lg px-4 py-2.5 text-on-surface outline-none focus:ring-2 focus:ring-primary/20 font-medium">
+                        <label
+                            class="block text-xs font-bold uppercase tracking-widest text-on-surface-variant mb-1">Inicio</label>
+                        <input type="time" id="schedule-start"
+                            class="w-full bg-surface-container-high border border-outline-variant/30 rounded-lg px-4 py-2.5 text-on-surface outline-none focus:ring-2 focus:ring-primary/20 font-medium">
                     </div>
                     <div>
-                        <label class="block text-xs font-bold uppercase tracking-widest text-on-surface-variant mb-1">Fin</label>
-                        <input type="time" id="schedule-end" class="w-full bg-surface-container-high border border-outline-variant/30 rounded-lg px-4 py-2.5 text-on-surface outline-none focus:ring-2 focus:ring-primary/20 font-medium">
+                        <label
+                            class="block text-xs font-bold uppercase tracking-widest text-on-surface-variant mb-1">Fin</label>
+                        <input type="time" id="schedule-end"
+                            class="w-full bg-surface-container-high border border-outline-variant/30 rounded-lg px-4 py-2.5 text-on-surface outline-none focus:ring-2 focus:ring-primary/20 font-medium">
                     </div>
                 </div>
 
                 <div>
-                    <label class="block text-xs font-bold uppercase tracking-widest text-on-surface-variant mb-1">Materia / Actividad</label>
-                    <input type="text" id="schedule-subject" placeholder="Ej: Matemáticas" class="w-full bg-surface-container-high border border-outline-variant/30 rounded-lg px-4 py-2.5 text-on-surface outline-none focus:ring-2 focus:ring-primary/20 font-medium">
+                    <label
+                        class="block text-xs font-bold uppercase tracking-widest text-on-surface-variant mb-1">Materia /
+                        Actividad</label>
+                    <input type="text" id="schedule-subject" placeholder="Ej: Matemáticas"
+                        class="w-full bg-surface-container-high border border-outline-variant/30 rounded-lg px-4 py-2.5 text-on-surface outline-none focus:ring-2 focus:ring-primary/20 font-medium">
                 </div>
 
                 <div class="pt-4 border-t border-outline-variant/10">
-                    <button onclick="window.calendarEngine.addScheduleItem()" class="w-full py-2.5 rounded-lg font-bold bg-surface-container-high text-on-surface hover:bg-surface-container-highest transition-colors flex items-center justify-center gap-2">
+                    <button onclick="window.calendarEngine.addScheduleItem()"
+                        class="w-full py-2.5 rounded-lg font-bold bg-surface-container-high text-on-surface hover:bg-surface-container-highest transition-colors flex items-center justify-center gap-2">
                         <i data-lucide="plus" class="w-4 h-4"></i> Añadir al Horario
                     </button>
                 </div>
-                
+
                 <div id="schedule-modal-list" class="space-y-2 mt-4">
                     <!-- List of items to edit/delete -->
                 </div>
             </div>
 
             <div class="flex justify-end pt-4 border-t border-outline-variant/10 shrink-0">
-                <button onclick="document.getElementById('schedule-modal-overlay').classList.add('hidden')" class="px-5 py-2.5 rounded-lg font-bold bg-primary text-on-primary shadow-md hover:bg-indigo-700 transition-colors">Cerrar</button>
+                <button onclick="document.getElementById('schedule-modal-overlay').classList.add('hidden')"
+                    class="px-5 py-2.5 rounded-lg font-bold bg-primary text-on-primary shadow-md hover:bg-indigo-700 transition-colors">Cerrar</button>
             </div>
         </div>
     </div>

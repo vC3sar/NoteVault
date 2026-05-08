@@ -165,12 +165,12 @@ export function renderDayDetails(date) {
             evt.className = 'p-3 rounded-xl border border-outline-variant/10 bg-surface-container-high group relative overflow-hidden';
             evt.innerHTML = `
                 <div class="absolute left-0 top-0 bottom-0 w-1.5" style="background-color: ${e.color}"></div>
-                <div class="pl-3 flex justify-between items-start gap-2">
+                <div class="pl-3 flex justify-between items-center gap-2">
                     <div>
                         <h5 class="font-bold text-sm text-on-surface">${e.title}</h5>
                         ${e.description ? `<p class="text-xs text-on-surface-variant mt-1">${e.description}</p>` : ''}
                     </div>
-                    <button onclick="window.calendarEngine.deleteEvent('${e.id}')" class="text-on-surface-variant opacity-0 group-hover:opacity-100 hover:text-error transition-all p-1 active:scale-95"><i data-lucide="trash-2" class="w-4 h-4"></i></button>
+                    <button onclick="window.calendarEngine.deleteEvent('${e.id}')" class="text-on-surface-variant opacity-0 group-hover:opacity-100 hover:text-error transition-all p-1 active:scale-95 shrink-0"><i data-lucide="trash-2" class="w-4 h-4"></i></button>
                 </div>
             `;
             eventsList.appendChild(evt);

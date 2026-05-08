@@ -1,3 +1,10 @@
+.logo-font {
+    font-family: 'Plus Jakarta Sans', sans-serif !important;
+    letter-spacing: -0.04em;
+    font-weight: 800 !important;
+    font-size: 24px !important;
+}
+
 /* Pantalla de Carga (Tres puntos) */
 .dots-loader {
     display: flex;
