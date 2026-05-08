@@ -33,7 +33,7 @@ export function showDashboard(view = state.currentView) {
     const calendarView = document.getElementById('calendar-view');
 
     if (calendarView) {
-        calendarView.classList.remove('block');
+        calendarView.classList.remove('block', 'flex');
         calendarView.classList.add('hidden');
     }
 
@@ -43,12 +43,12 @@ export function showDashboard(view = state.currentView) {
     }
 
     if (notebookView) {
-        notebookView.classList.remove('flex');
+        notebookView.classList.remove('block', 'flex');
         notebookView.classList.add('hidden');
     }
 
     if (trashView) {
-        trashView.classList.remove('block');
+        trashView.classList.remove('block', 'flex');
         trashView.classList.add('hidden');
     }
 
@@ -69,11 +69,13 @@ export function showDashboard(view = state.currentView) {
     const navbarSubtitle = document.getElementById('navbar-subtitle');
 
     if (view === 'all') {
-        document.getElementById('nav-library').classList.add('active');
+        const navLib = document.getElementById('nav-library');
+        if (navLib) navLib.classList.add('active');
         if (navbarInfo) navbarInfo.classList.remove('hidden');
         if (navbarSubtitle) navbarSubtitle.textContent = 'Todas tus libretas';
     } else if (view === 'favorites') {
-        document.getElementById('nav-favorites').classList.add('active');
+        const navFav = document.getElementById('nav-favorites');
+        if (navFav) navFav.classList.add('active');
         if (navbarInfo) navbarInfo.classList.remove('hidden');
         if (navbarSubtitle) navbarSubtitle.textContent = 'Mis Favoritos';
     }
@@ -102,16 +104,16 @@ export function showTrash() {
     const calendarView = document.getElementById('calendar-view');
 
     if (calendarView) {
-        calendarView.classList.remove('block');
+        calendarView.classList.remove('block', 'flex');
         calendarView.classList.add('hidden');
     }
 
     if (dashboard) {
-        dashboard.classList.remove('block');
+        dashboard.classList.remove('block', 'flex');
         dashboard.classList.add('hidden');
     }
     if (notebookView) {
-        notebookView.classList.remove('flex');
+        notebookView.classList.remove('block', 'flex');
         notebookView.classList.add('hidden');
     }
     if (trashView) {
@@ -161,20 +163,20 @@ export function showCalendar() {
     const calendarView = document.getElementById('calendar-view');
 
     if (dashboard) {
-        dashboard.classList.remove('block');
+        dashboard.classList.remove('block', 'flex');
         dashboard.classList.add('hidden');
     }
     if (notebookView) {
-        notebookView.classList.remove('flex');
+        notebookView.classList.remove('block', 'flex');
         notebookView.classList.add('hidden');
     }
     if (trashView) {
-        trashView.classList.remove('block');
+        trashView.classList.remove('block', 'flex');
         trashView.classList.add('hidden');
     }
     if (calendarView) {
         calendarView.classList.remove('hidden');
-        calendarView.classList.add('block');
+        calendarView.classList.add('flex');
     }
 
     const searchContainer = document.getElementById('search-container');

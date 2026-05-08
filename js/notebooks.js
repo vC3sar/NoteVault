@@ -133,11 +133,12 @@ export function selectNotebook(id) {
     const dashboard = document.getElementById('dashboard');
     const notebookView = document.getElementById('notebook-view');
     const trashView = document.getElementById('trash-view');
+    const calendarView = document.getElementById('calendar-view');
     const editorContainer = document.getElementById('editor-container');
 
     if (dashboard) {
         dashboard.classList.add('hidden');
-        dashboard.classList.remove('block');
+        dashboard.classList.remove('block', 'flex');
     }
 
     if (notebookView) {
@@ -148,7 +149,12 @@ export function selectNotebook(id) {
 
     if (trashView) {
         trashView.classList.add('hidden');
-        trashView.classList.remove('block');
+        trashView.classList.remove('block', 'flex');
+    }
+
+    if (calendarView) {
+        calendarView.classList.add('hidden');
+        calendarView.classList.remove('block', 'flex');
     }
 
     if (editorContainer) editorContainer.classList.add('hidden');

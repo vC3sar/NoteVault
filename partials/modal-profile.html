@@ -1,0 +1,71 @@
+<!-- Profile Modal (Perfil) -->
+<div id="profile-modal"
+    class="fixed inset-0 bg-black/60 backdrop-blur-md hidden items-center justify-center z-50 transition-opacity">
+    <div
+        class="bg-surface-container-lowest rounded-[2rem] w-[480px] shadow-[0_32px_80px_-16px_rgba(0,0,0,0.3)] animate-[fadeIn_0.3s_ease-out] overflow-hidden border border-white/10">
+        <div class="p-10">
+            <!-- Top Section: Minimalist Avatar & Title -->
+            <div class="flex items-center gap-6 mb-10">
+                <div
+                    class="w-16 h-16 bg-indigo-500/10 rounded-2xl flex items-center justify-center border border-indigo-500/20 shadow-inner">
+                    <i data-lucide="user" class="w-8 h-8 text-indigo-600 dark:text-indigo-400"></i>
+                </div>
+                <div>
+                    <h4 class="text-2xl font-black text-on-surface tracking-tight leading-tight">Configuración del
+                        Perfil</h4>
+                    <p class="text-xs font-bold text-on-surface-variant/50 uppercase tracking-widest mt-1">
+                        Personalización</p>
+                </div>
+            </div>
+
+            <div class="space-y-8">
+                <!-- Name Input -->
+                <div class="relative group">
+                    <div
+                        class="absolute -top-2.5 left-4 px-1.5 bg-surface-container-lowest text-[10px] font-black text-indigo-600 dark:text-indigo-400 uppercase tracking-widest transition-all group-focus-within:text-primary z-10">
+                        Nombre Completo
+                    </div>
+                    <input type="text" id="profile-name-input" placeholder="¿Cómo te llamas?"
+                        class="w-full bg-transparent border-2 border-outline-variant/20 dark:border-white/10 rounded-2xl px-5 py-4 text-on-surface font-bold outline-none focus:border-indigo-500/50 focus:ring-4 focus:ring-indigo-500/5 transition-all placeholder:font-normal placeholder:opacity-30">
+                </div>
+
+                <!-- Email Input -->
+                <div class="relative group">
+                    <div
+                        class="absolute -top-2.5 left-4 px-1.5 bg-surface-container-lowest text-[10px] font-black text-indigo-600 dark:text-indigo-400 uppercase tracking-widest transition-all group-focus-within:text-primary z-10">
+                        Correo Electrónico
+                    </div>
+                    <input type="email" id="profile-email-input" placeholder="tu@email.com"
+                        class="w-full bg-transparent border-2 border-outline-variant/20 dark:border-white/10 rounded-2xl px-5 py-4 text-on-surface font-bold outline-none focus:border-indigo-500/50 focus:ring-4 focus:ring-indigo-500/5 transition-all placeholder:font-normal placeholder:opacity-30">
+                </div>
+
+                <!-- Language Select -->
+                <div class="relative group">
+                    <div
+                        class="absolute -top-2.5 left-4 px-1.5 bg-surface-container-lowest text-[10px] font-black text-indigo-600 dark:text-indigo-400 uppercase tracking-widest transition-all group-focus-within:text-primary z-10">
+                        Idioma de Preferencia
+                    </div>
+                    <select id="profile-lang-input"
+                        class="w-full bg-transparent border-2 border-outline-variant/20 dark:border-white/10 rounded-2xl px-5 py-4 text-on-surface font-bold outline-none focus:border-indigo-500/50 focus:ring-4 focus:ring-indigo-500/5 appearance-none transition-all cursor-pointer">
+                        <option value="es">Español</option>
+                        <option value="en">English</option>
+                        <option value="fr">Français</option>
+                    </select>
+                    <div
+                        class="absolute right-5 top-1/2 -translate-y-1/2 pointer-events-none text-on-surface-variant/40">
+                        <i data-lucide="chevron-down" class="w-5 h-5"></i>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Actions -->
+            <div class="flex items-center justify-end gap-3 mt-12">
+                <button id="profile-cancel"
+                    class="px-6 py-3.5 rounded-xl font-bold text-on-surface-variant hover:bg-surface-container-high transition-all active:scale-95 text-sm">Cancelar</button>
+                <button id="profile-confirm"
+                    class="px-8 py-3.5 rounded-xl font-black bg-indigo-600 text-white shadow-xl shadow-indigo-600/20 hover:bg-indigo-500 hover:scale-[1.02] active:scale-95 transition-all text-sm">Guardar
+                    Cambios</button>
+            </div>
+        </div>
+    </div>
+</div>

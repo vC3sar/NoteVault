@@ -1,0 +1,43 @@
+<!-- DASHBOARD VIEW -->
+<div id="dashboard" class="flex-1 overflow-y-auto p-10 custom-scrollbar relative">
+    <!-- Personalized Greeting -->
+    <div id="user-greeting" class="hidden mb-12 animate-[fadeIn_0.5s_ease-out] max-w-7xl mx-auto w-full">
+        <h1 id="user-greeting-text" class="text-4xl font-black text-on-surface tracking-tighter"></h1>
+        <div class="h-1.5 w-24 bg-indigo-500 mt-3 rounded-full opacity-60"></div>
+    </div>
+
+    <!-- Loader -->
+    <div id="notebook-loader" class="flex justify-center items-center p-12">
+        <div class="dots-loader">
+            <div></div>
+            <div></div>
+            <div></div>
+        </div>
+    </div>
+
+    <div id="notebook-grid"
+        class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6 max-w-7xl mx-auto w-full">
+    </div>
+
+    <!-- Empty state -->
+    <div id="empty-state"
+        class="hidden flex-col items-center justify-center p-20 text-center text-on-surface-variant">
+        <i data-lucide="book-x" class="w-16 h-16 mb-4 opacity-40"></i>
+        <h3 class="text-xl font-bold text-on-surface">No hay libretas aquí</h3>
+        <p class="text-sm mt-2 opacity-80">Empieza creando una nueva libreta.</p>
+        <button onclick="document.getElementById('add-notebook').click()"
+            class="mt-6 font-semibold text-primary hover:underline">Crear libreta</button>
+    </div>
+
+    <!-- Recent Notes Widget -->
+    <div id="recent-notes-section" class="hidden max-w-7xl mx-auto w-full mt-10 mb-4">
+        <div class="flex items-center gap-3 mb-4">
+            <i data-lucide="clock" class="w-4 h-4 text-on-surface-variant opacity-50"></i>
+            <h2 class="text-[11px] font-black uppercase tracking-widest text-on-surface-variant opacity-50">
+                Notas Recientes</h2>
+        </div>
+        <div id="recent-notes-list"
+            class="flex flex-col divide-y divide-outline-variant/10 bg-surface-container-lowest rounded-2xl border border-outline-variant/10 overflow-hidden shadow-sm">
+        </div>
+    </div>
+</div>

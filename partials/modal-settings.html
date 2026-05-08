@@ -1,0 +1,51 @@
+<!-- Settings Modal -->
+<div id="settings-modal"
+    class="fixed inset-0 bg-black/40 backdrop-blur-sm hidden items-center justify-center z-50 transition-opacity">
+    <div class="bg-surface-container-lowest p-6 rounded-2xl w-[400px] shadow-2xl animate-[fadeIn_0.2s_ease-out]">
+        <h4 class="text-xl font-bold mb-6 text-on-surface flex items-center gap-2"><i data-lucide="settings"></i>
+            Ajustes</h4>
+        <div class="mb-4">
+            <label class="block text-sm font-semibold text-on-surface-variant mb-2">Tema de la aplicación:</label>
+            <select id="theme-input"
+                class="w-full bg-indigo-100/80 dark:bg-black/20 border border-indigo-200 dark:border-white/10 rounded-xl px-4 py-3 text-on-surface outline-none focus:ring-2 focus:ring-primary/20 shadow-sm transition-all">
+                <option value="system">Tema del Sistema</option>
+                <option value="light">Claro</option>
+                <option value="dark">Oscuro</option>
+            </select>
+        </div>
+        <div class="mb-4">
+            <label class="block text-sm font-semibold text-on-surface-variant mb-2">Días para borrar notas de
+                papelera:</label>
+            <input type="number" id="trash-retention-input" min="1" max="365" value="30"
+                class="w-full bg-indigo-100/80 dark:bg-black/20 border border-indigo-200 dark:border-white/10 rounded-xl px-4 py-3 text-on-surface outline-none focus:ring-2 focus:ring-primary/20 shadow-sm transition-all">
+        </div>
+        <div class="mb-4">
+            <label class="block text-sm font-semibold text-on-surface-variant mb-2">Autoguardar cada
+                (minutos):</label>
+            <input type="number" id="autosave-interval-input" min="1" max="60" value="5"
+                class="w-full bg-indigo-100/80 dark:bg-black/20 border border-indigo-200 dark:border-white/10 rounded-xl px-4 py-3 text-on-surface outline-none focus:ring-2 focus:ring-primary/20 shadow-sm transition-all">
+        </div>
+        <div class="mb-8">
+            <div
+                class="flex items-center justify-between bg-indigo-100/80 dark:bg-black/20 border border-indigo-200 dark:border-white/10 rounded-xl p-3.5 shadow-sm">
+                <div>
+                    <div class="text-sm font-semibold text-on-surface">Reproductor multimedia</div>
+                    <div class="text-xs text-on-surface-variant mt-0.5 opacity-80">Muestra Spotify y otros
+                        reproductores en la barra lateral</div>
+                </div>
+                <label class="relative inline-flex items-center cursor-pointer ml-4 shrink-0">
+                    <input type="checkbox" id="media-player-toggle" class="sr-only peer">
+                    <div
+                        class="w-11 h-6 bg-outline-variant/50 dark:bg-outline-variant/80 rounded-full peer peer-checked:bg-primary transition-colors duration-300 after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:rounded-full after:h-5 after:w-5 after:transition-all after:duration-300 peer-checked:after:translate-x-5">
+                    </div>
+                </label>
+            </div>
+        </div>
+        <div class="flex justify-end gap-3">
+            <button id="settings-cancel"
+                class="px-5 py-2.5 rounded-lg font-medium text-on-surface-variant hover:bg-surface-container-high transition-colors">Cancelar</button>
+            <button id="settings-confirm"
+                class="px-5 py-2.5 rounded-lg font-bold bg-primary text-on-primary shadow-md hover:bg-indigo-700 transition-colors">Guardar</button>
+        </div>
+    </div>
+</div>

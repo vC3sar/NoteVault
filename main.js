@@ -46,8 +46,50 @@ function createWindow() {
     webPreferences: {
       preload: path.join(__dirname, 'preload.js'),
       contextIsolation: true,
-      nodeIntegration: false
+      nodeIntegration: false,
+      spellcheck: true
     }
+  });
+
+  // Manejador para el corrector ortográfico y menú contextual
+  mainWindow.webContents.on('context-menu', (event, params) => {
+    const menu = new Menu();
+
+    // Añadir sugerencias de ortografía
+    for (const suggestion of params.dictionarySuggestions) {
+      menu.append(new MenuItem({
+        label: suggestion,
+        click: () => mainWindow.webContents.replaceMisspelling(suggestion)
+      }));
+    }
+
+    // Permitir añadir palabras al diccionario
+    if (params.misspelledWord) {
+      menu.append(
+        new MenuItem({
+          label: 'Añadir al diccionario',
+          click: () => mainWindow.webContents.session.addWordToSpellCheckerDictionary(params.misspelledWord)
+        })
+      );
+      menu.append(new MenuItem({ type: 'separator' }));
+    }
+
+    // Si hay sugerencias o una palabra mal escrita, mostramos el menú con ellas
+    if (params.dictionarySuggestions.length > 0 || params.misspelledWord) {
+      menu.append(new MenuItem({ type: 'separator' }));
+    }
+
+    // Acciones estándar de edición
+    menu.append(new MenuItem({ role: 'undo', label: 'Deshacer' }));
+    menu.append(new MenuItem({ role: 'redo', label: 'Rehacer' }));
+    menu.append(new MenuItem({ type: 'separator' }));
+    menu.append(new MenuItem({ role: 'cut', label: 'Cortar' }));
+    menu.append(new MenuItem({ role: 'copy', label: 'Copiar' }));
+    menu.append(new MenuItem({ role: 'paste', label: 'Pegar' }));
+    menu.append(new MenuItem({ type: 'separator' }));
+    menu.append(new MenuItem({ role: 'selectAll', label: 'Seleccionar todo' }));
+
+    menu.popup();
   });
   // DEBUG OPTION ------ REVISAR ANTES DE PRODUCCION
   if (!debug) mainWindow.maximize();
@@ -386,6 +428,10 @@ if (!gotTheLock) {
   app.whenReady().then(() => {
     createWindow();
     setupMenu();
+    // Configurar el idioma del corrector (Español)
+    if (mainWindow && mainWindow.webContents.session) {
+      mainWindow.webContents.session.setSpellCheckerLanguages(['es']);
+    }
   });
 }
 

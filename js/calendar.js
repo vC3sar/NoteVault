@@ -4,6 +4,8 @@ import { refreshIcons } from './utils.js';
 let currentDate = new Date();
 let selectedDate = new Date();
 let scheduleMode = 'lv'; // 'lv' (Lun-Vie) or 'ls' (Lun-Sab)
+let editingEventId = null;
+let editingScheduleId = null;
 
 const monthNames = [
     "Enero", "Febrero", "Marzo", "Abril", "Mayo", "Junio",
@@ -170,7 +172,10 @@ export function renderDayDetails(date) {
                         <h5 class="font-bold text-sm text-on-surface">${e.title}</h5>
                         ${e.description ? `<p class="text-xs text-on-surface-variant mt-1">${e.description}</p>` : ''}
                     </div>
-                    <button onclick="window.calendarEngine.deleteEvent('${e.id}')" class="text-on-surface-variant opacity-0 group-hover:opacity-100 hover:text-error transition-all p-1 active:scale-95 shrink-0"><i data-lucide="trash-2" class="w-4 h-4"></i></button>
+                    <div class="flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-all shrink-0">
+                        <button onclick="window.calendarEngine.showEventModal('${e.id}')" class="text-on-surface-variant hover:text-primary transition-all p-1 active:scale-95"><i data-lucide="edit-3" class="w-4 h-4"></i></button>
+                        <button onclick="window.calendarEngine.deleteEvent('${e.id}')" class="text-on-surface-variant hover:text-error transition-all p-1 active:scale-95"><i data-lucide="trash-2" class="w-4 h-4"></i></button>
+                    </div>
                 </div>
             `;
             eventsList.appendChild(evt);
@@ -179,10 +184,25 @@ export function renderDayDetails(date) {
     refreshIcons();
 }
 
-export function showEventModal() {
-    document.getElementById('event-title').value = '';
-    document.getElementById('event-desc').value = '';
-    document.getElementById('event-color').value = '#4338ca';
+export function showEventModal(id = null) {
+    editingEventId = id;
+    const modalTitle = document.querySelector('#event-modal-overlay h4');
+    
+    if (id) {
+        const event = state.calendar.events.find(e => e.id === id);
+        if (event) {
+            document.getElementById('event-title').value = event.title;
+            document.getElementById('event-desc').value = event.description || '';
+            document.getElementById('event-color').value = event.color || '#4338ca';
+            if (modalTitle) modalTitle.textContent = 'Editar Evento';
+        }
+    } else {
+        document.getElementById('event-title').value = '';
+        document.getElementById('event-desc').value = '';
+        document.getElementById('event-color').value = '#4338ca';
+        if (modalTitle) modalTitle.textContent = 'Añadir Evento';
+    }
+    
     document.getElementById('event-modal-overlay').classList.remove('hidden');
 }
 
@@ -193,16 +213,27 @@ export async function saveEvent() {
     
     if (!title) return; // Add simple validation if needed
     
-    const newEvent = {
-        id: Date.now().toString(),
-        date: selectedDate.toISOString().split('T')[0],
-        title,
-        description: desc,
-        color
-    };
-    
-    if (!state.calendar.events) state.calendar.events = [];
-    state.calendar.events.push(newEvent);
+    if (editingEventId) {
+        const index = state.calendar.events.findIndex(e => e.id === editingEventId);
+        if (index !== -1) {
+            state.calendar.events[index] = {
+                ...state.calendar.events[index],
+                title,
+                description: desc,
+                color
+            };
+        }
+    } else {
+        const newEvent = {
+            id: Date.now().toString(),
+            date: selectedDate.toISOString().split('T')[0],
+            title,
+            description: desc,
+            color
+        };
+        if (!state.calendar.events) state.calendar.events = [];
+        state.calendar.events.push(newEvent);
+    }
     
     await saveAll();
     
@@ -219,12 +250,16 @@ export async function deleteEvent(id) {
 }
 
 export function showScheduleModal() {
+    editingScheduleId = null;
     document.getElementById('schedule-subject').value = '';
     document.getElementById('schedule-start').value = '';
     document.getElementById('schedule-end').value = '';
     document.getElementById('schedule-color').value = '#10b981';
     document.getElementById('schedule-day').value = '1';
     
+    const addBtn = document.querySelector('#schedule-modal-overlay button[onclick*="addScheduleItem"]');
+    if (addBtn) addBtn.innerHTML = '<i data-lucide="plus" class="w-4 h-4"></i> Añadir al Horario';
+
     renderScheduleModalList();
     document.getElementById('schedule-modal-overlay').classList.remove('hidden');
 }
@@ -246,17 +281,30 @@ export async function addScheduleItem() {
     
     if (!subject || !start || !end) return;
     
-    const newItem = {
-        id: Date.now().toString(),
-        day,
-        start,
-        end,
-        subject,
-        color
-    };
-    
-    if (!state.calendar.schedule) state.calendar.schedule = [];
-    state.calendar.schedule.push(newItem);
+    if (editingScheduleId) {
+        const index = state.calendar.schedule.findIndex(s => s.id === editingScheduleId);
+        if (index !== -1) {
+            state.calendar.schedule[index] = {
+                ...state.calendar.schedule[index],
+                day,
+                start,
+                end,
+                subject,
+                color
+            };
+        }
+    } else {
+        const newItem = {
+            id: Date.now().toString(),
+            day,
+            start,
+            end,
+            subject,
+            color
+        };
+        if (!state.calendar.schedule) state.calendar.schedule = [];
+        state.calendar.schedule.push(newItem);
+    }
     
     // Sort by start time
     state.calendar.schedule.sort((a, b) => a.start.localeCompare(b.start));
@@ -268,10 +316,31 @@ export async function addScheduleItem() {
     renderCalendar();
     renderDayDetails(selectedDate);
     
+    editingScheduleId = null;
+    const addBtn = document.querySelector('#schedule-modal-overlay button[onclick*="addScheduleItem"]');
+    if (addBtn) addBtn.innerHTML = '<i data-lucide="plus" class="w-4 h-4"></i> Añadir al Horario';
+
     // Reset inputs
     document.getElementById('schedule-subject').value = '';
     document.getElementById('schedule-start').value = '';
     document.getElementById('schedule-end').value = '';
+}
+
+export function editScheduleItem(id) {
+    editingScheduleId = id;
+    const item = state.calendar.schedule.find(s => s.id === id);
+    if (!item) return;
+
+    document.getElementById('schedule-subject').value = item.subject;
+    document.getElementById('schedule-start').value = item.start;
+    document.getElementById('schedule-end').value = item.end;
+    document.getElementById('schedule-color').value = item.color;
+    document.getElementById('schedule-day').value = item.day.toString();
+
+    const addBtn = document.querySelector('#schedule-modal-overlay button[onclick*="addScheduleItem"]');
+    if (addBtn) addBtn.innerHTML = '<i data-lucide="save" class="w-4 h-4"></i> Guardar Cambios';
+
+    document.querySelector('#schedule-modal-overlay .space-y-4').scrollTop = 0;
 }
 
 export async function deleteScheduleItem(id) {
@@ -361,7 +430,10 @@ function renderScheduleModalList() {
                         <div class="text-[10px] font-bold text-on-surface-variant opacity-70">${item.start} - ${item.end}</div>
                     </div>
                 </div>
-                <button onclick="window.calendarEngine.deleteScheduleItem('${item.id}')" class="text-on-surface-variant hover:text-error p-1.5 transition-colors active:scale-95"><i data-lucide="trash-2" class="w-3.5 h-3.5"></i></button>
+                <div class="flex items-center gap-1">
+                    <button onclick="window.calendarEngine.editScheduleItem('${item.id}')" class="text-on-surface-variant hover:text-primary p-1.5 transition-colors active:scale-95"><i data-lucide="edit-3" class="w-3.5 h-3.5"></i></button>
+                    <button onclick="window.calendarEngine.deleteScheduleItem('${item.id}')" class="text-on-surface-variant hover:text-error p-1.5 transition-colors active:scale-95"><i data-lucide="trash-2" class="w-3.5 h-3.5"></i></button>
+                </div>
             `;
             group.appendChild(el);
         });

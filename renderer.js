@@ -23,8 +23,10 @@ window.applyTheme = applyTheme;
 window.saveAll = saveAll;
 window.toggleNotesPanel = toggleNotesPanel;
 
-// Initialization
-window.addEventListener('DOMContentLoaded', async () => {
+// Initialization — wait for all HTML partials to be injected into the DOM.
+// ES modules are deferred, so partials:ready may fire before this listener
+// is registered. The window.partialsReady flag handles that race condition.
+async function initApp() {
     const savedData = await window.api.loadData();
     state.notebooks = savedData.notebooks || [];
     state.trash = savedData.trash || [];
@@ -60,7 +62,15 @@ window.addEventListener('DOMContentLoaded', async () => {
     
     setupIPC();
     setupEventListeners();
-});
+}
+
+// Start: if partials already loaded (loader ran before module), init now.
+// Otherwise, wait for the event.
+if (window.partialsReady) {
+    initApp();
+} else {
+    document.addEventListener('partials:ready', initApp);
+}
 
 let periodicTimer = null;
 export function startPeriodicAutosave() {

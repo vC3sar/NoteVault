@@ -1,0 +1,98 @@
+<!-- NOTEBOOK VIEW (Editor + Note List) -->
+<div id="notebook-view" class="flex-1 flex overflow-hidden" style="display:none;">
+    <!-- Panel 2: Notes List -->
+    <section id="notes-panel"
+        class="w-72 md:w-80 border-r border-outline-variant/10 bg-surface-container-lowest flex flex-col overflow-hidden shrink-0 transition-all duration-300">
+        <div class="p-4 border-b border-outline-variant/10 flex items-center justify-between gap-1">
+            <h3 id="panel-notebook-name" class="font-bold text-lg text-on-surface truncate flex-1">Nombre
+                Libreta</h3>
+            <button id="panel-add-note" title="Nueva nota"
+                class="shrink-0 flex items-center justify-center w-8 h-8 rounded-lg bg-primary/10 hover:bg-primary/20 text-primary transition-colors active:scale-95">
+                <i data-lucide="plus" style="width:16px;height:16px;"></i>
+            </button>
+            <button id="collapse-notes-panel" title="Ocultar notas" onclick="window.toggleNotesPanel()"
+                class="shrink-0 flex items-center justify-center w-8 h-8 rounded-lg hover:bg-surface-container-high text-on-surface-variant transition-colors active:scale-95">
+                <i data-lucide="panel-left-close" class="w-4 h-4"></i>
+            </button>
+        </div>
+        <div class="relative flex-1 overflow-hidden">
+            <div id="notes-list" class="absolute inset-0 overflow-y-auto custom-scrollbar p-3 space-y-1"></div>
+            <div id="notes-empty-state"
+                class="hidden absolute inset-0 flex-col items-center justify-center p-8 text-center text-on-surface-variant pointer-events-none select-none">
+                <i data-lucide="notebook-pen" class="w-10 h-10 mb-3 opacity-30"></i>
+                <p class="text-sm font-medium opacity-60">Aún no hay notas,<br>crea una para comenzar.</p>
+            </div>
+        </div>
+    </section>
+
+    <!-- Panel 3: Editor -->
+    <section id="editor-panel" class="flex-1 bg-surface-container-low flex flex-col overflow-hidden relative">
+
+        <button id="show-notes-panel-btn" title="Ver Lista de Notas" onclick="window.toggleNotesPanel()"
+            class="hidden absolute top-6 left-6 md:left-8 p-2.5 bg-surface-container/80 backdrop-blur-sm rounded-xl shadow-sm border border-outline-variant/20 text-on-surface-variant hover:text-primary hover:bg-surface-container-high transition-colors z-20">
+            <i data-lucide="panel-left" class="w-5 h-5"></i>
+        </button>
+
+        <button id="toggle-attachments" title="Ver Adjuntos"
+            class="hidden absolute top-6 right-8 p-2.5 bg-surface-container/80 backdrop-blur-sm rounded-xl shadow-sm border border-outline-variant/20 text-on-surface-variant hover:text-primary hover:bg-surface-container-high transition-colors z-20">
+            <i data-lucide="paperclip" class="w-5 h-5"></i>
+        </button>
+
+        <div id="editor-empty-state"
+            class="absolute inset-0 flex flex-col items-center justify-center p-8 text-center text-on-surface-variant z-10 bg-surface-container-low">
+            <i data-lucide="file-edit" class="w-16 h-16 mb-4 opacity-40"></i>
+            <h3 class="text-xl font-bold text-on-surface">Ninguna nota seleccionada</h3>
+            <p class="text-sm mt-2 opacity-80">Selecciona una nota de la lista o crea una nueva.</p>
+        </div>
+
+        <div id="editor-container" class="flex-1 overflow-y-auto p-8 md:p-12 xl:px-16 w-full mb-20">
+            <input type="text" id="note-title" placeholder="Título de la nota..."
+                class="text-4xl font-extrabold tracking-tight text-on-surface bg-transparent border-none outline-none mb-6 w-full placeholder:text-on-surface-variant/30 leading-tight">
+            <div id="editor" contenteditable="true" spellcheck="true" placeholder="Escribe tus apuntes aquí..."
+                class="text-lg text-on-surface leading-relaxed outline-none min-h-[50vh]"></div>
+        </div>
+
+        <div id="editor-status-bar"
+            class="hidden absolute bottom-6 right-8 flex items-center bg-surface-container-lowest border border-outline-variant/20 rounded-full px-4 py-2 shadow-lg gap-3 z-20">
+            <div class="flex items-center gap-1.5 px-3 border-r border-outline-variant/20 mr-1">
+                <i data-lucide="type" class="w-4 h-4 text-primary"></i>
+                <span id="word-count" class="text-sm font-semibold text-on-surface-variant">0 palabras</span>
+            </div>
+            <button id="zoom-out" title="Alejar"
+                class="text-on-surface-variant hover:text-primary transition-colors"><i
+                    data-lucide="minus"></i></button>
+            <input type="range" id="zoom-slider" min="50" max="200" value="100" step="10"
+                class="w-24 accent-primary">
+            <button id="zoom-in" title="Acercar"
+                class="text-on-surface-variant hover:text-primary transition-colors"><i
+                    data-lucide="plus"></i></button>
+            <span id="zoom-label"
+                class="text-sm font-semibold min-w-[3ch] text-right text-on-surface-variant">100%</span>
+        </div>
+    </section>
+
+    <!-- Panel 4: Attachments -->
+    <section id="attachments-panel"
+        class="w-72 border-l border-outline-variant/10 bg-surface-container-lowest hidden flex-col overflow-hidden shrink-0 transition-all duration-300">
+        <div
+            class="p-4 border-b border-outline-variant/10 flex justify-between items-center bg-surface/50 backdrop-blur-sm shrink-0">
+            <h3 class="font-bold text-sm text-on-surface flex items-center gap-2 uppercase tracking-wide"><i
+                    data-lucide="paperclip" class="w-4 h-4 text-primary"></i> Adjuntos</h3>
+            <button id="close-attachments"
+                class="text-on-surface-variant hover:text-error hover:bg-error-container rounded-lg p-1.5 transition-colors"><i
+                    data-lucide="x" class="w-4 h-4"></i></button>
+        </div>
+        <div class="px-4 py-3 border-b border-outline-variant/10 shrink-0">
+            <div class="relative group">
+                <i data-lucide="search"
+                    class="absolute left-3 top-1/2 -translate-y-1/2 text-on-surface-variant w-4 h-4 group-focus-within:text-primary transition-colors"></i>
+                <input type="text" id="search-attachments"
+                    class="w-full pl-9 pr-3 py-2 bg-surface-container border-none rounded-lg text-sm focus:ring-2 focus:ring-primary/20 transition-all outline-none placeholder:text-on-surface-variant/60"
+                    placeholder="Buscar imágenes...">
+            </div>
+        </div>
+        <div id="attachments-list" class="flex-1 overflow-y-auto custom-scrollbar p-3 space-y-2">
+            <!-- Dynamic rendering -->
+        </div>
+    </section>
+</div>

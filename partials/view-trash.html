@@ -1,0 +1,26 @@
+<!-- TRASH VIEW -->
+<div id="trash-view" class="flex-1 overflow-y-auto p-8 custom-scrollbar relative hidden">
+    <div class="mb-12 flex items-end justify-between max-w-7xl mx-auto w-full">
+        <div class="pr-8">
+            <h2 class="text-4xl font-extrabold tracking-tighter text-on-surface mb-2">Papelera</h2>
+            <p class="text-on-surface-variant text-lg font-medium opacity-70">Notas eliminadas (se borrarán en
+                30 días por defecto - Puedes cambiarlo en la configuración)</p>
+        </div>
+        <button id="empty-trash"
+            class="flex items-center gap-2 px-4 py-2 text-sm font-bold text-error border border-error/20 dark:border-error/40 hover:bg-error-container rounded-xl transition-colors">
+            <i data-lucide="trash-2" style="width:16px;"></i> Vaciar papelera
+        </button>
+    </div>
+
+    <div id="trash-list"
+        class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6 max-w-7xl mx-auto w-full">
+    </div>
+
+    <!-- Empty state for trash -->
+    <div id="trash-empty-state"
+        class="hidden flex-col items-center justify-center p-20 text-center text-on-surface-variant">
+        <i data-lucide="trash" class="w-16 h-16 mb-4 opacity-40"></i>
+        <h3 class="text-xl font-bold text-on-surface">La papelera está vacía</h3>
+        <p class="text-sm mt-2 opacity-80">Las notas que elimines aparecerán aquí.</p>
+    </div>
+</div>
