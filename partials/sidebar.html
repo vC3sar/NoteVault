@@ -9,8 +9,7 @@
             <i data-lucide="book-marked" class="text-white w-5 h-5 drop-shadow-sm"></i>
         </div>
         <div class="sidebar-text transition-opacity duration-300 flex flex-col items-start justify-center">
-            <h1
-                class="font-extrabold text-indigo-700 dark:text-indigo-400 whitespace-nowrap logo-font leading-none">
+            <h1 class="font-extrabold text-indigo-700 dark:text-indigo-400 whitespace-nowrap logo-font leading-none">
                 NoteVault
             </h1>
             <p style="padding-left: 1px;" id="pro-edition"
@@ -22,30 +21,30 @@
     <!-- Navigation -->
     <nav class="flex-1 flex flex-col overflow-hidden min-h-0">
         <div id="main-nav-links" class="flex flex-col space-y-1 shrink-0">
-        <a id="nav-library" title="Librería"
-            class="nav-item active text-slate-600 dark:text-slate-400 hover:bg-slate-200/40 dark:hover:bg-slate-800/40 rounded-lg flex items-center gap-3 px-3 py-2.5 cursor-pointer active:scale-95 transition-colors duration-200 font-medium text-sm overflow-hidden"
-            onclick="showDashboard('all')">
-            <i data-lucide="library" class="shrink-0"></i>
-            <span class="sidebar-text whitespace-nowrap transition-opacity duration-300">Librería</span>
-        </a>
-        <a id="nav-favorites" title="Favoritos"
-            class="nav-item text-slate-600 dark:text-slate-400 hover:bg-slate-200/40 dark:hover:bg-slate-800/40 rounded-lg flex items-center gap-3 px-3 py-2.5 cursor-pointer active:scale-95 transition-colors duration-200 font-medium text-sm overflow-hidden"
-            onclick="showDashboard('favorites')">
-            <i data-lucide="star" class="shrink-0"></i>
-            <span class="sidebar-text whitespace-nowrap transition-opacity duration-300">Favoritos</span>
-        </a>
-        <a id="nav-calendar" title="Calendario y Horario"
-            class="nav-item text-slate-600 dark:text-slate-400 hover:bg-slate-200/40 dark:hover:bg-slate-800/40 rounded-lg flex items-center gap-3 px-3 py-2.5 cursor-pointer active:scale-95 transition-colors duration-200 font-medium text-sm overflow-hidden"
-            onclick="window.showCalendar()">
-            <i data-lucide="calendar-days" class="shrink-0"></i>
-            <span class="sidebar-text whitespace-nowrap transition-opacity duration-300">Calendario</span>
-        </a>
-        <a id="nav-trash" title="Papelera"
-            class="nav-item text-slate-600 dark:text-slate-400 hover:bg-slate-200/40 dark:hover:bg-slate-800/40 rounded-lg flex items-center gap-3 px-3 py-2.5 cursor-pointer active:scale-95 transition-colors duration-200 font-medium text-sm overflow-hidden"
-            onclick="showTrash()">
-            <i data-lucide="trash-2" class="shrink-0"></i>
-            <span class="sidebar-text whitespace-nowrap transition-opacity duration-300">Papelera</span>
-        </a>
+            <a id="nav-library" title="Librería"
+                class="nav-item active text-slate-600 dark:text-slate-400 hover:bg-slate-200/40 dark:hover:bg-slate-800/40 rounded-lg flex items-center gap-3 px-3 py-2.5 cursor-pointer active:scale-95 transition-colors duration-200 font-medium text-sm overflow-hidden"
+                onclick="showDashboard('all')">
+                <i data-lucide="library" class="shrink-0"></i>
+                <span class="sidebar-text whitespace-nowrap transition-opacity duration-300">Librería</span>
+            </a>
+            <a id="nav-favorites" title="Favoritos"
+                class="nav-item text-slate-600 dark:text-slate-400 hover:bg-slate-200/40 dark:hover:bg-slate-800/40 rounded-lg flex items-center gap-3 px-3 py-2.5 cursor-pointer active:scale-95 transition-colors duration-200 font-medium text-sm overflow-hidden"
+                onclick="showDashboard('favorites')">
+                <i data-lucide="star" class="shrink-0"></i>
+                <span class="sidebar-text whitespace-nowrap transition-opacity duration-300">Favoritos</span>
+            </a>
+            <a id="nav-calendar" title="Calendario y Horario"
+                class="nav-item text-slate-600 dark:text-slate-400 hover:bg-slate-200/40 dark:hover:bg-slate-800/40 rounded-lg flex items-center gap-3 px-3 py-2.5 cursor-pointer active:scale-95 transition-colors duration-200 font-medium text-sm overflow-hidden"
+                onclick="window.showCalendar()">
+                <i data-lucide="calendar-days" class="shrink-0"></i>
+                <span class="sidebar-text whitespace-nowrap transition-opacity duration-300">Calendario</span>
+            </a>
+            <a id="nav-trash" title="Papelera"
+                class="nav-item text-slate-600 dark:text-slate-400 hover:bg-slate-200/40 dark:hover:bg-slate-800/40 rounded-lg flex items-center gap-3 px-3 py-2.5 cursor-pointer active:scale-95 transition-colors duration-200 font-medium text-sm overflow-hidden"
+                onclick="showTrash()">
+                <i data-lucide="trash-2" class="shrink-0"></i>
+                <span class="sidebar-text whitespace-nowrap transition-opacity duration-300">Papelera</span>
+            </a>
         </div>
 
 
@@ -71,27 +70,25 @@
                     class="text-on-surface-variant hover:text-error transition-colors shrink-0"><i data-lucide="x"
                         class="w-3 h-3"></i></button>
             </div>
-            <div
-                class="bg-slate-800 dark:bg-slate-900 rounded-xl p-4 shadow-md border border-slate-700 dark:border-slate-800 relative overflow-hidden group">
+            <div class="glass-player-card p-4 relative group">
                 <div
-                    class="absolute inset-0 bg-gradient-to-br from-indigo-500/20 to-transparent pointer-events-none">
+                    class="absolute inset-0 bg-gradient-to-br from-indigo-500/10 dark:from-indigo-500/15 via-transparent to-transparent pointer-events-none opacity-50 group-hover:opacity-100 transition-opacity duration-500 rounded-[8px]">
                 </div>
-                <div class="relative z-10 overflow-hidden">
-                    <div class="truncate text-sm font-extrabold text-white drop-shadow-sm sidebar-text transition-opacity duration-300"
-                        id="media-title">Sin
-                        reproducción</div>
-                    <div class="truncate text-xs text-slate-400 font-medium mt-0.5 sidebar-text transition-opacity duration-300"
+                <div class="relative z-10">
+                    <div class="truncate text-sm font-extrabold text-indigo-950 dark:text-white drop-shadow-sm sidebar-text transition-opacity duration-300"
+                        id="media-title">Sin reproducción</div>
+                    <div class="truncate text-xs text-indigo-600 dark:text-slate-400 font-medium mt-0.5 sidebar-text transition-opacity duration-300"
                         id="media-artist">...</div>
-                    <div class="flex items-center justify-center gap-4 mt-4">
-                        <button onclick="window.api.mediaPrev()"
-                            class="p-1 text-slate-400 hover:text-white transition-colors active:scale-95"><i
+                    <div class="flex items-center justify-center gap-5 mt-1">
+                        <button onclick="window.api.mediaPrev()" title="Anterior" class="player-btn-secondary"><i
                                 data-lucide="skip-back" class="w-4 h-4 fill-current"></i></button>
-                        <button onclick="window.api.mediaToggle()"
-                            class="p-2.5 bg-indigo-500 text-white rounded-full hover:bg-indigo-400 hover:scale-105 active:scale-95 transition-all shadow-lg shadow-indigo-500/20"><i
-                                data-lucide="play" id="media-play-icon"
-                                class="w-4 h-4 fill-current ml-0.5"></i></button>
-                        <button onclick="window.api.mediaNext()"
-                            class="p-1 text-slate-400 hover:text-white transition-colors active:scale-95"><i
+
+                        <button onclick="window.api.mediaToggle()" title="Reproducir/Pausa"
+                            class="player-play-btn w-11 h-11 rounded-full flex items-center justify-center">
+                            <i data-lucide="play" id="media-play-icon" class="w-5 h-5 fill-current ml-0.5"></i>
+                        </button>
+
+                        <button onclick="window.api.mediaNext()" title="Siguiente" class="player-btn-secondary"><i
                                 data-lucide="skip-forward" class="w-4 h-4 fill-current"></i></button>
                     </div>
                 </div>
