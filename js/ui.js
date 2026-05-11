@@ -250,24 +250,84 @@ export function refreshSidebarState() {
     } else {
         sidebar.classList.remove('collapsed');
     }
-}export function updateGreeting() {
-    const greetingContainer = document.getElementById('user-greeting');
-    const greetingTextEl = document.getElementById('user-greeting-text');
-    if (!greetingContainer || !greetingTextEl) return;
+}let greetingInterval = null;
+let greetingToggleState = false;
 
-    // Only show in Library view ('all'), if no notebook is active, and if name is defined
-    if (state.currentView !== 'all' || state.activeNotebookId || !state.profile || !state.profile.name) {
-        greetingContainer.classList.add('hidden');
-        return;
+export function updateGreeting() {
+    if (greetingInterval) {
+        clearInterval(greetingInterval);
+        greetingInterval = null;
     }
+    
+    greetingToggleState = false;
 
-    const hours = new Date().getHours();
-    let greeting = "Buenas noches";
-    if (hours >= 6 && hours < 12) greeting = "Buenos días";
-    else if (hours >= 12 && hours < 20) greeting = "Buenas tardes";
+    const update = () => {
+        const greetingContainer = document.getElementById('user-greeting');
+        const greetingTextEl = document.getElementById('user-greeting-text');
+        if (!greetingContainer || !greetingTextEl) return;
 
-    greetingTextEl.textContent = `${greeting}, ${state.profile.name.split(' ')[0]}`;
-    greetingContainer.classList.remove('hidden');
+        if (state.currentView !== 'all' || state.activeNotebookId || !state.profile || !state.profile.name) {
+            greetingContainer.classList.add('hidden');
+            return;
+        }
+
+        const now = new Date();
+        const hours = now.getHours();
+        let greeting = "Buenas noches";
+        if (hours >= 6 && hours < 12) greeting = "Buenos días";
+        else if (hours >= 12 && hours < 20) greeting = "Buenas tardes";
+
+        const name = state.profile.name.split(' ')[0];
+        let baseGreeting = `${greeting}, ${name}`;
+        let classMessageHTML = null;
+
+        if (state.calendar && state.calendar.schedule) {
+            let currentDay = now.getDay();
+            if (currentDay === 0) currentDay = 7; // Sunday = 7
+
+            const currentHourStr = hours.toString().padStart(2, '0') + ':' + now.getMinutes().toString().padStart(2, '0');
+            const todaysClasses = state.calendar.schedule.filter(s => parseInt(s.day) === currentDay);
+            
+            if (todaysClasses.length > 0) {
+                todaysClasses.sort((a, b) => a.start.localeCompare(b.start));
+                
+                let activeClass = todaysClasses.find(c => currentHourStr >= c.start && currentHourStr <= c.end);
+                let nextClass = todaysClasses.find(c => currentHourStr < c.start);
+                
+                if (activeClass) {
+                    classMessageHTML = `<span class="font-light text-on-surface-variant">Estás en clase de</span> <span class="font-bold text-primary">${activeClass.subject}</span>`;
+                } else if (nextClass) {
+                    classMessageHTML = `<span class="font-light text-on-surface-variant">Próxima clase:</span> <span class="font-bold text-primary">${nextClass.subject}</span> <span class="font-medium text-on-surface-variant/50 text-xl ml-1">a las ${nextClass.start}</span>`;
+                }
+            }
+        }
+
+        if (classMessageHTML) {
+            // Apply a small fade effect for smoothness
+            greetingTextEl.style.opacity = '0';
+            setTimeout(() => {
+                if (greetingToggleState) {
+                    greetingTextEl.innerHTML = classMessageHTML;
+                    greetingTextEl.className = 'text-3xl tracking-tight mt-1';
+                } else {
+                    greetingTextEl.textContent = baseGreeting;
+                    greetingTextEl.className = 'text-4xl font-black text-on-surface tracking-tighter';
+                }
+                greetingTextEl.style.opacity = '1';
+                greetingTextEl.style.transition = 'opacity 0.3s ease';
+                greetingToggleState = !greetingToggleState;
+            }, 300);
+        } else {
+            greetingTextEl.textContent = baseGreeting;
+            greetingTextEl.className = 'text-4xl font-black text-on-surface tracking-tighter';
+            greetingToggleState = false;
+        }
+
+        greetingContainer.classList.remove('hidden');
+    };
+
+    update();
+    greetingInterval = setInterval(update, 5000);
 }
 
 export function toggleNotesPanel() {

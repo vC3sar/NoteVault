@@ -19,7 +19,7 @@ function createWindow(debug, checkMedia) {
     height: 800,
     show: false,
     webPreferences: {
-      preload: path.join(__dirname, '../../preload.js'),
+      preload: path.join(__dirname, '..', 'preload.js'),
       contextIsolation: true,
       nodeIntegration: false,
       spellcheck: true
@@ -71,7 +71,7 @@ function createWindow(debug, checkMedia) {
   if (!debug) mainWindow.maximize();
   mainWindow.show();
 
-  mainWindow.loadFile('index.html');
+  mainWindow.loadFile(path.join(__dirname, '..', 'index.html'));
 
   // Media polling
   if (typeof checkMedia === 'function') {

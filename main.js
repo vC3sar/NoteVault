@@ -9,19 +9,19 @@ const { app } = require('electron');
 const path = require('path');
 const fs = require('fs');
 
-const { createWindow }          = require('./src/main/window');
-const { setupMenu }             = require('./src/main/menu');
-const { registerIpcHandlers }   = require('./src/main/ipc-handlers');
-const { initMedia, checkMedia } = require('./src/main/media');
+const { createWindow } = require('./modules/window');
+const { setupMenu } = require('./modules/menu');
+const { registerIpcHandlers } = require('./modules/ipc-handlers');
+const { initMedia, checkMedia } = require('./modules/media');
 
 // ── Configuración de identidad ─────────────────────────────────────────────
 app.setAppUserModelId('ovh.vazquezsg.NoteVault');
 app.name = 'NoteVault';
 
 // ── Rutas de datos de usuario ──────────────────────────────────────────────
-const DATA_PATH       = path.join(app.getPath('userData'), 'notes_data.json');
-const NOTES_DIR       = path.join(app.getPath('userData'), 'notes');
-const COVERS_DIR      = path.join(app.getPath('userData'), 'covers');
+const DATA_PATH = path.join(app.getPath('userData'), 'notes_data.json');
+const NOTES_DIR = path.join(app.getPath('userData'), 'notes');
+const COVERS_DIR = path.join(app.getPath('userData'), 'covers');
 const ATTACHMENTS_DIR = path.join(app.getPath('userData'), 'attachments');
 
 // Asegurar que existan los directorios

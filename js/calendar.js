@@ -317,8 +317,11 @@ export async function addScheduleItem() {
     renderDayDetails(selectedDate);
     
     editingScheduleId = null;
-    const addBtn = document.querySelector('#schedule-modal-overlay button[onclick*="addScheduleItem"]');
-    if (addBtn) addBtn.innerHTML = '<i data-lucide="plus" class="w-4 h-4"></i> Añadir al Horario';
+    const addBtn = document.getElementById('schedule-add-btn');
+    if (addBtn) {
+        addBtn.innerHTML = '<i data-lucide="plus" class="w-4 h-4"></i> Añadir al Horario';
+        if (typeof refreshIcons === 'function') refreshIcons();
+    }
 
     // Reset inputs
     document.getElementById('schedule-subject').value = '';
@@ -337,8 +340,11 @@ export function editScheduleItem(id) {
     document.getElementById('schedule-color').value = item.color;
     document.getElementById('schedule-day').value = item.day.toString();
 
-    const addBtn = document.querySelector('#schedule-modal-overlay button[onclick*="addScheduleItem"]');
-    if (addBtn) addBtn.innerHTML = '<i data-lucide="save" class="w-4 h-4"></i> Guardar Cambios';
+    const addBtn = document.getElementById('schedule-add-btn');
+    if (addBtn) {
+        addBtn.innerHTML = '<i data-lucide="save" class="w-4 h-4"></i> Guardar Cambios';
+        if (typeof refreshIcons === 'function') refreshIcons();
+    }
 
     document.querySelector('#schedule-modal-overlay .space-y-4').scrollTop = 0;
 }
@@ -368,7 +374,7 @@ export function renderScheduleList() {
         hasItems = true;
         
         const dayHeader = document.createElement('div');
-        dayHeader.className = 'text-[10px] font-black uppercase tracking-widest text-on-surface-variant/50 mt-4 mb-2 -ml-3';
+        dayHeader.className = 'text-[10px] font-black uppercase tracking-widest text-on-surface-variant/50 mt-4 mb-2 -ml-4 pl-1 py-1 bg-surface-container-lowest relative z-10';
         dayHeader.textContent = dayNames[day];
         list.appendChild(dayHeader);
         
