@@ -7,6 +7,7 @@ const path = require('path');
 
 let mainWindow = null;
 let mediaPollInterval = null;
+const APP_ICON = path.join(__dirname, '..', 'img', 'logo.ico');
 
 /**
  * Crea y configura la ventana principal de la aplicación.
@@ -19,6 +20,7 @@ function createWindow(debug, checkMedia) {
     width: 1200,
     height: 800,
     show: false,
+    icon: APP_ICON,
     webPreferences: {
       preload: path.join(__dirname, '..', 'preload.js'),
       contextIsolation: true,
