@@ -4,6 +4,174 @@ export function refreshIcons() {
     }
 }
 
+export function escapeHTML(value) {
+    return String(value ?? '')
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;')
+        .replace(/'/g, '&#39;');
+}
+
+export function stripHTML(html) {
+    if (!html) return '';
+    const parser = new DOMParser();
+    const doc = parser.parseFromString(String(html), 'text/html');
+    return (doc.body.textContent || '').replace(/\s+/g, ' ').trim();
+}
+
+function sanitizeStyleValue(styleValue) {
+    return String(styleValue)
+        .replace(/\/\*[\s\S]*?\*\//g, '')
+        .replace(/url\s*\(\s*[^)]*\)/gi, '')
+        .replace(/expression\s*\([^)]*\)/gi, '')
+        .replace(/javascript\s*:/gi, '')
+        .replace(/vbscript\s*:/gi, '')
+        .replace(/behavior\s*:/gi, '')
+        .replace(/@import/gi, '')
+        .trim();
+}
+
+function sanitizeUrlAttribute(value, allowData = false) {
+    const raw = String(value ?? '').trim();
+    if (!raw) return '';
+    if (/^file:/i.test(raw)) return raw;
+    if (/^https?:/i.test(raw)) return raw;
+    if (/^blob:/i.test(raw)) return raw;
+    if (allowData && /^data:image\//i.test(raw)) return raw;
+    if (/^mailto:/i.test(raw) || /^tel:/i.test(raw)) return raw;
+    return '';
+}
+
+function unwrapElement(el) {
+    const parent = el.parentNode;
+    if (!parent) return;
+    while (el.firstChild) parent.insertBefore(el.firstChild, el);
+    parent.removeChild(el);
+}
+
+const ALLOWED_TAGS = new Set([
+    'A', 'ABBR', 'B', 'BLOCKQUOTE', 'BR', 'CAPTION', 'CITE', 'CODE', 'COL',
+    'COLGROUP', 'DD', 'DEL', 'DETAILS', 'DIV', 'DL', 'DT', 'EM', 'FIGCAPTION',
+    'FIGURE', 'FONT', 'H1', 'H2', 'H3', 'H4', 'H5', 'H6', 'HR', 'I', 'IMG',
+    'INS', 'KBD', 'LABEL', 'LI', 'MARK', 'OL', 'P', 'PRE', 'Q', 'S', 'SAMP',
+    'SECTION', 'SMALL', 'SPAN', 'STRONG', 'SUB', 'SUP', 'TABLE', 'TBODY', 'TD',
+    'TFOOT', 'TH', 'THEAD', 'TR', 'U', 'UL', 'INPUT'
+]);
+
+const SAFE_ATTRS = new Set([
+    'href', 'src', 'alt', 'title', 'class', 'style', 'colspan', 'rowspan',
+    'scope', 'loading', 'target', 'rel', 'type', 'checked', 'disabled',
+    'contenteditable', 'data-lucide', 'color', 'size', 'face', 'dir', 'align'
+]);
+
+export function sanitizeHTML(html) {
+    if (!html) return '';
+    const parser = new DOMParser();
+    const doc = parser.parseFromString(String(html), 'text/html');
+
+    const allElements = Array.from(doc.body.querySelectorAll('*'));
+    for (const el of allElements) {
+        const tag = el.tagName.toUpperCase();
+        if (!ALLOWED_TAGS.has(tag)) {
+            el.remove();
+            continue;
+        }
+
+        for (const attr of Array.from(el.attributes)) {
+            const name = attr.name.toLowerCase();
+            if (name.startsWith('on')) {
+                el.removeAttribute(attr.name);
+                continue;
+            }
+            if (!SAFE_ATTRS.has(name) && !name.startsWith('data-')) {
+                el.removeAttribute(attr.name);
+                continue;
+            }
+
+            if (name === 'style') {
+                const cleaned = sanitizeStyleValue(attr.value);
+                if (cleaned) el.setAttribute('style', cleaned);
+                else el.removeAttribute('style');
+                continue;
+            }
+
+            if (name === 'href') {
+                const cleaned = sanitizeUrlAttribute(attr.value, true);
+                if (cleaned) {
+                    el.setAttribute('href', cleaned);
+                    el.setAttribute('rel', 'noopener noreferrer');
+                } else {
+                    el.removeAttribute('href');
+                }
+                continue;
+            }
+
+            if (name === 'src') {
+                const cleaned = sanitizeUrlAttribute(attr.value, true);
+                if (cleaned) el.setAttribute('src', cleaned);
+                else el.removeAttribute('src');
+                continue;
+            }
+
+            if (name === 'target') {
+                const target = String(attr.value).toLowerCase();
+                if (target !== '_blank' && target !== '_self' && target !== '_parent' && target !== '_top') {
+                    el.removeAttribute('target');
+                }
+                continue;
+            }
+
+            if (tag === 'INPUT' && name === 'type') {
+                const type = String(attr.value).toLowerCase();
+                if (type !== 'checkbox' && type !== 'radio') {
+                    el.setAttribute('type', 'text');
+                }
+                continue;
+            }
+        }
+
+        if (tag === 'INPUT') {
+            const type = (el.getAttribute('type') || '').toLowerCase();
+            if (type !== 'checkbox' && type !== 'radio') {
+                el.setAttribute('type', 'text');
+            }
+            el.removeAttribute('onchange');
+            el.removeAttribute('onclick');
+            el.removeAttribute('oninput');
+        }
+    }
+
+    const forbidden = doc.body.querySelectorAll('script, iframe, object, embed, link, meta, base, form, textarea, select, option, button, svg, math');
+    forbidden.forEach(node => node.remove());
+
+    const iterator = doc.createNodeIterator(doc.body, NodeFilter.SHOW_COMMENT);
+    let currentNode;
+    while ((currentNode = iterator.nextNode())) {
+        currentNode.parentNode.removeChild(currentNode);
+    }
+
+    doc.body.querySelectorAll('img').forEach(img => {
+        const cleanedSrc = sanitizeUrlAttribute(img.getAttribute('src'), true);
+        if (cleanedSrc) img.setAttribute('src', cleanedSrc);
+        else img.removeAttribute('src');
+        img.setAttribute('loading', 'lazy');
+        if (!img.hasAttribute('alt')) img.setAttribute('alt', 'Imagen de nota');
+    });
+
+    doc.body.querySelectorAll('a').forEach(anchor => {
+        const href = sanitizeUrlAttribute(anchor.getAttribute('href'), true);
+        if (href) {
+            anchor.setAttribute('href', href);
+            anchor.setAttribute('rel', 'noopener noreferrer');
+        } else {
+            anchor.removeAttribute('href');
+        }
+    });
+
+    return doc.body.innerHTML;
+}
+
 export function showModal(title, placeholder, initialValue = '') {
     return new Promise((resolve) => {
         const modal = document.getElementById('custom-modal');
@@ -72,35 +240,54 @@ export function showModal(title, placeholder, initialValue = '') {
 
 export function cleanHTML(html) {
     if (!html) return '';
+    const sanitized = sanitizeHTML(html);
     const parser = new DOMParser();
-    const doc = parser.parseFromString(html, 'text/html');
-
-    const allElements = doc.querySelectorAll('*');
-    allElements.forEach(el => {
-        if (el.hasAttribute('style')) {
-            let style = el.getAttribute('style');
-            style = style.replace(/--[a-zA-Z0-9-]+:[^;]+;?/g, '').trim();
-            if (style && style !== ' ') {
-                el.setAttribute('style', style);
-            } else {
-                el.removeAttribute('style');
-            }
+    const doc = parser.parseFromString(sanitized, 'text/html');
+    doc.body.querySelectorAll('*').forEach(el => {
+        if (el.classList) {
+            el.classList.remove('Apple-interchange-newline', 'processed');
+            if (el.classList.length === 0) el.removeAttribute('class');
         }
-        el.classList.remove('Apple-interchange-newline', 'processed');
-        if (el.classList.length === 0) el.removeAttribute('class');
+        if (el.hasAttribute('style')) {
+            const style = sanitizeStyleValue(el.getAttribute('style'));
+            if (style) el.setAttribute('style', style);
+            else el.removeAttribute('style');
+        }
     });
-
-    const iterator = doc.createNodeIterator(doc.body, NodeFilter.SHOW_COMMENT);
-    let currentNode;
-    while (currentNode = iterator.nextNode()) {
-        currentNode.parentNode.removeChild(currentNode);
-    }
-
-    const images = doc.querySelectorAll('img');
-    images.forEach(img => {
-        img.setAttribute('loading', 'lazy');
-        if (!img.hasAttribute('alt')) img.setAttribute('alt', 'Imagen de nota');
-    });
-
     return doc.body.innerHTML;
+}
+
+export function createId() {
+    if (window.crypto && typeof window.crypto.randomUUID === 'function') {
+        return window.crypto.randomUUID();
+    }
+    return `${Date.now().toString(36)}-${Math.random().toString(36).slice(2, 10)}`;
+}
+
+export function safeHexColor(value, fallback = '#2b2d2e') {
+    const raw = String(value ?? '').trim();
+    if (/^#([0-9a-fA-F]{3}|[0-9a-fA-F]{6}|[0-9a-fA-F]{8})$/.test(raw)) return raw;
+    return fallback;
+}
+
+export function hexToRgba(value, alpha = 1, fallback = 'rgba(43,45,46,1)') {
+    const raw = safeHexColor(value, '');
+    if (!raw) return fallback;
+
+    let hex = raw.slice(1);
+    if (hex.length === 3) {
+        hex = hex.split('').map(ch => ch + ch).join('');
+    }
+    if (hex.length === 8) {
+        hex = hex.slice(0, 6);
+    }
+    if (hex.length !== 6) return fallback;
+
+    const r = parseInt(hex.slice(0, 2), 16);
+    const g = parseInt(hex.slice(2, 4), 16);
+    const b = parseInt(hex.slice(4, 6), 16);
+    if ([r, g, b].some(Number.isNaN)) return fallback;
+
+    const clampedAlpha = Math.min(1, Math.max(0, Number(alpha)));
+    return `rgba(${r}, ${g}, ${b}, ${clampedAlpha})`;
 }

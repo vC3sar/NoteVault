@@ -1,5 +1,5 @@
 import { state, saveAll } from './state.js';
-import { refreshIcons, showModal } from './utils.js';
+import { refreshIcons, showModal, escapeHTML, createId, safeHexColor } from './utils.js';
 import { renderNotesList } from './notes.js';
 import { updateGreeting } from './ui.js';
 
@@ -16,7 +16,7 @@ export function renderNotebookGrid(searchQuery = '') {
 
     if (searchQuery) {
         const q = searchQuery.toLowerCase();
-        toDisplay = toDisplay.filter(nb => nb.name.toLowerCase().includes(q));
+        toDisplay = toDisplay.filter(nb => String(nb.name || '').toLowerCase().includes(q));
     }
 
     if (toDisplay.length === 0) {
@@ -42,20 +42,24 @@ export function renderNotebookGrid(searchQuery = '') {
         let visualStyle = '';
         let cardBgStyle = '';
         if (nb.coverType === 'image') {
+            const coverSrcRaw = String(nb.coverValue || '');
+            const coverSrc = coverSrcRaw.startsWith('file:') ? coverSrcRaw : `file:///${coverSrcRaw.replace(/\\/g, '/')}`;
             visualStyle = `
                 <div class="absolute inset-0 z-0">
-                    <img src="file://${nb.coverValue.replace(/\\/g, '/')}" class="w-full h-full object-cover group-hover:scale-105 transition-all duration-700">
+                    <img src="${escapeHTML(coverSrc)}" class="w-full h-full object-cover group-hover:scale-105 transition-all duration-700">
                     <div class="absolute inset-0 bg-gradient-to-t from-black/60 via-black/10 to-transparent pointer-events-none"></div>
                 </div>
                 <div class="notebook-spine">${spineRings}</div>
             `;
         } else {
-            const color = nb.coverValue || '#2b2d2e';
+            const color = safeHexColor(nb.coverValue, '#2b2d2e');
             cardBgStyle = `background-color:${color};`;
             visualStyle = `<div class="notebook-spine" style="background-color: ${color}">${spineRings}</div>`;
         }
 
         const favHtml = nb.isFavorite ? `<i data-lucide="star" style="fill: currentColor;" class="text-amber-400 w-4 h-4 absolute top-4 right-12 z-20"></i>` : '';
+        const safeName = escapeHTML(nb.name || 'Libreta sin nombre');
+        const noteCount = Array.isArray(nb.notes) ? nb.notes.length : 0;
 
         card.className = 'group relative rounded-2xl shadow-sm hover:shadow-xl transition-all duration-300 cursor-pointer overflow-hidden border border-outline-variant/10 aspect-[3/4] max-h-[320px] flex flex-col justify-end';
         card.style.cssText = cardBgStyle || 'background-color: var(--surface-container-lowest, #f8f9fa)';
@@ -66,8 +70,8 @@ export function renderNotebookGrid(searchQuery = '') {
                 <i data-lucide="more-vertical" class="text-on-surface w-5 h-5"></i>
             </button>
             <div class="relative z-10 bg-white/10 dark:bg-black/20 backdrop-blur-md p-2.5 ml-6 mr-2 mb-2 rounded-xl shadow-sm border border-white/20 transition-all">
-                <h3 class="text-lg font-bold text-white drop-shadow-md mb-0.5 break-words leading-tight">${nb.name}</h3>
-                <p class="text-[10px] text-white/80 font-bold uppercase tracking-wide drop-shadow-md mt-1">${nb.notes.length} Notas</p>
+                <h3 class="text-lg font-bold text-white drop-shadow-md mb-0.5 break-words leading-tight">${safeName}</h3>
+                <p class="text-[10px] text-white/80 font-bold uppercase tracking-wide drop-shadow-md mt-1">${noteCount} Notas</p>
             </div>
         `;
 
@@ -99,14 +103,15 @@ export function renderSidebar() {
         item.className = `flex items-center gap-3 px-3 py-2 cursor-pointer transition-colors duration-200 text-sm font-medium rounded-lg group ${isActive ? 'bg-indigo-50/50 dark:bg-indigo-900/20 text-indigo-700 dark:text-indigo-400 font-bold' : 'text-slate-600 dark:text-slate-400 hover:bg-slate-200/40 dark:hover:bg-slate-800/40'}`;
 
         const favIcon = nb.isFavorite ? `<i data-lucide="star" class="w-3 h-3 text-amber-400" style="fill:currentColor;"></i>` : '';
-        const colorIndicator = nb.coverType === 'color' ? `<div class="w-2 h-2 rounded-full" style="background-color: ${nb.coverValue || '#2b2d2e'}"></div>` : `<i data-lucide="image" class="w-3 h-3"></i>`;
+        const colorIndicator = nb.coverType === 'color' ? `<div class="w-2 h-2 rounded-full" style="background-color: ${safeHexColor(nb.coverValue, '#2b2d2e')}"></div>` : `<i data-lucide="image" class="w-3 h-3"></i>`;
+        const safeName = escapeHTML(nb.name || 'Libreta sin nombre');
 
         item.title = nb.name;
         if (nb.isFavorite) item.classList.add('is-favorite');
 
         item.innerHTML = `
             <div class="shrink-0 flex items-center justify-center">${colorIndicator}</div>
-            <span class="truncate flex-1 sidebar-text transition-opacity duration-300">${nb.name}</span>
+            <span class="truncate flex-1 sidebar-text transition-opacity duration-300">${safeName}</span>
             <div class="shrink-0 notebook-fav-icon">${favIcon}</div>
         `;
 
@@ -221,7 +226,7 @@ export async function addNotebook() {
         }
 
         const newNb = {
-            id: Date.now().toString(),
+            id: createId(),
             name,
             coverType,
             coverValue,
@@ -259,7 +264,7 @@ export function renderRecentNotes() {
     const allNotes = [];
     state.notebooks.forEach(nb => {
         (nb.notes || []).forEach(note => {
-            const ts = note.lastEdited || parseInt(note.id) || 0;
+            const ts = note.lastEdited || note.createdAt || (String(note.id || '').match(/^\d+$/) ? parseInt(note.id) : 0);
             allNotes.push({ note, notebook: nb, ts });
         });
     });
@@ -280,15 +285,16 @@ export function renderRecentNotes() {
     recent.forEach(({ note, notebook, ts }) => {
         const item = document.createElement('div');
         item.className = 'group flex items-center justify-between gap-4 py-3.5 px-4 rounded-2xl cursor-pointer hover:bg-surface-container transition-colors border border-transparent hover:border-outline-variant/10';
+        const safeNotebookName = escapeHTML(notebook.name || 'Libreta sin nombre');
         item.innerHTML = `
             <div class="flex items-center gap-3 overflow-hidden">
                 <div class="shrink-0 w-9 h-9 rounded-xl bg-indigo-500/10 dark:bg-indigo-500/20 flex items-center justify-center">
                     <i data-lucide="file-text" class="w-4 h-4 text-indigo-500 dark:text-indigo-400"></i>
                 </div>
-                <span class="text-sm font-semibold text-on-surface truncate">${note.title || 'Nota sin título'}</span>
+                <span class="text-sm font-semibold text-on-surface truncate">${escapeHTML(note.title || 'Nota sin título')}</span>
             </div>
             <div class="shrink-0 flex items-center gap-2 text-right">
-                <span class="text-xs font-bold text-on-surface-variant opacity-60 hidden sm:block truncate max-w-[120px]">${notebook.name}</span>
+                <span class="text-xs font-bold text-on-surface-variant opacity-60 hidden sm:block truncate max-w-[120px]">${safeNotebookName}</span>
                 <span class="text-[11px] font-bold text-indigo-500 dark:text-indigo-400 whitespace-nowrap bg-indigo-500/8 dark:bg-indigo-500/15 px-2 py-0.5 rounded-full">${timeAgo(ts)}</span>
             </div>
         `;

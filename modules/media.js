@@ -5,6 +5,7 @@
 const { ipcMain } = require('electron');
 
 let mediaControl = null;
+let ipcRegistered = false;
 
 /**
  * Inicializa el módulo de media.
@@ -19,31 +20,35 @@ function initMedia(getWindow) {
       console.error('win-media-control not available', e);
     });
 
-  // Eventos IPC de control de medios
-  ipcMain.on('media-toggle', async () => {
-    if (mediaControl) {
-      await mediaControl.togglePlayPause();
-      setTimeout(() => checkMedia(getWindow), 500);
-    }
-  });
+  if (!ipcRegistered) {
+    ipcRegistered = true;
 
-  ipcMain.on('media-next', async () => {
-    if (mediaControl) {
-      await mediaControl.next();
-      setTimeout(() => checkMedia(getWindow), 500);
-    }
-  });
+    // Eventos IPC de control de medios
+    ipcMain.on('media-toggle', async () => {
+      if (mediaControl) {
+        await mediaControl.togglePlayPause();
+        setTimeout(() => checkMedia(getWindow), 500);
+      }
+    });
 
-  ipcMain.on('media-prev', async () => {
-    if (mediaControl) {
-      await mediaControl.previous();
-      setTimeout(() => checkMedia(getWindow), 500);
-    }
-  });
+    ipcMain.on('media-next', async () => {
+      if (mediaControl) {
+        await mediaControl.next();
+        setTimeout(() => checkMedia(getWindow), 500);
+      }
+    });
 
-  ipcMain.on('media-check-now', () => {
-    checkMedia(getWindow);
-  });
+    ipcMain.on('media-prev', async () => {
+      if (mediaControl) {
+        await mediaControl.previous();
+        setTimeout(() => checkMedia(getWindow), 500);
+      }
+    });
+
+    ipcMain.on('media-check-now', () => {
+      checkMedia(getWindow);
+    });
+  }
 }
 
 /**

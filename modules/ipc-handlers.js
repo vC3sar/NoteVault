@@ -5,18 +5,115 @@
 const { ipcMain, Menu, BrowserWindow, app } = require('electron');
 const path = require('path');
 const fs = require('fs');
+const { pathToFileURL } = require('url');
+const fsp = fs.promises;
 
 /**
  * Registra todos los handlers de IPC del proceso principal.
  * @param {{ DATA_PATH: string, NOTES_DIR: string, COVERS_DIR: string, ATTACHMENTS_DIR: string }} paths
  */
 function registerIpcHandlers({ DATA_PATH, NOTES_DIR, COVERS_DIR, ATTACHMENTS_DIR }) {
+  const DATA_BACKUP_PATH = `${DATA_PATH}.bak`;
+
+  function normalizePath(input) {
+    const raw = String(input ?? '');
+    const withoutScheme = raw.startsWith('file:///') ? raw.replace('file:///', '') : raw;
+    return path.resolve(decodeURIComponent(withoutScheme.replace(/\//g, path.sep)));
+  }
+
+  function isInsideDir(baseDir, candidate) {
+    const base = path.resolve(baseDir);
+    const target = path.resolve(candidate);
+    const relative = path.relative(base, target);
+    return !!relative && !relative.startsWith('..') && !path.isAbsolute(relative);
+  }
+
+  function sanitizeFileId(id) {
+    const safe = String(id ?? '').trim();
+    return safe && safe === path.basename(safe) && !safe.includes(path.sep) && !safe.includes('/') && !safe.includes('\\') ? safe : null;
+  }
+
+  async function readJsonFile(filePath) {
+    const content = await fsp.readFile(filePath, 'utf-8');
+    return JSON.parse(content);
+  }
+
+  async function pathExists(filePath) {
+    try {
+      await fsp.access(filePath);
+      return true;
+    } catch (error) {
+      return false;
+    }
+  }
+
+  async function loadPersistedData() {
+    let loadError = '';
+    try {
+      if (await pathExists(DATA_PATH)) {
+        return await readJsonFile(DATA_PATH);
+      }
+    } catch (error) {
+      loadError = error.message;
+    }
+
+    try {
+      if (await pathExists(DATA_BACKUP_PATH)) {
+        const backup = await readJsonFile(DATA_BACKUP_PATH);
+        if (loadError) backup.loadError = loadError;
+        return backup;
+      }
+    } catch (error) {
+      loadError = loadError || error.message;
+    }
+
+    return { notebooks: [], trash: [], settings: {}, profile: {}, calendar: {}, loadError };
+  }
+
+  async function writeAtomicJson(filePath, data) {
+    const dir = path.dirname(filePath);
+    const tempPath = path.join(dir, `${path.basename(filePath)}.${process.pid}.${Date.now()}.tmp`);
+    const payload = JSON.stringify(data, null, 2);
+
+    await fsp.writeFile(tempPath, payload, 'utf-8');
+    try {
+      if (await pathExists(filePath)) {
+        await fsp.copyFile(filePath, DATA_BACKUP_PATH);
+      }
+    } catch (error) {
+      // Backup is best-effort.
+    }
+
+    try {
+      await fsp.rename(tempPath, filePath);
+    } catch (error) {
+      await fsp.copyFile(tempPath, filePath);
+      await fsp.unlink(tempPath).catch(() => {});
+    }
+
+    await fsp.copyFile(filePath, DATA_BACKUP_PATH).catch(() => {});
+  }
+
+  async function safeDeleteInsideDir(baseDir, candidatePath) {
+    const resolved = normalizePath(candidatePath);
+    if (!isInsideDir(baseDir, resolved)) {
+      return { success: false, error: 'Path outside allowed directory' };
+    }
+
+    try {
+      await fsp.unlink(resolved);
+      return { success: true };
+    } catch (error) {
+      if (error.code === 'ENOENT') return { success: true };
+      return { success: false, error: error.message };
+    }
+  }
 
   // ── Almacenamiento principal (metadata) ────────────────────────────────────
 
   ipcMain.handle('save-data', async (event, data) => {
     try {
-      fs.writeFileSync(DATA_PATH, JSON.stringify(data, null, 2));
+      await writeAtomicJson(DATA_PATH, data);
       return { success: true };
     } catch (error) {
       return { success: false, error: error.message };
@@ -25,13 +122,9 @@ function registerIpcHandlers({ DATA_PATH, NOTES_DIR, COVERS_DIR, ATTACHMENTS_DIR
 
   ipcMain.handle('load-data', async () => {
     try {
-      if (fs.existsSync(DATA_PATH)) {
-        const data = fs.readFileSync(DATA_PATH, 'utf-8');
-        return JSON.parse(data);
-      }
-      return { notebooks: [] };
+      return await loadPersistedData();
     } catch (error) {
-      return { notebooks: [] };
+      return { notebooks: [], trash: [], settings: {}, profile: {}, calendar: {}, loadError: error.message };
     }
   });
 
@@ -39,8 +132,10 @@ function registerIpcHandlers({ DATA_PATH, NOTES_DIR, COVERS_DIR, ATTACHMENTS_DIR
 
   ipcMain.handle('save-note-content', async (event, { id, content }) => {
     try {
-      const filePath = path.join(NOTES_DIR, `${id}.html`);
-      fs.writeFileSync(filePath, content, 'utf-8');
+      const safeId = sanitizeFileId(id);
+      if (!safeId) return { success: false, error: 'Invalid note id' };
+      const filePath = path.join(NOTES_DIR, `${safeId}.html`);
+      await fsp.writeFile(filePath, content, 'utf-8');
       return { success: true };
     } catch (error) {
       return { success: false, error: error.message };
@@ -49,31 +144,35 @@ function registerIpcHandlers({ DATA_PATH, NOTES_DIR, COVERS_DIR, ATTACHMENTS_DIR
 
   ipcMain.handle('load-note-content', async (event, id) => {
     try {
-      const filePath = path.join(NOTES_DIR, `${id}.html`);
-      if (fs.existsSync(filePath)) {
-        return fs.readFileSync(filePath, 'utf-8');
+      const safeId = sanitizeFileId(id);
+      if (!safeId) return null;
+      const filePath = path.join(NOTES_DIR, `${safeId}.html`);
+      if (await pathExists(filePath)) {
+        return await fsp.readFile(filePath, 'utf-8');
       }
-      return '';
+      return null;
     } catch (error) {
-      return '';
+      return null;
     }
   });
 
   ipcMain.handle('delete-note-file', async (event, id) => {
     try {
-      const filePath = path.join(NOTES_DIR, `${id}.html`);
-      if (fs.existsSync(filePath)) {
-        const content = fs.readFileSync(filePath, 'utf-8');
+      const safeId = sanitizeFileId(id);
+      if (!safeId) return { success: false, error: 'Invalid note id' };
+      const filePath = path.join(NOTES_DIR, `${safeId}.html`);
+      if (await pathExists(filePath)) {
+        const content = await fsp.readFile(filePath, 'utf-8');
         // Buscar rutas de adjuntos locales y eliminarlos
         const imgRegex = /src="file:\/\/\/([^"]+attachments\/[^"]+)"/g;
         let match;
         while ((match = imgRegex.exec(content)) !== null) {
-          const fullPath = decodeURIComponent(match[1].replace(/\//g, path.sep));
-          if (fs.existsSync(fullPath)) {
-            fs.unlinkSync(fullPath);
+          const fullPath = normalizePath(match[1]);
+          if (isInsideDir(ATTACHMENTS_DIR, fullPath) && await pathExists(fullPath)) {
+            await fsp.unlink(fullPath).catch(() => {});
           }
         }
-        fs.unlinkSync(filePath);
+        await fsp.unlink(filePath);
       }
       return { success: true };
     } catch (error) {
@@ -88,8 +187,8 @@ function registerIpcHandlers({ DATA_PATH, NOTES_DIR, COVERS_DIR, ATTACHMENTS_DIR
       const ext = path.extname(filePath);
       const fileName = `${Date.now()}${ext}`;
       const destPath = path.join(COVERS_DIR, fileName);
-      fs.copyFileSync(filePath, destPath);
-      return { success: true, path: destPath };
+      await fsp.copyFile(filePath, destPath);
+      return { success: true, path: pathToFileURL(destPath).href };
     } catch (error) {
       return { success: false, error: error.message };
     }
@@ -97,8 +196,7 @@ function registerIpcHandlers({ DATA_PATH, NOTES_DIR, COVERS_DIR, ATTACHMENTS_DIR
 
   ipcMain.handle('delete-cover', async (event, coverPath) => {
     try {
-      if (fs.existsSync(coverPath)) fs.unlinkSync(coverPath);
-      return { success: true };
+      return await safeDeleteInsideDir(COVERS_DIR, coverPath);
     } catch (error) {
       return { success: false, error: error.message };
     }
@@ -112,15 +210,17 @@ function registerIpcHandlers({ DATA_PATH, NOTES_DIR, COVERS_DIR, ATTACHMENTS_DIR
       const destPath = path.join(ATTACHMENTS_DIR, fileName);
 
       if (base64) {
-        const buffer = Buffer.from(base64.split(',')[1], 'base64');
-        fs.writeFileSync(destPath, buffer);
+        const parts = String(base64).split(',');
+        const payload = parts[1] || parts[0] || '';
+        const buffer = Buffer.from(payload, 'base64');
+        await fsp.writeFile(destPath, buffer);
       } else if (url) {
         if (url.startsWith('file:///')) {
           // Copiar archivo local existente para dar independencia
-          const srcPath = decodeURIComponent(url.replace('file:///', '').replace(/\//g, path.sep));
-          if (fs.existsSync(srcPath)) {
-            fs.copyFileSync(srcPath, destPath);
-            return { success: true, path: `file:///${destPath.replace(/\\/g, '/')}` };
+          const srcPath = normalizePath(url);
+          if (await pathExists(srcPath)) {
+            await fsp.copyFile(srcPath, destPath);
+            return { success: true, path: pathToFileURL(destPath).href };
           }
         }
 
@@ -137,8 +237,9 @@ function registerIpcHandlers({ DATA_PATH, NOTES_DIR, COVERS_DIR, ATTACHMENTS_DIR
               response.on('data', (chunk) => chunks.push(chunk));
               response.on('end', () => {
                 const buffer = Buffer.concat(chunks);
-                fs.writeFileSync(destPath, buffer);
-                resolve({ success: true, path: `file:///${destPath.replace(/\\/g, '/')}` });
+                fsp.writeFile(destPath, buffer)
+                  .then(() => resolve({ success: true, path: pathToFileURL(destPath).href }))
+                  .catch((err) => resolve({ success: false, error: err.message }));
               });
             });
             request.on('error', (err) => resolve({ success: false, error: err.message }));
@@ -149,7 +250,7 @@ function registerIpcHandlers({ DATA_PATH, NOTES_DIR, COVERS_DIR, ATTACHMENTS_DIR
         });
       }
 
-      return { success: true, path: `file:///${destPath.replace(/\\/g, '/')}` };
+      return { success: true, path: pathToFileURL(destPath).href };
     } catch (error) {
       return { success: false, error: error.message };
     }
@@ -157,20 +258,18 @@ function registerIpcHandlers({ DATA_PATH, NOTES_DIR, COVERS_DIR, ATTACHMENTS_DIR
 
   ipcMain.handle('delete-attachment', async (event, fileUrl) => {
     try {
-      const fileName = path.basename(fileUrl);
-      const filePath = decodeURIComponent(fileUrl.replace('file:///', '').replace(/\//g, path.sep));
-
-      if (!filePath.includes('attachments') || !fs.existsSync(filePath)) {
+      const filePath = normalizePath(fileUrl);
+      if (!isInsideDir(ATTACHMENTS_DIR, filePath) || !(await pathExists(filePath))) {
         return { success: false, error: 'Not an attachment or file not found' };
       }
 
       // Seguridad: Escanear todas las notas para ver si alguien más la usa
-      const notes = fs.readdirSync(NOTES_DIR);
+      const notes = await fsp.readdir(NOTES_DIR);
       let isUsed = false;
       for (const noteFile of notes) {
         if (noteFile.endsWith('.html')) {
-          const content = fs.readFileSync(path.join(NOTES_DIR, noteFile), 'utf-8');
-          if (content.includes(fileName)) {
+          const content = await fsp.readFile(path.join(NOTES_DIR, noteFile), 'utf-8');
+          if (content.includes(path.basename(filePath))) {
             isUsed = true;
             break;
           }
@@ -178,7 +277,7 @@ function registerIpcHandlers({ DATA_PATH, NOTES_DIR, COVERS_DIR, ATTACHMENTS_DIR
       }
 
       if (!isUsed) {
-        fs.unlinkSync(filePath);
+        await fsp.unlink(filePath);
         return { success: true, deleted: true };
       }
 

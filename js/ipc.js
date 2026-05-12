@@ -2,7 +2,14 @@ import { state, saveAll } from './state.js';
 import { applyTheme, showDashboard, showTrash, showCalendar } from './ui.js';
 import { renderSidebar, renderNotebookGrid, selectNotebook } from './notebooks.js';
 import { renderNotesList, selectNote, cleanupTrash } from './notes.js';
-import { refreshIcons, showModal } from './utils.js';
+import { refreshIcons, showModal, createId, cleanHTML } from './utils.js';
+
+function getFileLabel(value) {
+    const raw = String(value || '');
+    if (!raw) return '';
+    const cleaned = raw.startsWith('file:') ? decodeURIComponent(raw.replace('file:///', '')) : raw;
+    return cleaned.split(/[\\/]/).pop() || cleaned;
+}
 
 export function setupIPC() {
     window.api.onNotebookAction(async ({ action, id }) => {
@@ -31,7 +38,7 @@ export function setupIPC() {
                 radioImage.checked = true;
                 colorSection.style.display = 'none';
                 imageSection.style.display = 'block';
-                currentImageLabel.textContent = `Previamente: ${nb.coverValue.split('\\').pop() || nb.coverValue.split('/').pop()}`;
+                currentImageLabel.textContent = `Previamente: ${getFileLabel(nb.coverValue)}`;
                 radioImage.closest('label').dataset.active = "true";
                 radioColor.closest('label').dataset.active = "false";
             } else {
@@ -102,12 +109,14 @@ export function setupIPC() {
                 if (savedContent !== null) contentToClone = savedContent;
             } catch (err) { console.error('Error cargando nota origen:', err); }
 
-            const newId = Date.now().toString();
+            const newId = createId();
             const clonedNote = {
                 id: newId,
                 title: `${note.title || 'Nota sin título'} (Copia)`,
                 content: contentToClone,
-                isPinned: false
+                isPinned: false,
+                createdAt: Date.now(),
+                lastEdited: Date.now()
             };
             notebook.notes.push(clonedNote);
             await window.api.saveNoteContent(newId, contentToClone);
@@ -138,7 +147,7 @@ export function setupIPC() {
             if (state.activeNoteId) {
                 const editor = document.getElementById('editor');
                 const content = editor ? editor.innerHTML : '';
-                await window.api.saveNoteContent(state.activeNoteId, content);
+                await window.api.saveNoteContent(state.activeNoteId, cleanHTML(content));
             }
             await saveAll();
             window.api.sendSafeCloseReady();

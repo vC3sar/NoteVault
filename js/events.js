@@ -3,7 +3,7 @@ import { applyTheme, showDashboard, showTrash, updateZoom, currentZoom, toggleSi
 import { addNotebook, renderNotebookGrid } from './notebooks.js';
 import { addNote, renderNotesList, selectNote, renderTrashList } from './notes.js';
 import { executeEditAction, setupEditor } from './editor.js';
-import { refreshIcons } from './utils.js';
+import { refreshIcons, escapeHTML, stripHTML } from './utils.js';
 
 export function setupEventListeners() {
     setupEditor();
@@ -261,6 +261,7 @@ export function setupEventListeners() {
                 filtered.forEach(note => {
                     const item = document.createElement('div');
                     const isActive = state.activeNoteId === note.id;
+                    const plainPreview = stripHTML(note.content || '');
                     item.className = `group flex items-center justify-between p-3 rounded-xl cursor-pointer transition-colors ${isActive ? 'bg-primary/5 border border-primary/10' : 'hover:bg-surface-bright border border-transparent'}`;
                     item.innerHTML = `
                         <div class="flex items-start overflow-hidden pr-2">
@@ -268,9 +269,9 @@ export function setupEventListeners() {
                                 <i data-lucide="file-text" class="w-4 h-4"></i>
                             </div>
                             <div class="flex flex-col overflow-hidden">
-                                <span class="truncate text-sm font-bold text-on-surface flex items-center">${note.title || 'Nota sin título'}</span>
+                                <span class="truncate text-sm font-bold text-on-surface flex items-center">${escapeHTML(note.title || 'Nota sin título')}</span>
                                 <span class="text-[10px] text-on-surface-variant uppercase tracking-widest mt-0.5 truncate opacity-70">
-                                    ${note.content ? note.content.replace(/<[^>]*>?/gm, '').substring(0, 30) + '...' : 'Sin contenido'}
+                                    ${escapeHTML(plainPreview ? `${plainPreview.substring(0, 30)}${plainPreview.length > 30 ? '...' : ''}` : 'Sin contenido')}
                                 </span>
                             </div>
                         </div>`;

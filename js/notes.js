@@ -1,5 +1,5 @@
 import { state, saveAll } from './state.js';
-import { refreshIcons, showModal, cleanHTML } from './utils.js';
+import { refreshIcons, showModal, cleanHTML, escapeHTML, stripHTML, createId } from './utils.js';
 import { renderSidebar } from './notebooks.js';
 import { updateWordCount, updateAttachmentsIfNeeded } from './editor.js';
 
@@ -40,6 +40,9 @@ export function renderNotesList() {
         item.className = `group flex items-center justify-between p-3 rounded-xl cursor-pointer transition-colors ${isActive ? 'bg-primary/5 border border-primary/10' : 'hover:bg-surface-bright border border-transparent'}`;
 
         const pinHtml = note.isPinned ? `<i data-lucide="pin" class="w-3 h-3 text-primary rotate-45 mr-2"></i>` : '';
+        const plainPreview = stripHTML(note.content || '');
+        const safeTitle = escapeHTML(note.title || 'Nota sin título');
+        const safePreview = escapeHTML(plainPreview ? `${plainPreview.substring(0, 30)}${plainPreview.length > 30 ? '...' : ''}` : 'Sin contenido');
 
         item.innerHTML = `
             <div class="flex items-start overflow-hidden pr-2">
@@ -49,10 +52,10 @@ export function renderNotesList() {
                 <div class="flex flex-col overflow-hidden">
                     <span class="truncate text-sm font-bold text-on-surface flex items-center">
                         ${pinHtml}
-                        ${note.title || 'Nota sin título'}
+                        ${safeTitle}
                     </span>
                     <span class="text-[10px] text-on-surface-variant uppercase tracking-widest mt-0.5 truncate opacity-70">
-                        ${note.content ? note.content.replace(/<[^>]*>?/gm, '').substring(0, 30) + '...' : 'Sin contenido'}
+                        ${safePreview}
                     </span>
                 </div>
             </div>
@@ -154,7 +157,8 @@ export async function addNote() {
     const title = await showModal("Nombre de la nota:", "Nueva Nota");
     if (title) {
         const notebook = state.notebooks.find(n => n.id === state.activeNotebookId);
-        const newNote = { id: Date.now().toString(), title, content: '' };
+        const now = Date.now();
+        const newNote = { id: createId(), title, content: '', createdAt: now, lastEdited: now };
         notebook.notes.push(newNote);
         await saveAll();
         selectNote(newNote.id);
@@ -193,6 +197,10 @@ export function renderTrashList() {
         const daysLabel = daysLeft <= 0 ? 'Expirando hoy' : `${daysLeft} días restantes`;
         const originalNb = state.notebooks.find(nb => nb.id === note.originalNotebookId);
         const originalName = originalNb ? originalNb.name : 'Libreta eliminada';
+        const plainPreview = stripHTML(note.content || '');
+        const safeTitle = escapeHTML(note.title || 'Nota sin título');
+        const safeOriginalName = escapeHTML(originalName);
+        const safePreview = escapeHTML(plainPreview ? plainPreview.substring(0, 80) : 'Sin contenido');
 
         card.innerHTML = `
             <div class="flex items-start justify-between">
@@ -200,14 +208,14 @@ export function renderTrashList() {
                     <i data-lucide="file-text"></i>
                 </div>
                 <div class="text-[10px] font-bold uppercase tracking-widest ${daysLeft <= 1 ? 'text-error' : 'text-on-surface-variant opacity-60'}">
-                    ${daysLabel}
+                    ${escapeHTML(daysLabel)}
                 </div>
             </div>
             <div>
-                <h3 class="font-bold text-on-surface truncate">${note.title || 'Nota sin título'}</h3>
-                <p class="text-[10px] text-on-surface-variant font-bold uppercase tracking-wider mt-0.5 opacity-50">De: ${originalName}</p>
+                <h3 class="font-bold text-on-surface truncate">${safeTitle}</h3>
+                <p class="text-[10px] text-on-surface-variant font-bold uppercase tracking-wider mt-0.5 opacity-50">De: ${safeOriginalName}</p>
                 <p class="text-xs text-on-surface-variant mt-2 line-clamp-2 opacity-70">
-                    ${note.content ? note.content.replace(/<[^>]*>?/gm, '').substring(0, 80) : 'Sin contenido'}
+                    ${safePreview}
                 </p>
             </div>
             <div class="mt-auto pt-4 flex items-center gap-2 border-t border-outline-variant/5">

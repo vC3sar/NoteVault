@@ -2,7 +2,7 @@
 // Módulo del proceso principal encargado del menú de la aplicación (barra de menú nativa).
 // No importar desde /js/ — ese es el proceso de renderizado.
 
-const { Menu, dialog, shell } = require('electron');
+const { Menu, dialog, shell, app } = require('electron');
 
 /**
  * Construye y establece el menú de la aplicación.
@@ -77,7 +77,7 @@ function setupMenu(mainWindow, debug) {
               type: 'info',
               title: 'Acerca de NoteVault',
               message: 'NoteVault Pro Edition',
-              detail: 'Versión: 1.1.0-beta\nCreador: vC3sar\nOrganización: Vazquezsg.ovh\n\nUna aplicación de notas moderna y segura.',
+              detail: `Versión: ${app.getVersion()}\nCreador: vC3sar\nOrganización: Vazquezsg.ovh\n\nUna aplicación de notas moderna y segura.`,
               buttons: ['Entendido']
             });
           }

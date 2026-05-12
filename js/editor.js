@@ -84,13 +84,18 @@ export const handleInput = () => {
         const title = document.getElementById('note-title').value;
         const editor = document.getElementById('editor');
         const content = editor ? editor.innerHTML : '';
+        const sanitizedContent = cleanHTML(content);
 
         const titleChanged = note.title !== title;
         note.title = title;
-        note.content = content;
+        note.content = sanitizedContent;
         note.lastEdited = Date.now();
 
-        await window.api.saveNoteContent(state.activeNoteId, content);
+        if (editor && sanitizedContent !== content) {
+            editor.innerHTML = sanitizedContent;
+        }
+
+        await window.api.saveNoteContent(state.activeNoteId, sanitizedContent);
         await saveAll();
 
         if (titleChanged) {
@@ -265,11 +270,11 @@ export function setupEditor() {
         }
 
         if (!imageFound) {
-            const html = clipboardData.getData('text/html');
-            if (html && html.includes('<img')) {
-                e.preventDefault();
-                const parser = new DOMParser();
-                const doc = parser.parseFromString(html, 'text/html');
+                const html = clipboardData.getData('text/html');
+                if (html && html.includes('<img')) {
+                    e.preventDefault();
+                    const parser = new DOMParser();
+                    const doc = parser.parseFromString(html, 'text/html');
                 const images = doc.querySelectorAll('img');
 
                 for (const img of images) {
@@ -295,11 +300,11 @@ export function setupEditor() {
                     img.className = "max-w-full h-auto rounded-2xl shadow-lg my-6 border border-outline-variant/20 block processed";
                     img.style.display = "block";
                     img.style.margin = "1.5rem 0";
+                    }
+                    document.execCommand('insertHTML', false, cleanHTML(doc.body.innerHTML));
+                    handleInput();
                 }
-                document.execCommand('insertHTML', false, doc.body.innerHTML);
-                handleInput();
             }
-        }
 
         setTimeout(() => {
             const ed = document.getElementById('editor');

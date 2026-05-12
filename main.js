@@ -1,10 +1,9 @@
 // ─────────────────────────────────────────────────────────────────────────────
 // main.js — Punto de entrada del proceso principal de Electron (NoteVault)
-// Los módulos del proceso principal están en src/main/
+// Los módulos del proceso principal están en ./modules/
 // Los archivos de /js/ pertenecen al proceso de renderizado (browser) — no mezclar
 // ─────────────────────────────────────────────────────────────────────────────
 
-const debug = true;
 const { app } = require('electron');
 const path = require('path');
 const fs = require('fs');
@@ -13,6 +12,8 @@ const { createWindow } = require('./modules/window');
 const { setupMenu } = require('./modules/menu');
 const { registerIpcHandlers } = require('./modules/ipc-handlers');
 const { initMedia, checkMedia } = require('./modules/media');
+
+const debug = !app.isPackaged;
 
 // ── Configuración de identidad ─────────────────────────────────────────────
 app.setAppUserModelId('ovh.vazquezsg.NoteVault');
@@ -26,7 +27,7 @@ const ATTACHMENTS_DIR = path.join(app.getPath('userData'), 'attachments');
 
 // Asegurar que existan los directorios
 [NOTES_DIR, COVERS_DIR, ATTACHMENTS_DIR].forEach(d => {
-  if (!fs.existsSync(d)) fs.mkdirSync(d, { recursive: true });
+  fs.mkdirSync(d, { recursive: true });
 });
 
 // ── Registro de handlers IPC ───────────────────────────────────────────────

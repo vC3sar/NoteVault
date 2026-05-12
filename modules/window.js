@@ -6,6 +6,7 @@ const { BrowserWindow, Menu, MenuItem, dialog } = require('electron');
 const path = require('path');
 
 let mainWindow = null;
+let mediaPollInterval = null;
 
 /**
  * Crea y configura la ventana principal de la aplicación.
@@ -75,7 +76,11 @@ function createWindow(debug, checkMedia) {
 
   // Media polling
   if (typeof checkMedia === 'function') {
-    setInterval(() => checkMedia(() => mainWindow), 2000);
+    mediaPollInterval = setInterval(() => {
+      if (mainWindow && !mainWindow.isDestroyed()) {
+        checkMedia(() => mainWindow);
+      }
+    }, 2000);
   }
 
   // Confirmación antes de cerrar
@@ -93,6 +98,14 @@ function createWindow(debug, checkMedia) {
         mainWindow.webContents.send('app-closing');
       }
     }
+  });
+
+  mainWindow.on('closed', () => {
+    if (mediaPollInterval) {
+      clearInterval(mediaPollInterval);
+      mediaPollInterval = null;
+    }
+    mainWindow = null;
   });
 
   return mainWindow;

@@ -1,5 +1,5 @@
 import { state, saveAll } from './state.js';
-import { refreshIcons } from './utils.js';
+import { refreshIcons, escapeHTML, createId, safeHexColor, hexToRgba } from './utils.js';
 
 let currentDate = new Date();
 let selectedDate = new Date();
@@ -103,9 +103,10 @@ function createDayCell(date, isPadding, isToday = false, isSelected = false) {
     dayEvents.forEach(e => {
         const evt = document.createElement('div');
         evt.className = 'text-[10px] font-bold px-1.5 py-0.5 rounded truncate bg-opacity-20 border border-opacity-30';
-        evt.style.backgroundColor = `${e.color}33`;
-        evt.style.borderColor = `${e.color}66`;
-        evt.style.color = e.color;
+        const safeColor = safeHexColor(e.color, '#4338ca');
+        evt.style.backgroundColor = hexToRgba(safeColor, 0.2);
+        evt.style.borderColor = hexToRgba(safeColor, 0.4);
+        evt.style.color = safeColor;
         evt.textContent = e.title;
         eventsContainer.appendChild(evt);
     });
@@ -118,7 +119,7 @@ function createDayCell(date, isPadding, isToday = false, isSelected = false) {
         classEvt.className = 'text-[9px] font-semibold px-1.5 py-0.5 rounded truncate border border-transparent flex items-center gap-1';
         classEvt.style.backgroundColor = 'var(--surface-container-high)';
         classEvt.style.color = 'var(--on-surface-variant)';
-        classEvt.innerHTML = `<span class="w-1.5 h-1.5 rounded-full shrink-0" style="background-color: ${s.color}"></span> ${s.start} ${s.subject}`;
+        classEvt.innerHTML = `<span class="w-1.5 h-1.5 rounded-full shrink-0" style="background-color: ${safeHexColor(s.color, '#10b981')}"></span> ${escapeHTML(s.start)} ${escapeHTML(s.subject)}`;
         eventsContainer.appendChild(classEvt);
     });
     
@@ -165,12 +166,13 @@ export function renderDayDetails(date) {
         dayEvents.forEach(e => {
             const evt = document.createElement('div');
             evt.className = 'p-3 rounded-xl border border-outline-variant/10 bg-surface-container-high group relative overflow-hidden';
+            const safeColor = safeHexColor(e.color, '#4338ca');
             evt.innerHTML = `
-                <div class="absolute left-0 top-0 bottom-0 w-1.5" style="background-color: ${e.color}"></div>
+                <div class="absolute left-0 top-0 bottom-0 w-1.5" style="background-color: ${safeColor}"></div>
                 <div class="pl-3 flex justify-between items-center gap-2">
                     <div>
-                        <h5 class="font-bold text-sm text-on-surface">${e.title}</h5>
-                        ${e.description ? `<p class="text-xs text-on-surface-variant mt-1">${e.description}</p>` : ''}
+                        <h5 class="font-bold text-sm text-on-surface">${escapeHTML(e.title)}</h5>
+                        ${e.description ? `<p class="text-xs text-on-surface-variant mt-1">${escapeHTML(e.description)}</p>` : ''}
                     </div>
                     <div class="flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-all shrink-0">
                         <button onclick="window.calendarEngine.showEventModal('${e.id}')" class="text-on-surface-variant hover:text-primary transition-all p-1 active:scale-95"><i data-lucide="edit-3" class="w-4 h-4"></i></button>
@@ -225,7 +227,7 @@ export async function saveEvent() {
         }
     } else {
         const newEvent = {
-            id: Date.now().toString(),
+            id: createId(),
             date: selectedDate.toISOString().split('T')[0],
             title,
             description: desc,
@@ -295,7 +297,7 @@ export async function addScheduleItem() {
         }
     } else {
         const newItem = {
-            id: Date.now().toString(),
+            id: createId(),
             day,
             start,
             end,
@@ -381,14 +383,15 @@ export function renderScheduleList() {
         dayItems.forEach(item => {
             const el = document.createElement('div');
             el.className = 'relative mb-3';
+            const safeColor = safeHexColor(item.color, '#10b981');
             el.innerHTML = `
-                <div class="absolute -left-4 top-1.5 w-2 h-2 rounded-full border-2 border-surface-container-lowest" style="background-color: ${item.color}"></div>
+                <div class="absolute -left-4 top-1.5 w-2 h-2 rounded-full border-2 border-surface-container-lowest" style="background-color: ${safeColor}"></div>
                 <div class="bg-surface-container-high rounded-lg p-2.5 border border-outline-variant/10 shadow-sm">
                     <div class="flex items-center gap-2 mb-1">
                         <i data-lucide="clock" class="w-3 h-3 text-on-surface-variant opacity-60"></i>
-                        <span class="text-[11px] font-bold text-on-surface-variant">${item.start} - ${item.end}</span>
+                        <span class="text-[11px] font-bold text-on-surface-variant">${escapeHTML(item.start)} - ${escapeHTML(item.end)}</span>
                     </div>
-                    <div class="text-sm font-bold text-on-surface leading-tight">${item.subject}</div>
+                    <div class="text-sm font-bold text-on-surface leading-tight">${escapeHTML(item.subject)}</div>
                 </div>
             `;
             list.appendChild(el);
@@ -428,12 +431,13 @@ function renderScheduleModalList() {
         dayItems.forEach(item => {
             const el = document.createElement('div');
             el.className = 'flex items-center justify-between bg-surface-container p-2 rounded-lg mb-1 border border-outline-variant/10';
+            const safeColor = safeHexColor(item.color, '#10b981');
             el.innerHTML = `
                 <div class="flex items-center gap-3 overflow-hidden">
-                    <div class="w-2.5 h-2.5 rounded-full shrink-0" style="background-color: ${item.color}"></div>
+                    <div class="w-2.5 h-2.5 rounded-full shrink-0" style="background-color: ${safeColor}"></div>
                     <div class="truncate">
-                        <div class="text-xs font-bold text-on-surface truncate">${item.subject}</div>
-                        <div class="text-[10px] font-bold text-on-surface-variant opacity-70">${item.start} - ${item.end}</div>
+                        <div class="text-xs font-bold text-on-surface truncate">${escapeHTML(item.subject)}</div>
+                        <div class="text-[10px] font-bold text-on-surface-variant opacity-70">${escapeHTML(item.start)} - ${escapeHTML(item.end)}</div>
                     </div>
                 </div>
                 <div class="flex items-center gap-1">

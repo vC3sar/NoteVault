@@ -1,10 +1,10 @@
-import { state, saveAll } from './js/state.js';
+import { state, saveAll, normalizeLoadedData } from './js/state.js';
 import { applyTheme, showDashboard, showTrash, updateZoom, refreshSidebarState, updateGreeting, toggleNotesPanel, showCalendar } from './js/ui.js';
 import { setupIPC } from './js/ipc.js';
 import { setupEventListeners } from './js/events.js';
 import { cleanupTrash, selectNote, addNote, restoreNote, permanentlyDeleteNote } from './js/notes.js';
 import { selectNotebook, addNotebook } from './js/notebooks.js';
-import { refreshIcons } from './js/utils.js';
+import { refreshIcons, cleanHTML } from './js/utils.js';
 import * as calendarEngine from './js/calendar.js';
 
 // Expose functions to window for HTML compatibility (onclick handlers)
@@ -27,7 +27,16 @@ window.toggleNotesPanel = toggleNotesPanel;
 // ES modules are deferred, so partials:ready may fire before this listener
 // is registered. The window.partialsReady flag handles that race condition.
 async function initApp() {
-    const savedData = await window.api.loadData();
+    let savedData;
+    try {
+        savedData = normalizeLoadedData(await window.api.loadData());
+    } catch (error) {
+        console.warn('No se pudieron cargar los datos:', error);
+        savedData = normalizeLoadedData(null);
+    }
+    if (savedData.loadError) {
+        console.warn('Error al cargar datos:', savedData.loadError);
+    }
     state.notebooks = savedData.notebooks || [];
     state.trash = savedData.trash || [];
     if (savedData.settings) {
@@ -81,8 +90,10 @@ export function startPeriodicAutosave() {
         if (state.activeNoteId) {
             const editor = document.getElementById('editor');
             const content = editor ? editor.innerHTML : '';
+            const sanitizedContent = cleanHTML(content);
             if (typeof window.updateHighlightsPanel === 'function') window.updateHighlightsPanel();
-            await window.api.saveNoteContent(state.activeNoteId, content);
+            if (editor && sanitizedContent !== content) editor.innerHTML = sanitizedContent;
+            await window.api.saveNoteContent(state.activeNoteId, sanitizedContent);
         }
         await saveAll();
     }, ms);
