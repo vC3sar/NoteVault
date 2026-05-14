@@ -1,3 +1,10 @@
+body {
+    background-color: #111111;
+    margin: 0;
+    overflow: hidden;
+    animation: fadeIn 0.6s cubic-bezier(0.22, 1, 0.36, 1);
+}
+
 .logo-font {
     font-family: 'Plus Jakarta Sans', sans-serif !important;
     letter-spacing: -0.04em;

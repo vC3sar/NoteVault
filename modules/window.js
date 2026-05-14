@@ -20,6 +20,7 @@ function createWindow(debug, checkMedia) {
     width: 1200,
     height: 800,
     show: false,
+    backgroundColor: '#111111',
     icon: APP_ICON,
     webPreferences: {
       preload: path.join(__dirname, '..', 'preload.js'),
@@ -70,11 +71,14 @@ function createWindow(debug, checkMedia) {
     menu.popup();
   });
 
-  // DEBUG OPTION ------ REVISAR ANTES DE PRODUCCION
-  if (!debug) mainWindow.maximize();
-  mainWindow.show();
-
   mainWindow.loadFile(path.join(__dirname, '..', 'index.html'));
+
+  // Mostrar la ventana solo cuando esté lista (evita el flash blanco)
+  mainWindow.once('ready-to-show', () => {
+    if (!debug) mainWindow.maximize();
+    mainWindow.show();
+    mainWindow.focus();
+  });
 
   // Media polling
   if (typeof checkMedia === 'function') {
@@ -85,20 +89,14 @@ function createWindow(debug, checkMedia) {
     }, 2000);
   }
 
-  // Confirmación antes de cerrar
+  // Manejo de cierre seguro y estético
   mainWindow.on('close', (e) => {
     const { app } = require('electron');
     if (!app.isQuitting) {
       e.preventDefault();
-      const choice = dialog.showMessageBoxSync(mainWindow, {
-        type: 'question',
-        buttons: ['Guardar cambios y salir', 'Cancelar'],
-        title: 'Confirmación de salida',
-        message: '¿Deseas cerrar NoteVault? Espera un segundo para enviar tus últimos cambios locales pendientes.'
-      });
-      if (choice === 0) {
-        mainWindow.webContents.send('app-closing');
-      }
+      // Solicitamos al renderer que guarde el estado y cambios locales (autosave)
+      // sin interrumpir la experiencia con un diálogo nativo antiestético.
+      mainWindow.webContents.send('app-closing');
     }
   });
 
