@@ -1,5 +1,5 @@
 import { state, saveAll } from './state.js';
-import { refreshIcons, cleanHTML } from './utils.js';
+import { refreshIcons, cleanHTML, hashString, buildPreview } from './utils.js';
 import { renderNotesList } from './notes.js';
 
 let savedSelectionRange = null;
@@ -70,39 +70,56 @@ export function executeEditAction(data) {
     handleInput();
 }
 
+export async function forceSaveNote() {
+    if (!state.activeNoteId) return;
+    const notebook = state.notebooks.find(n => n.id === state.activeNotebookId);
+    if (!notebook) return;
+    const note = notebook.notes.find(n => n.id === state.activeNoteId);
+    if (!note) return;
+
+    const title = document.getElementById('note-title').value;
+    const editor = document.getElementById('editor');
+    const content = editor ? editor.innerHTML : '';
+    const sanitizedContent = cleanHTML(content);
+
+    const titleChanged = note.title !== title;
+    const newHash = hashString(sanitizedContent);
+
+    if (!titleChanged && note.previewHash === newHash) {
+        return; // Sin cambios, omitir I/O
+    }
+
+    note.title = title;
+    note.content = sanitizedContent;
+    note.lastEdited = Date.now();
+
+    const newPreview = buildPreview(sanitizedContent);
+    if (newPreview) {
+        note.preview = newPreview;
+        note.previewHash = newHash;
+    }
+
+    if (editor && sanitizedContent !== content) {
+        editor.innerHTML = sanitizedContent;
+    }
+
+    await window.api.saveNoteContent(state.activeNoteId, sanitizedContent);
+    await saveAll();
+
+    if (titleChanged) {
+        renderNotesList();
+    }
+    updateWordCount();
+    updateAttachmentsIfNeeded();
+}
+
 let autosaveTimer;
 export const handleInput = () => {
     if (!state.activeNoteId) return;
 
     clearTimeout(autosaveTimer);
     autosaveTimer = setTimeout(async () => {
-        const notebook = state.notebooks.find(n => n.id === state.activeNotebookId);
-        if (!notebook) return;
-        const note = notebook.notes.find(n => n.id === state.activeNoteId);
-        if (!note) return;
-
-        const title = document.getElementById('note-title').value;
-        const editor = document.getElementById('editor');
-        const content = editor ? editor.innerHTML : '';
-        const sanitizedContent = cleanHTML(content);
-
-        const titleChanged = note.title !== title;
-        note.title = title;
-        note.content = sanitizedContent;
-        note.lastEdited = Date.now();
-
-        if (editor && sanitizedContent !== content) {
-            editor.innerHTML = sanitizedContent;
-        }
-
-        await window.api.saveNoteContent(state.activeNoteId, sanitizedContent);
-        await saveAll();
-
-        if (titleChanged) {
-            renderNotesList();
-        }
-        updateWordCount();
-        updateAttachmentsIfNeeded();
+        await forceSaveNote();
     }, 1000);
 };
 

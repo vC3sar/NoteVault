@@ -1,18 +1,25 @@
 {
   "name": "notevault",
-  "version": "1.2.0-beta",
+  "version": "1.3.0",
   "description": "NoteVault Electron App",
   "main": "main.js",
   "author": "vc3sar",
   "scripts": {
     "start": "electron .",
+    "prebuild": "if exist dist rd /s /q dist",
     "build": "electron-builder"
   },
   "build": {
     "appId": "ovh.vazquezsg.NoteVault",
     "productName": "NoteVault",
     "win": {
-      "icon": "img/logo.ico"
+      "icon": "img/logo.ico",
+      "target": "nsis"
+    },
+    "nsis": {
+      "oneClick": false,
+      "allowToChangeInstallationDirectory": true,
+      "license": "LICENSE.txt"
     }
   },
   "devDependencies": {

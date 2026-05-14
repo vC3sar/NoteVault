@@ -291,3 +291,27 @@ export function hexToRgba(value, alpha = 1, fallback = 'rgba(43,45,46,1)') {
     const clampedAlpha = Math.min(1, Math.max(0, Number(alpha)));
     return `rgba(${r}, ${g}, ${b}, ${clampedAlpha})`;
 }
+
+/**
+ * djb2 hash of a string — lightweight, non-cryptographic.
+ * Returns a base-36 string like "3q4r7a".
+ */
+export function hashString(str) {
+    let h = 5381;
+    for (let i = 0; i < str.length; i++) {
+        h = ((h << 5) + h) ^ str.charCodeAt(i);
+        h = h >>> 0; // keep unsigned 32-bit
+    }
+    return h.toString(36);
+}
+
+/**
+ * Builds a plain-text preview (max 150 chars) from raw HTML.
+ * Returns empty string for blank notes so they can be skipped.
+ */
+export function buildPreview(htmlContent) {
+    if (!htmlContent) return '';
+    const plain = stripHTML(htmlContent).replace(/\s+/g, ' ').trim();
+    if (!plain) return '';
+    return plain.length > 150 ? plain.slice(0, 150) + '\u2026' : plain;
+}

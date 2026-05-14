@@ -1,9 +1,9 @@
 <div align="center">
 
-<img src="https://img.shields.io/badge/version-1.2.0--beta-e8ff47?style=for-the-badge&labelColor=111111" alt="Version"/>
+<img src="https://img.shields.io/badge/version-1.3.0-e8ff47?style=for-the-badge&labelColor=111111" alt="Version"/>
 <img src="https://img.shields.io/badge/platform-Windows-4a9eff?style=for-the-badge&logo=windows&logoColor=white&labelColor=111111" alt="Platform"/>
 <img src="https://img.shields.io/badge/Electron-JS-47b4e8?style=for-the-badge&logo=electron&logoColor=white&labelColor=111111" alt="Electron"/>
-<img src="https://img.shields.io/badge/license-MIT-3ecf8e?style=for-the-badge&labelColor=111111" alt="License"/>
+<img src="https://img.shields.io/badge/license-Personal_Use-ff4757?style=for-the-badge&labelColor=111111" alt="License"/>
 
 <br/><br/>
 
@@ -190,11 +190,11 @@ NoteVault/
 
 ## 📄 Licencia
 
-```
-MIT License · Copyright (c) 2025 vC3sar · vazquezsg.ovh
+```text
+Licencia de Uso Personal · Copyright (c) 2025 vC3sar · vazquezsg.ovh
 ```
 
-Consulta el archivo [`LICENSE`](LICENSE) para los términos completos.
+Prohibido su uso comercial, venta o reventa. Consulta el archivo [`LICENSE.txt`](LICENSE.txt) para los términos completos.
 
 ---
 

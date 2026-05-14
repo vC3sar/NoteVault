@@ -163,7 +163,7 @@ export function selectNotebook(id) {
     }
 
     if (editorContainer) editorContainer.classList.add('hidden');
-    
+
     const editorEmptyState = document.getElementById('editor-empty-state');
     if (editorEmptyState) editorEmptyState.classList.remove('hidden');
 
@@ -275,27 +275,66 @@ export function renderRecentNotes() {
     }
 
     allNotes.sort((a, b) => b.ts - a.ts);
-    const recent = allNotes.slice(0, 3);
+    const recent = allNotes.slice(0, 4);
 
     container.classList.remove('hidden');
     const list = container.querySelector('#recent-notes-list');
     if (!list) return;
     list.innerHTML = '';
 
+    const palette = [
+        { bg: 'rgba(225, 29, 72, 0.15)', iconColor: '#e11d48', bar: '#e11d48', pill: 'rgba(225, 29, 72, 0.15)', pillText: '#e11d48' }, // Red
+        { bg: 'rgba(234, 88, 12, 0.15)', iconColor: '#ea580c', bar: '#ea580c', pill: 'rgba(234, 88, 12, 0.15)', pillText: '#ea580c' }, // Orange
+        { bg: 'rgba(202, 138, 4, 0.15)', iconColor: '#ca8a04', bar: '#ca8a04', pill: 'rgba(202, 138, 4, 0.15)', pillText: '#ca8a04' }, // Gold
+        { bg: 'rgba(22, 163, 74, 0.15)', iconColor: '#16a34a', bar: '#16a34a', pill: 'rgba(22, 163, 74, 0.15)', pillText: '#16a34a' }, // Green
+        { bg: 'rgba(13, 148, 136, 0.15)', iconColor: '#0d9488', bar: '#0d9488', pill: 'rgba(13, 148, 136, 0.15)', pillText: '#0d9488' }, // Teal
+        { bg: 'rgba(37, 99, 235, 0.15)', iconColor: '#2563eb', bar: '#2563eb', pill: 'rgba(37, 99, 235, 0.15)', pillText: '#2563eb' }, // Blue
+        { bg: 'rgba(2, 132, 199, 0.15)', iconColor: '#0284c7', bar: '#0284c7', pill: 'rgba(2, 132, 199, 0.15)', pillText: '#0284c7' }, // Cyan
+        { bg: 'rgba(79, 70, 229, 0.15)', iconColor: '#4f46e5', bar: '#4f46e5', pill: 'rgba(79, 70, 229, 0.15)', pillText: '#4f46e5' }, // Indigo
+        { bg: 'rgba(147, 51, 234, 0.15)', iconColor: '#9333ea', bar: '#9333ea', pill: 'rgba(147, 51, 234, 0.15)', pillText: '#9333ea' }, // Purple
+        { bg: 'rgba(219, 39, 119, 0.15)', iconColor: '#db2777', bar: '#db2777', pill: 'rgba(219, 39, 119, 0.15)', pillText: '#db2777' }  // Pink
+    ];
+
+    function hashString(str) {
+        let hash = 0;
+        for (let i = 0; i < str.length; i++) {
+            hash = (hash * 31 + str.charCodeAt(i)) >>> 0;
+        }
+        return hash;
+    }
+
     recent.forEach(({ note, notebook, ts }) => {
+        const title = note.title || 'Nota sin título';
+        const subject = notebook.name || 'Libreta sin nombre';
+        const timeStr = timeAgo(ts);
+
+        const hash = hashString(title + subject);
+        const colorToken = palette[hash % palette.length];
+
         const item = document.createElement('div');
-        item.className = 'group flex items-center justify-between gap-4 py-3.5 px-4 rounded-2xl cursor-pointer hover:bg-surface-container transition-colors border border-transparent hover:border-outline-variant/10';
-        const safeNotebookName = escapeHTML(notebook.name || 'Libreta sin nombre');
+        item.className = 'group flex items-center justify-between gap-4 py-3.5 px-4 rounded-2xl cursor-pointer hover:bg-surface-container transition-colors border border-outline-variant/10 bg-surface-container-lowest shadow-sm';
+
+        const safeNotebookName = escapeHTML(subject);
+        const safeTitle = escapeHTML(title);
+
         item.innerHTML = `
-            <div class="flex items-center gap-3 overflow-hidden">
-                <div class="shrink-0 w-9 h-9 rounded-xl bg-indigo-500/10 dark:bg-indigo-500/20 flex items-center justify-center">
-                    <i data-lucide="file-text" class="w-4 h-4 text-indigo-500 dark:text-indigo-400"></i>
+            <div class="flex items-center gap-4 overflow-hidden min-w-0 flex-1">
+                <div style="width: 36px; height: 36px; border-radius: 10px; background-color: ${colorToken.bg}; display: flex; align-items: center; justify-content: center; flex-shrink: 0; position: relative; overflow: hidden;">
+                    <div style="position: absolute; top: 0; bottom: 0; left: 0; width: 2px; background-color: ${colorToken.bar};"></div>
+                    <i data-lucide="file-text" style="color: ${colorToken.iconColor}; width: 18px; height: 18px; margin-left: 1px;"></i>
                 </div>
-                <span class="text-sm font-semibold text-on-surface truncate">${escapeHTML(note.title || 'Nota sin título')}</span>
+                <span class="text-on-surface truncate" style="font-size: 15px; font-weight: 700; letter-spacing: -0.01em;">${safeTitle}</span>
             </div>
-            <div class="shrink-0 flex items-center gap-2 text-right">
-                <span class="text-xs font-bold text-on-surface-variant opacity-60 hidden sm:block truncate max-w-[120px]">${safeNotebookName}</span>
-                <span class="text-[11px] font-bold text-indigo-500 dark:text-indigo-400 whitespace-nowrap bg-indigo-500/8 dark:bg-indigo-500/15 px-2 py-0.5 rounded-full">${timeAgo(ts)}</span>
+            
+            <div class="shrink-0 flex items-center gap-4 text-right">
+                <div class="hidden sm:flex items-center gap-1.5 text-on-surface-variant opacity-70">
+                    <i data-lucide="folder" style="width: 12px; height: 12px;"></i>
+                    <span class="truncate max-w-[150px]" style="font-size: 12px;">${safeNotebookName}</span>
+                </div>
+                
+                <div class="text-on-surface shrink-0" style="background-color: ${colorToken.pill}; padding: 4px 10px; border-radius: 9999px; font-size: 11px; font-weight: 700; display: inline-flex; align-items: center;">
+                    ${timeStr}
+                </div>
             </div>
         `;
         item.onclick = () => {

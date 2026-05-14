@@ -1,4 +1,4 @@
-import { createId, safeHexColor } from './utils.js';
+import { createId, safeHexColor, stripHTML, buildPreview, hashString } from './utils.js';
 
 export let state = {
     notebooks: [],
@@ -14,11 +14,27 @@ export let state = {
 function normalizeNote(note) {
     if (!note || typeof note !== 'object') return null;
     const lastEdited = Number(note.lastEdited);
+    const content = typeof note.content === 'string' ? note.content : '';
+
+    // Si el JSON antiguo aún trae content completo, generar preview al vuelo
+    // (compatibilidad hacia atrás). El backfill del renderer cubre el caso sin content.
+    let preview = typeof note.preview === 'string' ? note.preview : '';
+    let previewHash = typeof note.previewHash === 'string' ? note.previewHash : '';
+    if (content && (!preview || !previewHash)) {
+        const generated = buildPreview(content);
+        if (generated) {
+            preview = generated;
+            previewHash = hashString(content);
+        }
+    }
+
     return {
         ...note,
         id: String(note.id ?? '') || createId(),
         title: typeof note.title === 'string' ? note.title : '',
-        content: typeof note.content === 'string' ? note.content : '',
+        content,
+        preview,
+        previewHash,
         isPinned: !!note.isPinned,
         lastEdited: Number.isFinite(lastEdited) ? lastEdited : null
     };
@@ -100,10 +116,22 @@ export function normalizeLoadedData(data) {
     return { notebooks, trash, settings, profile, calendar, loadError };
 }
 
+/** Strips full HTML content before persisting — content lives in .html files only. */
+function serializeNoteForDisk(note) {
+    const { content: _dropped, ...rest } = note;
+    return rest;
+}
+
 export async function saveAll() {
+    const notebooksForDisk = state.notebooks.map(nb => ({
+        ...nb,
+        notes: nb.notes.map(serializeNoteForDisk)
+    }));
+    const trashForDisk = state.trash.map(serializeNoteForDisk);
+
     const result = await window.api.saveData({
-        notebooks: state.notebooks,
-        trash: state.trash,
+        notebooks: notebooksForDisk,
+        trash: trashForDisk,
         settings: state.settings,
         profile: state.profile,
         calendar: state.calendar

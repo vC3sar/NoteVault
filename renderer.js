@@ -4,7 +4,8 @@ import { setupIPC } from './js/ipc.js';
 import { setupEventListeners } from './js/events.js';
 import { cleanupTrash, selectNote, addNote, restoreNote, permanentlyDeleteNote } from './js/notes.js';
 import { selectNotebook, addNotebook } from './js/notebooks.js';
-import { refreshIcons, cleanHTML } from './js/utils.js';
+import { forceSaveNote } from './js/editor.js';
+import { refreshIcons, cleanHTML, buildPreview, hashString } from './js/utils.js';
 import * as calendarEngine from './js/calendar.js';
 
 // Expose functions to window for HTML compatibility (onclick handlers)
@@ -22,6 +23,7 @@ window.updateZoom = updateZoom;
 window.applyTheme = applyTheme;
 window.saveAll = saveAll;
 window.toggleNotesPanel = toggleNotesPanel;
+window.forceSaveNote = forceSaveNote;
 
 // Initialization — wait for all HTML partials to be injected into the DOM.
 // ES modules are deferred, so partials:ready may fire before this listener
@@ -71,6 +73,53 @@ async function initApp() {
     
     setupIPC();
     setupEventListeners();
+
+    // Backfill previews en segundo plano — no bloquea el arranque
+    backfillPreviews().catch(err => console.warn('[preview-backfill] error:', err));
+}
+
+/**
+ * Para cada nota sin preview válido (campo ausente o hash distinto al del .html en disco),
+ * carga el archivo .html, regenera preview + hash y persiste en un solo saveAll().
+ * Las notas vacías se omiten.
+ */
+async function backfillPreviews() {
+    const allNotes = [
+        ...state.notebooks.flatMap(nb => nb.notes.map(n => ({ note: n, source: nb.notes }))),
+        ...state.trash.map(n => ({ note: n, source: state.trash }))
+    ];
+
+    let dirty = false;
+
+    for (const { note } of allNotes) {
+        // Si ya tiene preview con hash, saltar
+        if (note.preview && note.previewHash) continue;
+
+        // Intentar cargar el .html desde disco
+        let html = '';
+        try {
+            html = await window.api.loadNote(note.id);
+        } catch (_) { /* nota sin archivo .html todavía */ }
+
+        if (!html) continue; // nota vacía — omitir
+
+        const newHash = hashString(html);
+
+        // Si el hash coincide con el guardado, el preview ya es válido (sólo falta persistir)
+        if (note.previewHash === newHash && note.preview) continue;
+
+        const newPreview = buildPreview(html);
+        if (!newPreview) continue; // sigue vacía
+
+        note.preview = newPreview;
+        note.previewHash = newHash;
+        dirty = true;
+    }
+
+    if (dirty) {
+        await saveAll();
+        console.info('[preview-backfill] Previews actualizados y guardados.');
+    }
 }
 
 // Start: if partials already loaded (loader ran before module), init now.
@@ -88,14 +137,11 @@ export function startPeriodicAutosave() {
 
     periodicTimer = setInterval(async () => {
         if (state.activeNoteId) {
-            const editor = document.getElementById('editor');
-            const content = editor ? editor.innerHTML : '';
-            const sanitizedContent = cleanHTML(content);
             if (typeof window.updateHighlightsPanel === 'function') window.updateHighlightsPanel();
-            if (editor && sanitizedContent !== content) editor.innerHTML = sanitizedContent;
-            await window.api.saveNoteContent(state.activeNoteId, sanitizedContent);
+            await window.forceSaveNote(); // Utiliza la lógica centralizada que incluye los hashes y metadatos
+        } else {
+            await saveAll(); // Si no hay nota activa, solo guarda la estructura general
         }
-        await saveAll();
     }, ms);
 }
 window.startPeriodicAutosave = startPeriodicAutosave;

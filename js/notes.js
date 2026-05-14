@@ -40,7 +40,7 @@ export function renderNotesList() {
         item.className = `group flex items-center justify-between p-3 rounded-xl cursor-pointer transition-colors ${isActive ? 'bg-primary/5 border border-primary/10' : 'hover:bg-surface-bright border border-transparent'}`;
 
         const pinHtml = note.isPinned ? `<i data-lucide="pin" class="w-3 h-3 text-primary rotate-45 mr-2"></i>` : '';
-        const plainPreview = stripHTML(note.content || '');
+        const plainPreview = note.preview || stripHTML(note.content || '');
         const safeTitle = escapeHTML(note.title || 'Nota sin título');
         const safePreview = escapeHTML(plainPreview ? `${plainPreview.substring(0, 30)}${plainPreview.length > 30 ? '...' : ''}` : 'Sin contenido');
 
@@ -197,7 +197,7 @@ export function renderTrashList() {
         const daysLabel = daysLeft <= 0 ? 'Expirando hoy' : `${daysLeft} días restantes`;
         const originalNb = state.notebooks.find(nb => nb.id === note.originalNotebookId);
         const originalName = originalNb ? originalNb.name : 'Libreta eliminada';
-        const plainPreview = stripHTML(note.content || '');
+        const plainPreview = note.preview || stripHTML(note.content || '');
         const safeTitle = escapeHTML(note.title || 'Nota sin título');
         const safeOriginalName = escapeHTML(originalName);
         const safePreview = escapeHTML(plainPreview ? plainPreview.substring(0, 80) : 'Sin contenido');
