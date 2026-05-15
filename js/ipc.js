@@ -172,8 +172,8 @@ export function setupIPC() {
             if (!player) return;
             if (!data || !state.settings.enableMedia) { player.classList.add('hidden'); return; }
 
-            data.title = data.title.normalize('NFC');
-            data.artist = data.artist.normalize('NFC');
+            if (typeof data.title === 'string') data.title = data.title.normalize('NFC');
+            if (typeof data.artist === 'string') data.artist = data.artist.normalize('NFC');
 
             player.classList.remove('hidden');
             document.getElementById('media-title').textContent = data.title || 'Desconocido';
