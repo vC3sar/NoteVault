@@ -21,6 +21,7 @@ contextBridge.exposeInMainWorld('api', {
 
     // Sistema local de cerrado anti pérdidas
     onAppClosing: (callback) => ipcRenderer.on('app-closing', () => callback()),
+    onForceSave: (callback) => ipcRenderer.on('force-save', () => callback()),
     sendSafeCloseReady: () => ipcRenderer.send('safe-close-ready'),
 
     // Spotify / Media Player Integration

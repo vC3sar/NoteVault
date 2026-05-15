@@ -154,12 +154,27 @@ export function setupIPC() {
         });
     }
 
+    if (window.api.onForceSave) {
+        window.api.onForceSave(async () => {
+            if (state.activeNoteId) {
+                const editor = document.getElementById('editor');
+                const content = editor ? editor.innerHTML : '';
+                await window.api.saveNoteContent(state.activeNoteId, cleanHTML(content));
+            }
+            await saveAll();
+        });
+    }
+
     if (window.api.onMediaUpdate) {
         window.api.onMediaUpdate((data) => {
             if (window.mediaTempDisabled) return;
             const player = document.getElementById('media-player');
             if (!player) return;
             if (!data || !state.settings.enableMedia) { player.classList.add('hidden'); return; }
+
+            data.title = data.title.normalize('NFC');
+            data.artist = data.artist.normalize('NFC');
+
             player.classList.remove('hidden');
             document.getElementById('media-title').textContent = data.title || 'Desconocido';
             document.getElementById('media-artist').textContent = data.artist || data.appName || 'Sin artista';
@@ -171,10 +186,10 @@ export function setupIPC() {
 
     if (window.api.onMenuAction) {
         const MENU_COMMANDS = {
-            'view-library':   () => showDashboard('all'),
+            'view-library': () => showDashboard('all'),
             'view-favorites': () => showDashboard('favorites'),
-            'view-trash':     () => showTrash(),
-            'view-calendar':  () => showCalendar(),
+            'view-trash': () => showTrash(),
+            'view-calendar': () => showCalendar(),
         };
         window.api.onMenuAction((action) => {
             const command = MENU_COMMANDS[action];

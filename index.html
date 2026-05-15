@@ -17,6 +17,13 @@
 
 <body class="bg-surface text-on-surface flex h-screen overflow-hidden font-sans">
 
+    <!-- Video Loader -->
+    <div id="video-loader" class="fixed inset-0 z-50 flex items-center justify-center bg-[#111111] transition-opacity duration-500">
+        <video id="intro-video" class="w-full h-full object-cover" autoplay muted playsinline>
+            <source src="mp4/notevault.mp4" type="video/mp4">
+        </video>
+    </div>
+
     <!-- Sidebar -->
     <div data-partial="sidebar"></div>
 
@@ -46,6 +53,27 @@
     <script src="js/partials-loader.js"></script>
     <script type="module" src="renderer.js"></script>
 
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const videoLoader = document.getElementById('video-loader');
+            const introVideo = document.getElementById('intro-video');
+
+            if (introVideo && videoLoader) {
+                // When video finishes playing
+                introVideo.addEventListener('ended', () => {
+                    videoLoader.style.opacity = '0';
+                    setTimeout(() => {
+                        videoLoader.remove();
+                    }, 500); // Wait for transition to finish
+                });
+
+                // Fail-safe in case video cannot auto-play or encounters an error
+                introVideo.addEventListener('error', () => {
+                    videoLoader.remove();
+                });
+            }
+        });
+    </script>
 </body>
 
 </html>

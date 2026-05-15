@@ -45,6 +45,12 @@ function setupMenu(mainWindow, debug) {
           label: 'Ir al Calendario',
           accelerator: 'CmdOrCtrl+H',
           click: () => { mainWindow.webContents.send('menu-action', 'view-calendar'); }
+        },
+        { type: 'separator' },
+        {
+          label: 'Pantalla Completa',
+          accelerator: 'F11',
+          click: () => { mainWindow.setFullScreen(!mainWindow.isFullScreen()); }
         }
       ]
     },
@@ -58,7 +64,7 @@ function setupMenu(mainWindow, debug) {
               type: 'info',
               title: 'Atajos de Teclado',
               message: 'Comandos rápidos para NoteVault',
-              detail: 'Ctrl + L: Ir a la Librería\nCtrl + T: Ir a la Papelera\nCtrl + F: Ir a Favoritos\nCtrl + H: Ir al Calendario',
+              detail: 'Ctrl + L: Ir a la Librería\nCtrl + T: Ir a la Papelera\nCtrl + F: Ir a Favoritos\nCtrl + H: Ir al Calendario\nF11: Pantalla Completa',
               buttons: ['Cerrar']
             });
           }

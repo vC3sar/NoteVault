@@ -4,6 +4,7 @@
 
 const { BrowserWindow, Menu, MenuItem, dialog } = require('electron');
 const path = require('path');
+const { createTray, destroyTray, notifyMinimized } = require('./tray');
 
 let mainWindow = null;
 let mediaPollInterval = null;
@@ -78,6 +79,8 @@ function createWindow(debug, checkMedia) {
     if (!debug) mainWindow.maximize();
     mainWindow.show();
     mainWindow.focus();
+    // Iniciar el tray una vez que la ventana esté lista
+    createTray(() => mainWindow);
   });
 
   // Media polling
@@ -89,14 +92,17 @@ function createWindow(debug, checkMedia) {
     }, 2000);
   }
 
-  // Manejo de cierre seguro y estético
+  // Al presionar X: ocultar al tray discretamente (NO cerrar la app)
   mainWindow.on('close', (e) => {
     const { app } = require('electron');
     if (!app.isQuitting) {
       e.preventDefault();
-      // Solicitamos al renderer que guarde el estado y cambios locales (autosave)
-      // sin interrumpir la experiencia con un diálogo nativo antiestético.
-      mainWindow.webContents.send('app-closing');
+      // Guardar la nota activa antes de ocultar
+      mainWindow.webContents.send('force-save');
+      // Ocultar la ventana en lugar de destruirla
+      mainWindow.hide();
+      // Avisar al usuario la primera vez en cada sesión
+      notifyMinimized();
     }
   });
 
@@ -105,6 +111,7 @@ function createWindow(debug, checkMedia) {
       clearInterval(mediaPollInterval);
       mediaPollInterval = null;
     }
+    destroyTray();
     mainWindow = null;
   });
 
