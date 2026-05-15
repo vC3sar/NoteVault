@@ -28,7 +28,7 @@
     "electron-builder": "^26.8.1"
   },
   "dependencies": {
-    "win-media-control": "^0.1.1"
+    "win-media-control-enhanced": "latest"
   },
   "pnpm": {
     "onlyBuiltDependencies": [

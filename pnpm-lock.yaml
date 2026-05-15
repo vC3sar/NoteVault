@@ -8,8 +8,8 @@ importers:
 
   .:
     dependencies:
-      win-media-control:
-        specifier: ^0.1.1
+      win-media-control-enhanced:
+        specifier: latest
         version: 0.1.1
     devDependencies:
       electron:
@@ -1021,8 +1021,8 @@ packages:
     engines: {node: ^20.17.0 || >=22.9.0}
     hasBin: true
 
-  win-media-control@0.1.1:
-    resolution: {integrity: sha512-fRpSAXwvap+BzCwb4MzsezesU7fOKz1zQhgYOw43QIzAHf3+9vHTy3WK9v1e+bv5AEjzBc73wvsV8DHF/+HpaQ==}
+  win-media-control-enhanced@0.1.1:
+    resolution: {integrity: sha512-jr/qqNwxf9OdlenkmHyzsxB+RJUJ3WaW3lwCJ3PrvsCJxVbFp2NSFbT/YvOKyk4vx+c+Xc1d46olk9Xz+oPoFw==}
     engines: {node: '>=14.0.0'}
     os: [win32]
     hasBin: true
@@ -2226,7 +2226,7 @@ snapshots:
     dependencies:
       isexe: 4.0.0
 
-  win-media-control@0.1.1: {}
+  win-media-control-enhanced@0.1.1: {}
 
   wrap-ansi@7.0.0:
     dependencies:

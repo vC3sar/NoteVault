@@ -161,7 +161,7 @@ NoteVault
 ├── Almacenamiento
 │   └── Sistema de archivos local (JSON + HTML)
 └── Integraciones
-    └── win-media-control (Windows Media Session API)
+    └── win-media-control-enhanced (Windows Media Session API)
 ```
 
 ---

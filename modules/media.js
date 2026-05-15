@@ -1,5 +1,5 @@
 // src/main/media.js
-// Módulo del proceso principal encargado del control de medios (win-media-control).
+// Módulo del proceso principal encargado del control de medios (win-media-control-enhanced).
 // No importar desde /js/ — ese es el proceso de renderizado.
 
 const { ipcMain } = require('electron');
@@ -12,12 +12,12 @@ let ipcRegistered = false;
  * @param {() => Electron.BrowserWindow} getWindow - Getter que devuelve la mainWindow activa.
  */
 function initMedia(getWindow) {
-  import('win-media-control')
+  import('win-media-control-enhanced')
     .then(module => {
-      mediaControl = module;
+      mediaControl = module?.default ?? module;
     })
     .catch(e => {
-      console.error('win-media-control not available', e);
+      console.error('win-media-control-enhanced not available', e);
     });
 
   if (!ipcRegistered) {
@@ -25,21 +25,32 @@ function initMedia(getWindow) {
 
     // Eventos IPC de control de medios
     ipcMain.on('media-toggle', async () => {
-      if (mediaControl) {
+      if (!mediaControl) return;
+
+      if (mediaControl.togglePlayPause) {
         await mediaControl.togglePlayPause();
-        setTimeout(() => checkMedia(getWindow), 500);
+      } else if (mediaControl.listSessions && mediaControl.play && mediaControl.pause) {
+        const sessions = await mediaControl.listSessions();
+        const active = (sessions || []).find(s => s.playbackStatus === 'Playing') || (sessions || [])[0];
+        if (active?.playbackStatus === 'Playing') {
+          await mediaControl.pause();
+        } else {
+          await mediaControl.play();
+        }
       }
+
+      setTimeout(() => checkMedia(getWindow), 500);
     });
 
     ipcMain.on('media-next', async () => {
-      if (mediaControl) {
+      if (mediaControl?.next) {
         await mediaControl.next();
         setTimeout(() => checkMedia(getWindow), 500);
       }
     });
 
     ipcMain.on('media-prev', async () => {
-      if (mediaControl) {
+      if (mediaControl?.previous) {
         await mediaControl.previous();
         setTimeout(() => checkMedia(getWindow), 500);
       }
@@ -58,6 +69,8 @@ function initMedia(getWindow) {
 function checkMedia(getWindow) {
   const win = getWindow();
   if (!mediaControl || !win || win.isDestroyed()) return;
+
+  if (!mediaControl.listSessions) return;
 
   mediaControl.listSessions()
     .then(sessions => {
