@@ -31,11 +31,11 @@ export function setupEventListeners() {
         document.getElementById('custom-context-menu').classList.add('hidden');
     });
 
-    // Unified Event Delegation for Click events
+    // Delegación unificada de eventos `click`: reduce listeners y funciona bien con partials dinámicos.
     document.addEventListener('click', async (e) => {
         const target = e.target;
 
-        // Settings Modal
+        // Modal de configuración: hidratar valores desde `state` y aplicar cambios persistentes.
         if (target.closest('#settings-btn')) {
             const autosaveInput = document.getElementById('autosave-interval-input');
             const themeInput = document.getElementById('theme-input');
@@ -86,7 +86,7 @@ export function setupEventListeners() {
             if (window.startPeriodicAutosave) window.startPeriodicAutosave();
         }
 
-        // Profile Modal
+        // Modal de perfil: editar y persistir datos del usuario (nombre, email, idioma).
         if (target.closest('#profile-btn')) {
             const nameInput = document.getElementById('profile-name-input');
             const emailInput = document.getElementById('profile-email-input');
@@ -132,7 +132,7 @@ export function setupEventListeners() {
             await saveAll();
         }
 
-        // Action Buttons
+        // Acciones de UI: creación, navegación y controles globales (sidebar/zoom).
         if (target.closest('#add-notebook')) {
             addNotebook();
         }
@@ -162,7 +162,7 @@ export function setupEventListeners() {
             renderTrashList();
         }
 
-        // Attachments Panel
+        // Panel de adjuntos: abrir/cerrar y refrescar lista sin acoplarse al editor.
         if (target.closest('#toggle-attachments')) {
             const panel = document.getElementById('attachments-panel');
             const toggleBtn = document.getElementById('toggle-attachments');
@@ -190,7 +190,7 @@ export function setupEventListeners() {
             if (toggleBtn) toggleBtn.classList.remove('bg-primary/10', 'text-primary', 'border-primary/20');
         }
 
-        // Notebook Cover Selection
+        // Selección de portada: alterna UI entre color e imagen al editar libretas.
         if (target.closest('input[name="cover-mode"]')) {
             const radio = target.closest('input[name="cover-mode"]');
             document.querySelectorAll('input[name="cover-mode"]').forEach(r => {
@@ -218,7 +218,7 @@ export function setupEventListeners() {
             }
         }
 
-        // Pro Edition Animation
+        // Animación decorativa del badge "Pro Edition". Mantener aislada del flujo de producto.
         if (target.closest('#pro-edition')) {
             const proEdition = target.closest('#pro-edition');
             if (proEdition.dataset.animating === 'true') return;
@@ -241,7 +241,7 @@ export function setupEventListeners() {
         }
     });
 
-    // Input Events Delegation
+    // Delegación unificada de eventos `input` para búsqueda, zoom y filtros.
     document.addEventListener('input', (e) => {
         const target = e.target;
 
@@ -295,7 +295,7 @@ export function setupEventListeners() {
         }
     });
 
-    // OS Preference Change
+    // Preferencia del SO: reaccionar sólo cuando el tema está configurado como `system`.
     window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', e => {
         if (state.settings.theme === 'system') applyTheme('system');
     });

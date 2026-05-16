@@ -4,6 +4,20 @@ import { renderSidebar, renderNotebookGrid, selectNotebook } from './notebooks.j
 import { renderNotesList, selectNote, cleanupTrash } from './notes.js';
 import { refreshIcons, showModal, createId, cleanHTML } from './utils.js';
 
+/**
+ * js/ipc.js — Adaptadores IPC en el renderer.
+ *
+ * Responsabilidades:
+ * - Traducir eventos/acciones provenientes del proceso principal (menús, cierre, media)
+ *   a actualizaciones de estado + re-render de UI.
+ * - Centralizar el manejo de "safe close": el proceso principal solicita guardado y el
+ *   renderer confirma cuando terminó (`safe-close-ready`).
+ *
+ * Nota:
+ * - Evitar lógica de persistencia duplicada: `saveAll()` es el punto único para metadata.
+ * - Cualquier operación de archivos debe pasar por `window.api`.
+ */
+
 function getFileLabel(value) {
     const raw = String(value || '');
     if (!raw) return '';

@@ -3,6 +3,18 @@ import { refreshIcons } from './utils.js';
 import { renderNotebookGrid, renderSidebar, renderRecentNotes } from './notebooks.js';
 import { renderTrashList, cleanupOrphans, cleanupTrash } from './notes.js';
 
+/**
+ * js/ui.js — Renderizado y navegación de alto nivel.
+ *
+ * Responsabilidades:
+ * - Gestionar transiciones entre vistas (dashboard, libreta, papelera, calendario).
+ * - Aplicar temas, zoom y estados globales de UI (sidebar, paneles).
+ *
+ * Diseño:
+ * - Este módulo opera sobre el DOM. La fuente de verdad del producto es `state`.
+ * - Mantener funciones idempotentes: cambiar de vista debe "resetear" UI de forma segura.
+ */
+
 export function applyTheme(theme) {
     const html = document.documentElement;
     if (theme === 'dark') {
@@ -120,7 +132,7 @@ export function showTrash() {
         trashView.classList.remove('hidden');
         trashView.classList.add('block');
 
-        // Update subtitle with current retention days
+        // Reflejar la política de retención actual para que el usuario entienda el borrado automático.
         const subtitle = trashView.querySelector('p');
         if (subtitle) {
             const days = state.settings.trashRetentionDays || 30;
@@ -255,7 +267,7 @@ let greetingInterval = null;
 let greetingToggleState = 0; // 0: Clase, 1: Saludo
 
 export function updateGreeting() {
-    // Reiniciamos el estado para que siempre empiece mostrando la clase primero si existe
+    // Reiniciar el estado para que el primer render priorice información contextual (clases) si existe.
     if (greetingInterval) {
         clearInterval(greetingInterval);
         greetingInterval = null;
@@ -268,7 +280,7 @@ export function updateGreeting() {
         const greetingTextEl = document.getElementById('user-greeting-text');
         if (!greetingContainer || !greetingTextEl) return;
 
-        // Solo mostrar en la vista de biblioteca y si hay un perfil con nombre
+        // Mostrar sólo en la vista de biblioteca y cuando exista un perfil con nombre.
         if (state.currentView !== 'all' || state.activeNotebookId || !state.profile || !state.profile.name) {
             greetingContainer.classList.add('hidden');
             return;
@@ -278,13 +290,13 @@ export function updateGreeting() {
         const hours = now.getHours();
         const name = state.profile.name.split(' ')[0];
 
-        // Determinar saludo base
+        // Determinar saludo base según hora local.
         let greetingText = "Buenas noches";
         if (hours >= 6 && hours < 12) greetingText = "Buenos días";
         else if (hours >= 12 && hours < 20) greetingText = "Buenas tardes";
         const baseGreeting = `${greetingText}, ${name}`;
 
-        // Buscar si hay clases hoy
+        // Construir mensaje contextual de horario (si aplica) para alternar con el saludo.
         let classMessageHTML = null;
         if (state.calendar && state.calendar.schedule) {
             let currentDay = now.getDay();
@@ -307,7 +319,7 @@ export function updateGreeting() {
             }
         }
 
-        // Si no hay clase hoy, mostramos el saludo y cancelamos cualquier intervalo activo
+        // Si no hay clases hoy, mostrar saludo y detener cualquier intervalo de alternancia.
         if (!classMessageHTML) {
             greetingTextEl.textContent = baseGreeting;
             greetingTextEl.className = 'text-4xl font-black text-on-surface tracking-tighter';
@@ -319,7 +331,7 @@ export function updateGreeting() {
             return;
         }
 
-        // Si hay clase, aseguramos que el intervalo esté corriendo para alternar
+        // Si hay clases, asegurar un único intervalo para alternar entre saludo y agenda.
         if (!greetingInterval) {
             greetingInterval = setInterval(() => {
                 greetingToggleState = (greetingToggleState + 1) % 2;
@@ -327,7 +339,7 @@ export function updateGreeting() {
             }, 8000);
         }
 
-        // Renderizar con efecto de fundido
+        // Render con transición: evitar cambios bruscos al alternar contenidos.
         greetingTextEl.style.opacity = '0';
         setTimeout(() => {
             if (greetingToggleState === 0) {
@@ -354,7 +366,7 @@ export function toggleNotesPanel() {
 
     panel.classList.toggle('collapsed');
 
-    // Si el panel de notas está colapsado, mostramos el botón en el editor
+    // Si el panel está colapsado, mantener un affordance para reabrir desde el editor.
     if (panel.classList.contains('collapsed')) {
         showBtn.classList.remove('hidden');
     } else {

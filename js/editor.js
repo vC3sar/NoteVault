@@ -370,7 +370,7 @@ export function setupEditor() {
 
     editor.addEventListener('input', handleInput);
 
-    // Color picker listeners
+    // Selector de color: restaurar selección y aplicar `foreColor` sin perder foco.
     const picker = document.getElementById('text-color-picker');
     if (picker) {
         picker.addEventListener('input', (e) => {
@@ -389,7 +389,7 @@ export function setupEditor() {
         });
     }
 
-    // IPC Editor Listeners
+    // Entradas desde menús nativos (proceso principal) para comandos del editor.
     window.api.onEditAction((data) => executeEditAction(data));
 
     window.api.onImageAction((action) => {

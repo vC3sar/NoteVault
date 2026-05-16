@@ -293,8 +293,13 @@ export function hexToRgba(value, alpha = 1, fallback = 'rgba(43,45,46,1)') {
 }
 
 /**
- * djb2 hash of a string — lightweight, non-cryptographic.
- * Returns a base-36 string like "3q4r7a".
+ * Hash djb2 sobre un string.
+ *
+ * Uso:
+ * - Fingerprints rápidos para detectar cambios (no criptográfico).
+ * - Salida en base-36 para almacenamiento compacto (ej: "3q4r7a").
+ *
+ * Nota: no usar para seguridad, firmas o autenticación.
  */
 export function hashString(str) {
     let h = 5381;
@@ -306,8 +311,10 @@ export function hashString(str) {
 }
 
 /**
- * Builds a plain-text preview (max 150 chars) from raw HTML.
- * Returns empty string for blank notes so they can be skipped.
+ * Genera un preview en texto plano (máx. 150 chars) a partir de HTML.
+ *
+ * Convención:
+ * - Devuelve string vacío para notas en blanco (facilita filtros y evita ruido en UI).
  */
 export function buildPreview(htmlContent) {
     if (!htmlContent) return '';

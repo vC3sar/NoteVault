@@ -7,7 +7,9 @@ export let state = {
     profile: { name: '', email: '', lang: 'es' },
     activeNotebookId: null,
     activeNoteId: null,
-    currentView: 'all', // 'all', 'favorites', 'trash', or 'calendar'
+    // Vista actual del dashboard. Este valor guía el renderizado y navegación global.
+    // Valores esperados: 'all', 'favorites', 'trash', 'calendar'.
+    currentView: 'all',
     calendar: { events: [], schedule: [] }
 };
 
@@ -16,8 +18,9 @@ function normalizeNote(note) {
     const lastEdited = Number(note.lastEdited);
     const content = typeof note.content === 'string' ? note.content : '';
 
-    // Si el JSON antiguo aún trae content completo, generar preview al vuelo
-    // (compatibilidad hacia atrás). El backfill del renderer cubre el caso sin content.
+    // Compatibilidad hacia atrás: versiones antiguas persistían `content` completo en JSON.
+    // Si llega aquí, generamos `preview`/`previewHash` en caliente. El renderer también
+    // ejecuta un backfill cuando el `.html` existe pero el preview falta.
     let preview = typeof note.preview === 'string' ? note.preview : '';
     let previewHash = typeof note.previewHash === 'string' ? note.previewHash : '';
     if (content && (!preview || !previewHash)) {
@@ -116,7 +119,12 @@ export function normalizeLoadedData(data) {
     return { notebooks, trash, settings, profile, calendar, loadError };
 }
 
-/** Strips full HTML content before persisting — content lives in .html files only. */
+/**
+ * Serializa una nota para disco.
+ *
+ * Invariante: el HTML completo vive en archivos `.html` individuales, no en el JSON
+ * de metadata. Esto mantiene el JSON liviano y reduce el riesgo de corrupción.
+ */
 function serializeNoteForDisk(note) {
     const { content: _dropped, ...rest } = note;
     return rest;

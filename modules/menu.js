@@ -1,6 +1,13 @@
-// src/main/menu.js
-// Módulo del proceso principal encargado del menú de la aplicación (barra de menú nativa).
-// No importar desde /js/ — ese es el proceso de renderizado.
+/**
+ * modules/menu.js — Menú nativo (proceso principal).
+ *
+ * Responsabilidades:
+ * - Definir menús y atajos globales integrados con el sistema operativo.
+ * - Emitir comandos al renderer vía IPC (`menu-action`) sin acoplarse a la UI.
+ *
+ * Nota:
+ * - Mantener este módulo sin dependencias del renderer (`js/`), sólo IPC.
+ */
 
 const { Menu, dialog, shell, app } = require('electron');
 

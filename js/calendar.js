@@ -3,7 +3,7 @@ import { refreshIcons, escapeHTML, createId, safeHexColor, hexToRgba } from './u
 
 let currentDate = new Date();
 let selectedDate = new Date();
-let scheduleMode = 'lv'; // 'lv' (Lun-Vie) or 'ls' (Lun-Sab)
+let scheduleMode = 'lv'; // 'lv' (Lun-Vie) o 'ls' (Lun-Sab)
 let editingEventId = null;
 let editingScheduleId = null;
 
@@ -17,7 +17,7 @@ const dayNames = ["Domingo", "Lunes", "Martes", "Miércoles", "Jueves", "Viernes
 export function initCalendar() {
     renderCalendar();
     selectDay(new Date());
-    setScheduleMode('lv'); // Default
+    setScheduleMode('lv'); // Valor por defecto
 }
 
 export function renderCalendar() {
@@ -29,7 +29,7 @@ export function renderCalendar() {
     const firstDay = new Date(year, month, 1).getDay();
     const daysInMonth = new Date(year, month + 1, 0).getDate();
     
-    // Adjust firstDay so Monday is 0 instead of Sunday being 0
+    // Ajuste de inicio de semana: convertir domingo (0) a final de semana para UI Lun-Dom.
     let startDay = firstDay === 0 ? 6 : firstDay - 1;
     
     const grid = document.getElementById('calendar-grid-content');
@@ -38,7 +38,7 @@ export function renderCalendar() {
     
     const today = new Date();
     
-    // Previous month padding
+    // Relleno con días del mes anterior para completar la grilla.
     const prevMonthDays = new Date(year, month, 0).getDate();
     for (let i = startDay - 1; i >= 0; i--) {
         const d = prevMonthDays - i;
@@ -46,7 +46,7 @@ export function renderCalendar() {
         grid.appendChild(cell);
     }
     
-    // Current month days
+    // Días del mes actual.
     for (let i = 1; i <= daysInMonth; i++) {
         const d = new Date(year, month, i);
         const isToday = d.toDateString() === today.toDateString();
@@ -55,7 +55,7 @@ export function renderCalendar() {
         grid.appendChild(cell);
     }
     
-    // Next month padding to complete the grid (usually 6 rows = 42 cells)
+    // Relleno con días del mes siguiente para completar la grilla (6 filas = 42 celdas).
     const totalCells = startDay + daysInMonth;
     const remainingCells = 42 - totalCells;
     for (let i = 1; i <= remainingCells; i++) {
@@ -95,7 +95,7 @@ function createDayCell(date, isPadding, isToday = false, isSelected = false) {
     dayHeader.innerHTML = `<span class="${daySpanClass}">${dayNum}</span>`;
     cell.appendChild(dayHeader);
     
-    // Add events indicators
+    // Indicadores de eventos puntuales (por fecha exacta).
     const eventsContainer = document.createElement('div');
     eventsContainer.className = 'flex-1 overflow-y-auto custom-scrollbar space-y-1 mt-1';
     
@@ -111,8 +111,8 @@ function createDayCell(date, isPadding, isToday = false, isSelected = false) {
         eventsContainer.appendChild(evt);
     });
 
-    // Add recurring schedule classes
-    const dayOfWeek = date.getDay() === 0 ? 7 : date.getDay(); // Adjust Sunday if needed, though our schedule is 1-6
+    // Indicadores de horario recurrente (clases por día de la semana).
+    const dayOfWeek = date.getDay() === 0 ? 7 : date.getDay(); // Normalizar domingo para que el horario use 1-7.
     const scheduleItems = (state.calendar.schedule || []).filter(s => s.day === dayOfWeek);
     scheduleItems.forEach(s => {
         const classEvt = document.createElement('div');
@@ -140,7 +140,7 @@ export function goToToday() {
 export function selectDay(date) {
     selectedDate = new Date(date);
     
-    // If selecting a day outside current month view, navigate there
+    // Si el usuario selecciona un día fuera del mes visible, navegar a ese mes para consistencia.
     if (selectedDate.getMonth() !== currentDate.getMonth() || selectedDate.getFullYear() !== currentDate.getFullYear()) {
         currentDate = new Date(selectedDate);
     }
@@ -151,7 +151,7 @@ export function selectDay(date) {
 
 export function renderDayDetails(date) {
     const dateStr = date.toISOString().split('T')[0];
-    const dayOfWeek = date.getDay(); // 0 is Sunday, 1 is Monday...
+    const dayOfWeek = date.getDay(); // 0 = domingo, 1 = lunes, etc.
     
     document.getElementById('selected-day-title').textContent = `${dayNames[dayOfWeek]}, ${date.getDate()} de ${monthNames[date.getMonth()]}`;
     
@@ -308,7 +308,7 @@ export async function addScheduleItem() {
         state.calendar.schedule.push(newItem);
     }
     
-    // Sort by start time
+    // Ordenar por hora de inicio para un render consistente.
     state.calendar.schedule.sort((a, b) => a.start.localeCompare(b.start));
     
     await saveAll();
@@ -325,7 +325,7 @@ export async function addScheduleItem() {
         if (typeof refreshIcons === 'function') refreshIcons();
     }
 
-    // Reset inputs
+    // Reset de inputs para evitar valores residuales al volver a abrir el modal.
     document.getElementById('schedule-subject').value = '';
     document.getElementById('schedule-start').value = '';
     document.getElementById('schedule-end').value = '';

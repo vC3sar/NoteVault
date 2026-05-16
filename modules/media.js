@@ -1,6 +1,15 @@
-// src/main/media.js
-// Módulo del proceso principal encargado del control de medios (win-media-control-enhanced).
-// No importar desde /js/ — ese es el proceso de renderizado.
+/**
+ * modules/media.js — Control de media sessions (proceso principal).
+ *
+ * Responsabilidades:
+ * - Encapsular integración con Windows Media Session API (vía win-media-control-enhanced).
+ * - Exponer comandos (play/pause/next/previous) por IPC para ser invocados desde UI.
+ * - Publicar snapshots periódicos al renderer para renderizar el mini-player.
+ *
+ * Diseño:
+ * - La dependencia se carga dinámicamente para no romper la app en entornos donde
+ *   la API no esté disponible o falle por permisos/implementación.
+ */
 
 const { ipcMain } = require('electron');
 
@@ -23,7 +32,7 @@ function initMedia(getWindow) {
   if (!ipcRegistered) {
     ipcRegistered = true;
 
-    // Eventos IPC de control de medios
+    // Comandos de control de media emitidos desde el renderer.
     ipcMain.on('media-toggle', async () => {
       if (!mediaControl) return;
 

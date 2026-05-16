@@ -1,6 +1,14 @@
-// modules/tray.js
-// Módulo del proceso principal que gestiona el ícono del System Tray (bandeja del sistema).
-// Al cerrar la ventana principal, la app se minimiza aquí discretamente.
+/**
+ * modules/tray.js — Bandeja del sistema (proceso principal).
+ *
+ * Responsabilidades:
+ * - Mantener un punto de entrada persistente cuando la ventana se oculta.
+ * - Exponer acciones críticas (abrir, salir) y enlaces externos de soporte.
+ *
+ * Notas:
+ * - `app.isQuitting` es el flag que indica cierre real (no sólo ocultar ventana).
+ * - El "Salir" inicia un cierre ordenado: el renderer persiste y luego confirma.
+ */
 
 const { Tray, Menu, app, nativeImage, shell } = require('electron');
 const path = require('path');
@@ -13,7 +21,8 @@ let hasNotified = false;
  * @param {() => Electron.BrowserWindow} getWindow - Función que retorna la ventana principal.
  */
 function createTray(getWindow) {
-  if (tray) return; // Evitar duplicados
+  // Idempotencia: Electron permite múltiples instancias de Tray si no se controla.
+  if (tray) return;
 
   const iconPath = path.join(__dirname, '..', 'img', 'logo.png');
   const icon = nativeImage.createFromPath(iconPath).resize({ width: 16, height: 16 });
@@ -41,7 +50,7 @@ function createTray(getWindow) {
         const win = getWindow();
         app.isQuitting = true;
 
-        // Guardar antes de salir definitivamente
+        // Cierre ordenado: el renderer guarda y luego envía `safe-close-ready`.
         if (win && !win.isDestroyed()) {
           win.webContents.send('app-closing');
         } else {
@@ -53,7 +62,7 @@ function createTray(getWindow) {
 
   tray.setContextMenu(contextMenu);
 
-  // Clic izquierdo en el ícono del tray → abrir la ventana
+  // Click en el ícono del tray: restaurar foco/visibilidad.
   tray.on('click', () => {
     const win = getWindow();
     if (win) {

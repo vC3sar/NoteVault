@@ -260,7 +260,7 @@ export function renderRecentNotes() {
     const container = document.getElementById('recent-notes-section');
     if (!container) return;
 
-    // Gather all notes from all notebooks with their notebook context
+    // Reunir notas recientes con su contexto de libreta para navegación rápida.
     const allNotes = [];
     state.notebooks.forEach(nb => {
         (nb.notes || []).forEach(note => {
@@ -283,16 +283,16 @@ export function renderRecentNotes() {
     list.innerHTML = '';
 
     const palette = [
-        { bg: 'rgba(225, 29, 72, 0.15)', iconColor: '#e11d48', bar: '#e11d48', pill: 'rgba(225, 29, 72, 0.15)', pillText: '#e11d48' }, // Red
-        { bg: 'rgba(234, 88, 12, 0.15)', iconColor: '#ea580c', bar: '#ea580c', pill: 'rgba(234, 88, 12, 0.15)', pillText: '#ea580c' }, // Orange
-        { bg: 'rgba(202, 138, 4, 0.15)', iconColor: '#ca8a04', bar: '#ca8a04', pill: 'rgba(202, 138, 4, 0.15)', pillText: '#ca8a04' }, // Gold
-        { bg: 'rgba(22, 163, 74, 0.15)', iconColor: '#16a34a', bar: '#16a34a', pill: 'rgba(22, 163, 74, 0.15)', pillText: '#16a34a' }, // Green
-        { bg: 'rgba(13, 148, 136, 0.15)', iconColor: '#0d9488', bar: '#0d9488', pill: 'rgba(13, 148, 136, 0.15)', pillText: '#0d9488' }, // Teal
-        { bg: 'rgba(37, 99, 235, 0.15)', iconColor: '#2563eb', bar: '#2563eb', pill: 'rgba(37, 99, 235, 0.15)', pillText: '#2563eb' }, // Blue
-        { bg: 'rgba(2, 132, 199, 0.15)', iconColor: '#0284c7', bar: '#0284c7', pill: 'rgba(2, 132, 199, 0.15)', pillText: '#0284c7' }, // Cyan
-        { bg: 'rgba(79, 70, 229, 0.15)', iconColor: '#4f46e5', bar: '#4f46e5', pill: 'rgba(79, 70, 229, 0.15)', pillText: '#4f46e5' }, // Indigo
-        { bg: 'rgba(147, 51, 234, 0.15)', iconColor: '#9333ea', bar: '#9333ea', pill: 'rgba(147, 51, 234, 0.15)', pillText: '#9333ea' }, // Purple
-        { bg: 'rgba(219, 39, 119, 0.15)', iconColor: '#db2777', bar: '#db2777', pill: 'rgba(219, 39, 119, 0.15)', pillText: '#db2777' }  // Pink
+        { bg: 'rgba(225, 29, 72, 0.15)', iconColor: '#e11d48', bar: '#e11d48', pill: 'rgba(225, 29, 72, 0.15)', pillText: '#e11d48' }, // Rojo
+        { bg: 'rgba(234, 88, 12, 0.15)', iconColor: '#ea580c', bar: '#ea580c', pill: 'rgba(234, 88, 12, 0.15)', pillText: '#ea580c' }, // Naranja
+        { bg: 'rgba(202, 138, 4, 0.15)', iconColor: '#ca8a04', bar: '#ca8a04', pill: 'rgba(202, 138, 4, 0.15)', pillText: '#ca8a04' }, // Dorado
+        { bg: 'rgba(22, 163, 74, 0.15)', iconColor: '#16a34a', bar: '#16a34a', pill: 'rgba(22, 163, 74, 0.15)', pillText: '#16a34a' }, // Verde
+        { bg: 'rgba(13, 148, 136, 0.15)', iconColor: '#0d9488', bar: '#0d9488', pill: 'rgba(13, 148, 136, 0.15)', pillText: '#0d9488' }, // Verde azulado
+        { bg: 'rgba(37, 99, 235, 0.15)', iconColor: '#2563eb', bar: '#2563eb', pill: 'rgba(37, 99, 235, 0.15)', pillText: '#2563eb' }, // Azul
+        { bg: 'rgba(2, 132, 199, 0.15)', iconColor: '#0284c7', bar: '#0284c7', pill: 'rgba(2, 132, 199, 0.15)', pillText: '#0284c7' }, // Cian
+        { bg: 'rgba(79, 70, 229, 0.15)', iconColor: '#4f46e5', bar: '#4f46e5', pill: 'rgba(79, 70, 229, 0.15)', pillText: '#4f46e5' }, // Índigo
+        { bg: 'rgba(147, 51, 234, 0.15)', iconColor: '#9333ea', bar: '#9333ea', pill: 'rgba(147, 51, 234, 0.15)', pillText: '#9333ea' }, // Morado
+        { bg: 'rgba(219, 39, 119, 0.15)', iconColor: '#db2777', bar: '#db2777', pill: 'rgba(219, 39, 119, 0.15)', pillText: '#db2777' }  // Rosa
     ];
 
     function hashString(str) {
@@ -338,7 +338,7 @@ export function renderRecentNotes() {
             </div>
         `;
         item.onclick = () => {
-            // Navigate to the notebook and note
+            // Navegar en dos pasos: primero activar libreta, luego seleccionar la nota.
             import('./notebooks.js').then(m => m.selectNotebook(notebook.id)).then(() => {
                 import('./notes.js').then(m => m.selectNote(note.id));
             });

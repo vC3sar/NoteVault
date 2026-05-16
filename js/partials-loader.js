@@ -1,12 +1,17 @@
 /**
- * partials-loader.js
- * Loads HTML partial files via XMLHttpRequest (reliable with file:// in Electron)
- * and injects them into the DOM, then signals readiness via:
- *   - window.partialsReady = true  (for modules that load after this script)
- *   - document event 'partials:ready'  (for listeners registered before dispatch)
+ * js/partials-loader.js — Loader de partials HTML (renderer, pre-bootstrap).
  *
- * Usage in HTML: <div data-partial="sidebar"></div>
- * File resolved: partials/sidebar.html
+ * Motivación:
+ * - En Electron con `file://`, `fetch()` puede comportarse distinto según settings/versión.
+ * - Se usa `XMLHttpRequest` por compatibilidad y simplicidad en runtime local.
+ *
+ * Flujo:
+ * - Busca placeholders: `<div data-partial="sidebar"></div>`.
+ * - Resuelve el archivo: `partials/sidebar.html`.
+ * - Inyecta el HTML en el DOM y elimina el placeholder.
+ * - Señaliza readiness de dos formas para evitar condiciones de carrera:
+ *   - `window.partialsReady = true` para módulos que cargan después.
+ *   - Evento `document` `partials:ready` para listeners registrados antes.
  */
 
 function loadPartialSync(name) {
@@ -14,7 +19,8 @@ function loadPartialSync(name) {
         const xhr = new XMLHttpRequest();
         xhr.open('GET', `partials/${name}.html`, true);
         xhr.onload = () => {
-            if (xhr.status === 200 || xhr.status === 0) { // status 0 = file:// success
+            // `status === 0` es un caso válido bajo `file://` en Electron.
+            if (xhr.status === 200 || xhr.status === 0) {
                 resolve(xhr.responseText);
             } else {
                 console.error(`[partials-loader] Failed to load "${name}" (status ${xhr.status})`);
@@ -45,14 +51,14 @@ function loadPartialSync(name) {
         const wrapper = document.createElement('div');
         wrapper.innerHTML = html;
         
-        // Move all children out of the wrapper to keep a clean DOM
+        // Mover hijos fuera del wrapper para evitar nodos contenedores extra en el árbol.
         while (wrapper.firstChild) {
             slot.parentNode.insertBefore(wrapper.firstChild, slot);
         }
         slot.remove();
     }));
 
-    // Set flag for ES modules that check after loading
+    // Bandera y evento para coordinar con módulos ES que dependen del DOM final.
     window.partialsReady = true;
     document.dispatchEvent(new Event('partials:ready'));
 })();

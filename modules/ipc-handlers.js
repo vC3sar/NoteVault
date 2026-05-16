@@ -1,6 +1,15 @@
-// src/main/ipc-handlers.js
-// Módulo del proceso principal que registra todos los handlers IPC.
-// No importar desde /js/ — ese es el proceso de renderizado.
+/**
+ * modules/ipc-handlers.js — Contratos IPC (proceso principal).
+ *
+ * Este módulo es la frontera de confianza entre renderer y sistema de archivos.
+ * Todas las operaciones sensibles (persistencia, borrado, import/export, menús)
+ * deben implementarse aquí para poder validar entradas y controlar permisos.
+ *
+ * Principios:
+ * - No confiar en el renderer: validar ids, normalizar rutas y limitar directorios.
+ * - Persistencia atómica para minimizar corrupción ante cierres inesperados.
+ * - Mantener las APIs IPC estables; cambios aquí impactan `preload.js` y `js/ipc.js`.
+ */
 
 const { ipcMain, Menu, BrowserWindow, app } = require('electron');
 const path = require('path');
@@ -81,7 +90,7 @@ function registerIpcHandlers({ DATA_PATH, NOTES_DIR, COVERS_DIR, ATTACHMENTS_DIR
         await fsp.copyFile(filePath, DATA_BACKUP_PATH);
       }
     } catch (error) {
-      // Backup is best-effort.
+      // El backup es best-effort: no debe bloquear el guardado principal.
     }
 
     try {
@@ -109,7 +118,7 @@ function registerIpcHandlers({ DATA_PATH, NOTES_DIR, COVERS_DIR, ATTACHMENTS_DIR
     }
   }
 
-  // ── Almacenamiento principal (metadata) ────────────────────────────────────
+  // Persistencia de metadata: estructura de libretas/notas/ajustes (sin HTML completo).
 
   ipcMain.handle('save-data', async (event, data) => {
     try {
@@ -128,7 +137,7 @@ function registerIpcHandlers({ DATA_PATH, NOTES_DIR, COVERS_DIR, ATTACHMENTS_DIR
     }
   });
 
-  // ── Contenido de notas (archivos HTML) ─────────────────────────────────────
+  // Persistencia de contenido: HTML por nota en archivos individuales.
 
   ipcMain.handle('save-note-content', async (event, { id, content }) => {
     try {
@@ -163,7 +172,7 @@ function registerIpcHandlers({ DATA_PATH, NOTES_DIR, COVERS_DIR, ATTACHMENTS_DIR
       const filePath = path.join(NOTES_DIR, `${safeId}.html`);
       if (await pathExists(filePath)) {
         const content = await fsp.readFile(filePath, 'utf-8');
-        // Buscar rutas de adjuntos locales y eliminarlos
+        // Eliminar adjuntos locales referenciados por la nota para evitar orfandad.
         const imgRegex = /src="file:\/\/\/([^"]+attachments\/[^"]+)"/g;
         let match;
         while ((match = imgRegex.exec(content)) !== null) {
@@ -180,7 +189,7 @@ function registerIpcHandlers({ DATA_PATH, NOTES_DIR, COVERS_DIR, ATTACHMENTS_DIR
     }
   });
 
-  // ── Portadas (covers) ──────────────────────────────────────────────────────
+  // Portadas de libretas (covers): archivos de imagen administrados por la app.
 
   ipcMain.handle('upload-cover', async (event, filePath) => {
     try {
@@ -202,7 +211,7 @@ function registerIpcHandlers({ DATA_PATH, NOTES_DIR, COVERS_DIR, ATTACHMENTS_DIR
     }
   });
 
-  // ── Adjuntos (imágenes pegadas) ────────────────────────────────────────────
+  // Adjuntos (imágenes pegadas): almacenamiento local para assets dentro de notas.
 
   ipcMain.handle('save-pasted-image', async (event, { url, base64 }) => {
     try {
@@ -216,7 +225,7 @@ function registerIpcHandlers({ DATA_PATH, NOTES_DIR, COVERS_DIR, ATTACHMENTS_DIR
         await fsp.writeFile(destPath, buffer);
       } else if (url) {
         if (url.startsWith('file:///')) {
-          // Copiar archivo local existente para dar independencia
+          // Copiar archivo local para que la nota sea autocontenida y no dependa de rutas externas.
           const srcPath = normalizePath(url);
           if (await pathExists(srcPath)) {
             await fsp.copyFile(srcPath, destPath);
@@ -263,7 +272,7 @@ function registerIpcHandlers({ DATA_PATH, NOTES_DIR, COVERS_DIR, ATTACHMENTS_DIR
         return { success: false, error: 'Not an attachment or file not found' };
       }
 
-      // Seguridad: Escanear todas las notas para ver si alguien más la usa
+      // Seguridad: escanear notas para evitar borrar un adjunto referenciado por otra nota.
       const notes = await fsp.readdir(NOTES_DIR);
       let isUsed = false;
       for (const noteFile of notes) {
@@ -287,14 +296,15 @@ function registerIpcHandlers({ DATA_PATH, NOTES_DIR, COVERS_DIR, ATTACHMENTS_DIR
     }
   });
 
-  // ── Ciclo de vida ──────────────────────────────────────────────────────────
+  // Ciclo de vida: handshake de cierre seguro coordinado desde el proceso principal.
 
   ipcMain.on('safe-close-ready', () => {
     app.isQuitting = true;
     app.quit();
   });
 
-  // ── Menús contextuales ─────────────────────────────────────────────────────
+  // Menús contextuales: se construyen en main para integrarse con el SO y evitar
+  // replicar lógica de menús en el renderer.
 
   ipcMain.on('show-notebook-menu', (event, { id, isFavorite }) => {
     const template = [

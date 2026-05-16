@@ -1,6 +1,15 @@
-// src/main/window.js
-// Módulo del proceso principal encargado de la creación y configuración de la ventana principal.
-// No importar desde /js/ — ese es el proceso de renderizado.
+/**
+ * modules/window.js — Ventana principal (proceso principal).
+ *
+ * Responsabilidades:
+ * - Crear la `BrowserWindow` con settings de seguridad (preload, isolation, etc.).
+ * - Gestionar ciclo de vida (ready-to-show, close/closed) y comportamiento de minimizar al tray.
+ * - Proveer UX nativa: menú contextual con sugerencias de ortografía del sistema.
+ *
+ * Contratos:
+ * - El renderer nunca debe asumir que la ventana se destruye al cerrar; por defecto se oculta.
+ * - El polling de media se inyecta como callback para mantener este módulo desacoplado.
+ */
 
 const { BrowserWindow, Menu, MenuItem, dialog } = require('electron');
 const path = require('path');
@@ -31,11 +40,11 @@ function createWindow(debug, checkMedia) {
     }
   });
 
-  // Manejador para el corrector ortográfico y menú contextual
+  // Menú contextual del sistema: sugerencias del corrector y acciones de edición.
   mainWindow.webContents.on('context-menu', (event, params) => {
     const menu = new Menu();
 
-    // Añadir sugerencias de ortografía
+    // Sugerencias del diccionario del sistema.
     for (const suggestion of params.dictionarySuggestions) {
       menu.append(new MenuItem({
         label: suggestion,
@@ -43,7 +52,7 @@ function createWindow(debug, checkMedia) {
       }));
     }
 
-    // Permitir añadir palabras al diccionario
+    // Permitir añadir palabras al diccionario del usuario.
     if (params.misspelledWord) {
       menu.append(
         new MenuItem({
@@ -54,12 +63,12 @@ function createWindow(debug, checkMedia) {
       menu.append(new MenuItem({ type: 'separator' }));
     }
 
-    // Si hay sugerencias o una palabra mal escrita, mostramos el menú con ellas
+    // Separador visual cuando hay contenido específico del corrector.
     if (params.dictionarySuggestions.length > 0 || params.misspelledWord) {
       menu.append(new MenuItem({ type: 'separator' }));
     }
 
-    // Acciones estándar de edición
+    // Acciones estándar de edición (delegadas al renderer por roles nativos).
     menu.append(new MenuItem({ role: 'undo', label: 'Deshacer' }));
     menu.append(new MenuItem({ role: 'redo', label: 'Rehacer' }));
     menu.append(new MenuItem({ type: 'separator' }));
@@ -74,16 +83,16 @@ function createWindow(debug, checkMedia) {
 
   mainWindow.loadFile(path.join(__dirname, '..', 'index.html'));
 
-  // Mostrar la ventana solo cuando esté lista (evita el flash blanco)
+  // Mostrar la ventana sólo cuando el renderer esté listo para evitar parpadeos.
   mainWindow.once('ready-to-show', () => {
     if (!debug) mainWindow.maximize();
     mainWindow.show();
     mainWindow.focus();
-    // Iniciar el tray una vez que la ventana esté lista
+    // Iniciar el tray una vez que la ventana esté lista.
     createTray(() => mainWindow);
   });
 
-  // Media polling
+  // Polling de media: se mantiene aquí para no cargar al renderer con lógica del SO.
   if (typeof checkMedia === 'function') {
     mediaPollInterval = setInterval(() => {
       if (mainWindow && !mainWindow.isDestroyed()) {
@@ -92,16 +101,17 @@ function createWindow(debug, checkMedia) {
     }, 2000);
   }
 
-  // Al presionar X: ocultar al tray discretamente (NO cerrar la app)
+  // Comportamiento de "cerrar" (X): ocultar al tray en vez de destruir la ventana.
+  // El cierre definitivo se gestiona desde el menú/tray con handshake de persistencia.
   mainWindow.on('close', (e) => {
     const { app } = require('electron');
     if (!app.isQuitting) {
       e.preventDefault();
-      // Guardar la nota activa antes de ocultar
+      // Solicitar persistencia al renderer antes de ocultar.
       mainWindow.webContents.send('force-save');
-      // Ocultar la ventana en lugar de destruirla
+      // Ocultar en lugar de destruir para mantener un arranque rápido y tray activo.
       mainWindow.hide();
-      // Avisar al usuario la primera vez en cada sesión
+      // Notificar una sola vez por sesión para educar el comportamiento.
       notifyMinimized();
     }
   });

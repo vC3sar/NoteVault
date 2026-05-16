@@ -286,7 +286,7 @@ export async function cleanupTrash() {
             return (now - note.deletedAt) <= retentionMs;
         });
         await saveAll();
-        // Solo renderizar si estamos en la vista de papelera
+        // Render condicional: evitar trabajo de UI si el usuario no está en la vista de papelera.
         if (state.currentView === 'trash') renderTrashList();
     }
 }

@@ -1,8 +1,20 @@
-// ─────────────────────────────────────────────────────────────────────────────
-// main.js — Punto de entrada del proceso principal de Electron (NoteVault)
-// Los módulos del proceso principal están en ./modules/
-// Los archivos de /js/ pertenecen al proceso de renderizado (browser) — no mezclar
-// ─────────────────────────────────────────────────────────────────────────────
+/**
+ * main.js — Bootstrap del proceso principal (Electron).
+ *
+ * Responsabilidades:
+ * - Configurar identidad de la app y políticas globales del proceso principal.
+ * - Definir rutas de almacenamiento en `app.getPath('userData')` y asegurar directorios.
+ * - Registrar contratos IPC (handlers) que consumirá el renderer vía `preload.js`.
+ * - Crear la ventana principal y cablear integraciones del SO (menú, media, tray).
+ *
+ * Arquitectura (alto nivel):
+ * - Proceso principal: orquesta ventanas, sistema de archivos y APIs nativas.
+ * - Renderer: UI y lógica de producto (carpeta `js/`), sin acceso directo a Node.
+ * - Bridge: `preload.js` expone un API mínimo y tipado informal vía `contextBridge`.
+ *
+ * Nota: Evitar importar módulos de `js/` desde el proceso principal. Son dos entornos
+ * con modelos de seguridad y dependencias distintas.
+ */
 
 const { app } = require('electron');
 const path = require('path');
@@ -15,25 +27,25 @@ const { initMedia, checkMedia } = require('./modules/media');
 
 const debug = !app.isPackaged;
 
-// ── Configuración de identidad ─────────────────────────────────────────────
+// Identidad de aplicación (Windows) y nombre visible.
 app.setAppUserModelId('ovh.vazquezsg.NoteVault');
 app.name = 'NoteVault';
 
-// ── Rutas de datos de usuario ──────────────────────────────────────────────
+// Directorios persistentes por usuario. `userData` es la fuente de verdad en runtime.
 const DATA_PATH = path.join(app.getPath('userData'), 'notes_data.json');
 const NOTES_DIR = path.join(app.getPath('userData'), 'notes');
 const COVERS_DIR = path.join(app.getPath('userData'), 'covers');
 const ATTACHMENTS_DIR = path.join(app.getPath('userData'), 'attachments');
 
-// Asegurar que existan los directorios
+// Crear directorios de forma idempotente para evitar errores en el primer arranque.
 [NOTES_DIR, COVERS_DIR, ATTACHMENTS_DIR].forEach(d => {
   fs.mkdirSync(d, { recursive: true });
 });
 
-// ── Registro de handlers IPC ───────────────────────────────────────────────
+// Registrar handlers IPC antes de abrir la ventana para evitar condiciones de carrera.
 registerIpcHandlers({ DATA_PATH, NOTES_DIR, COVERS_DIR, ATTACHMENTS_DIR });
 
-// ── Instancia única ────────────────────────────────────────────────────────
+// En Windows/macOS es común forzar instancia única para evitar corrupción de datos.
 const gotTheLock = app.requestSingleInstanceLock();
 
 if (!gotTheLock) {
@@ -54,7 +66,7 @@ if (!gotTheLock) {
     setupMenu(mainWindow, debug);
     initMedia(() => mainWindow);
 
-    // Configurar el idioma del corrector ortográfico (Español)
+    // Preferencia de idioma del corrector ortográfico para el renderer.
     if (mainWindow.webContents.session) {
       mainWindow.webContents.session.setSpellCheckerLanguages(['es']);
     }

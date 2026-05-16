@@ -8,7 +8,22 @@ import { forceSaveNote } from './js/editor.js';
 import { refreshIcons, cleanHTML, buildPreview, hashString } from './js/utils.js';
 import * as calendarEngine from './js/calendar.js';
 
-// Expose functions to window for HTML compatibility (onclick handlers)
+/**
+ * renderer.js — Entry point del renderer (UI).
+ *
+ * Responsabilidades:
+ * - Inicializar estado en memoria a partir de persistencia (`window.api.loadData()`).
+ * - Conectar IPC/eventos y arrancar la UI (vistas, sidebar, autosave).
+ * - Exponer funciones en `window` por compatibilidad con handlers inline en HTML
+ *   (idealmente, migrar a listeners delegados cuando se refactorice la UI).
+ *
+ * Notas de arquitectura:
+ * - La estructura (libretas/notas/ajustes) vive en JSON; el contenido HTML por nota
+ *   vive en archivos separados en disco. El renderer mantiene un cache temporal en memoria.
+ * - Cualquier operación con sistema de archivos debe ir por `window.api` (preload/IPC).
+ */
+
+// Exposición explícita por compatibilidad con `onclick` en HTML/partials.
 window.showDashboard = showDashboard;
 window.showTrash = showTrash;
 window.showCalendar = showCalendar;
@@ -25,9 +40,9 @@ window.saveAll = saveAll;
 window.toggleNotesPanel = toggleNotesPanel;
 window.forceSaveNote = forceSaveNote;
 
-// Initialization — wait for all HTML partials to be injected into the DOM.
-// ES modules are deferred, so partials:ready may fire before this listener
-// is registered. The window.partialsReady flag handles that race condition.
+// Arranque: la UI depende de partials HTML inyectados en el DOM. Como los ES modules
+// se difieren, el evento `partials:ready` puede dispararse antes de registrar este
+// listener. La bandera `window.partialsReady` evita esa condición de carrera.
 async function initApp() {
     let savedData;
     try {
@@ -74,14 +89,18 @@ async function initApp() {
     setupIPC();
     setupEventListeners();
 
-    // Backfill previews en segundo plano — no bloquea el arranque
+    // Regeneración de previews en segundo plano: no bloquea la UI inicial y corrige
+    // datos legacy donde el preview/hash aún no existían.
     backfillPreviews().catch(err => console.warn('[preview-backfill] error:', err));
 }
 
 /**
- * Para cada nota sin preview válido (campo ausente o hash distinto al del .html en disco),
- * carga el archivo .html, regenera preview + hash y persiste en un solo saveAll().
- * Las notas vacías se omiten.
+ * Reconciliación de previews para notas legacy.
+ *
+ * Estrategia:
+ * - Para notas sin `preview`/`previewHash`, cargar el `.html` desde disco.
+ * - Regenerar `preview` + `previewHash` y persistir en un solo `saveAll()`.
+ * - Omitir notas vacías para no ensuciar el dataset.
  */
 async function backfillPreviews() {
     const allNotes = [
@@ -92,20 +111,21 @@ async function backfillPreviews() {
     let dirty = false;
 
     for (const { note } of allNotes) {
-        // Si ya tiene preview con hash, saltar
+        // Caso común: dataset ya migrado.
         if (note.preview && note.previewHash) continue;
 
-        // Intentar cargar el .html desde disco
+        // Intentar cargar el `.html` desde disco. Puede no existir si la nota aún no
+        // se ha persistido o si fue eliminada externamente.
         let html = '';
         try {
             html = await window.api.loadNote(note.id);
-        } catch (_) { /* nota sin archivo .html todavía */ }
+        } catch (_) { /* nota sin archivo `.html` todavía */ }
 
-        if (!html) continue; // nota vacía — omitir
+        if (!html) continue; // Nota vacía: no generar preview.
 
         const newHash = hashString(html);
 
-        // Si el hash coincide con el guardado, el preview ya es válido (sólo falta persistir)
+        // Si el hash coincide con el guardado, el preview ya es válido (sólo faltaría persistir).
         if (note.previewHash === newHash && note.preview) continue;
 
         const newPreview = buildPreview(html);
@@ -122,8 +142,8 @@ async function backfillPreviews() {
     }
 }
 
-// Start: if partials already loaded (loader ran before module), init now.
-// Otherwise, wait for the event.
+// Si los partials ya se cargaron (el loader corrió antes que este módulo), arrancar ya.
+// Si no, esperar el evento.
 if (window.partialsReady) {
     initApp();
 } else {
