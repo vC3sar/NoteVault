@@ -238,6 +238,39 @@ export function renderAttachments(searchTerm = '') {
 export function setupEditor() {
     const editor = document.getElementById('editor');
     if (!editor) return;
+    const VIEWPORT_MARGIN = 12;
+
+    const positionContextMenu = (menu, clientX, clientY) => {
+        menu.style.left = `${clientX}px`;
+        menu.style.top = `${clientY}px`;
+
+        const rect = menu.getBoundingClientRect();
+        const maxX = window.innerWidth - rect.width - VIEWPORT_MARGIN;
+        const maxY = window.innerHeight - rect.height - VIEWPORT_MARGIN;
+
+        const clampedX = Math.max(VIEWPORT_MARGIN, Math.min(clientX, maxX));
+        const clampedY = Math.max(VIEWPORT_MARGIN, Math.min(clientY, maxY));
+
+        menu.style.left = `${clampedX}px`;
+        menu.style.top = `${clampedY}px`;
+
+        return { x: clampedX, y: clampedY, width: rect.width };
+    };
+
+    const setupHighlightSubmenuScroll = () => {
+        const highlightSubmenu = document.getElementById('highlight-submenu');
+        if (!highlightSubmenu || highlightSubmenu.dataset.wheelBound === 'true') return;
+
+        highlightSubmenu.addEventListener('wheel', (evt) => {
+            evt.preventDefault();
+            evt.stopPropagation();
+            highlightSubmenu.scrollTop += evt.deltaY;
+        }, { passive: false });
+
+        highlightSubmenu.dataset.wheelBound = 'true';
+    };
+
+    setupHighlightSubmenuScroll();
 
     editor.addEventListener('contextmenu', (e) => {
         if (e.target.tagName === 'IMG') {
@@ -256,14 +289,10 @@ export function setupEditor() {
         const menu = document.getElementById('custom-context-menu');
         menu.classList.remove('hidden');
 
-        let x = e.clientX;
-        let y = e.clientY;
-
-        menu.style.left = `${x}px`;
-        menu.style.top = `${y}px`;
+        const { x, width } = positionContextMenu(menu, e.clientX, e.clientY);
 
         const submenus = menu.querySelectorAll('.group\\/sub div[class*="absolute"]');
-        if (x + 220 + 160 > window.innerWidth) {
+        if (x + width + 160 > window.innerWidth) {
             submenus.forEach(s => {
                 s.classList.remove('left-full');
                 s.classList.add('right-full', 'mr-[-4px]');
