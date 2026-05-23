@@ -39,7 +39,24 @@ export function executeEditAction(data) {
         if (data.value === 'none') {
             document.execCommand('removeFormat', false, null);
         } else {
-            const colorMap = { 'yellow': '#fef08a', 'blue': '#bfdbfe', 'green': '#86efac', 'red': '#fecaca' };
+            const colorMap = {
+                'yellow': '#fef08a',
+                'green': '#86efac',
+                'blue': '#bfdbfe',
+                'red': '#fecaca',
+                'orange': '#fdba74',
+                'pink': '#f9a8d4',
+                'purple': '#d8b4fe',
+                'indigo': '#c7d2fe',
+                'teal': '#99f6e4',
+                'cyan': '#a5f3fc',
+                'lime': '#d9f99d',
+                'amber': '#fde68a',
+                'rose': '#fecdd3',
+                'gray': '#e5e7eb',
+                'brown': '#d6b38a',
+                'mint': '#bbf7d0'
+            };
             document.execCommand('backColor', false, colorMap[data.value] || '#fef08a');
         }
         handleInput();
