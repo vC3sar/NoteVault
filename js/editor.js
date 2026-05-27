@@ -661,6 +661,8 @@ export function setupEditor() {
         if (!node) return null;
         if (node.nodeType === Node.TEXT_NODE) node = node.parentElement;
         if (!node || !editor.contains(node)) return null;
+        const blockRoot = node.closest('[data-block-instance]');
+        if (blockRoot && editor.contains(blockRoot)) return blockRoot;
         while (node && node.parentElement && node.parentElement !== editor) {
             node = node.parentElement;
         }
@@ -671,14 +673,27 @@ export function setupEditor() {
         if (hasSelection) return false;
         let node = target;
         if (!node) return false;
-        if (node.nodeType === Node.TEXT_NODE) return true;
+        if (node.nodeType === Node.TEXT_NODE) node = node.parentElement;
         if (node.nodeType !== Node.ELEMENT_NODE) return false;
 
         const el = node;
+        if (el.closest('[data-block-instance]')) return false;
         if (el.closest('img, table, hr, pre, code, .insert-callout, [contenteditable="false"]')) {
             return false;
         }
         return true;
+    };
+
+    const ensureTrailingEditableLine = () => {
+        const last = editor.lastElementChild;
+        if (!last) {
+            editor.insertAdjacentHTML('beforeend', '<p><br></p>');
+            return;
+        }
+        if (last.matches('p') && (last.innerHTML || '').trim().toLowerCase() === '<br>') return;
+        if (last.matches('[data-block-instance], table, img, hr, pre, blockquote, ul, ol, details')) {
+            editor.insertAdjacentHTML('beforeend', '<p><br></p>');
+        }
     };
 
     editor.addEventListener('contextmenu', (e) => {
@@ -919,6 +934,24 @@ export function setupEditor() {
         }
 
         if (e.key === 'Enter' && !e.shiftKey) {
+            const sel = window.getSelection();
+            let node = sel && sel.anchorNode ? sel.anchorNode : null;
+            if (node && node.nodeType === Node.TEXT_NODE) node = node.parentElement;
+            const blockRoot = node && node.closest ? node.closest('[data-block-instance]') : null;
+            if (blockRoot && editor.contains(blockRoot)) {
+                e.preventDefault();
+                const paragraph = document.createElement('p');
+                paragraph.innerHTML = '<br>';
+                blockRoot.insertAdjacentElement('afterend', paragraph);
+                const range = document.createRange();
+                range.setStart(paragraph, 0);
+                range.collapse(true);
+                sel.removeAllRanges();
+                sel.addRange(range);
+                handleInput();
+                return;
+            }
+
             e.preventDefault();
             document.execCommand('insertParagraph', false);
 
@@ -956,7 +989,13 @@ export function setupEditor() {
         }
     });
 
-    editor.addEventListener('input', handleInput);
+    ensureTrailingEditableLine();
+
+    editor.addEventListener('input', () => {
+        ensureTrailingEditableLine();
+        handleInput();
+    });
+    editor.addEventListener('click', ensureTrailingEditableLine);
     document.addEventListener('selectionchange', () => {
         const sel = window.getSelection();
         if (!sel || !sel.rangeCount) return;

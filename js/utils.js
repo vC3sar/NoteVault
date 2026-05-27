@@ -90,7 +90,7 @@ const ALLOWED_TAGS = new Set([
     'FIGURE', 'FONT', 'H1', 'H2', 'H3', 'H4', 'H5', 'H6', 'HR', 'I', 'IMG', 'AUDIO',
     'INS', 'KBD', 'LABEL', 'LI', 'MARK', 'OL', 'P', 'PRE', 'Q', 'S', 'SAMP',
     'SECTION', 'SMALL', 'SPAN', 'STRONG', 'SUB', 'SUP', 'TABLE', 'TBODY', 'TD',
-    'TFOOT', 'TH', 'THEAD', 'TR', 'U', 'UL', 'INPUT', 'STRIKE'
+    'TFOOT', 'TH', 'THEAD', 'TR', 'U', 'UL', 'INPUT', 'STRIKE', 'BUTTON'
 ]);
 
 const SAFE_ATTRS = new Set([
@@ -159,7 +159,7 @@ export function sanitizeHTML(html) {
 
             if (tag === 'INPUT' && name === 'type') {
                 const type = String(attr.value).toLowerCase();
-                if (type !== 'checkbox' && type !== 'radio') {
+                if (type !== 'checkbox' && type !== 'radio' && type !== 'range') {
                     el.setAttribute('type', 'text');
                 }
                 continue;
@@ -168,7 +168,7 @@ export function sanitizeHTML(html) {
 
         if (tag === 'INPUT') {
             const type = (el.getAttribute('type') || '').toLowerCase();
-            if (type !== 'checkbox' && type !== 'radio') {
+            if (type !== 'checkbox' && type !== 'radio' && type !== 'range') {
                 el.setAttribute('type', 'text');
             }
             el.removeAttribute('onchange');
@@ -177,7 +177,7 @@ export function sanitizeHTML(html) {
         }
     }
 
-    const forbidden = doc.body.querySelectorAll('script, iframe, object, embed, link, meta, base, form, textarea, select, option, button, svg, math');
+    const forbidden = doc.body.querySelectorAll('script, iframe, object, embed, link, meta, base, form, textarea, select, option, svg, math');
     forbidden.forEach(node => node.remove());
 
     const iterator = doc.createNodeIterator(doc.body, NodeFilter.SHOW_COMMENT);

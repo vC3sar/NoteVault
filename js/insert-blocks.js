@@ -29,6 +29,13 @@ const baseTemplate = (title, desc) =>
         </div>
     `);
 
+function ensureWrappedBlock(id, html) {
+    const raw = String(html || '');
+    if (raw.includes('data-block-instance=')) return raw;
+    const inner = raw.replace(/(?:\s*<p><br><\/p>\s*)+$/i, '').trim();
+    return wrapBlock(id, inner || '<p><br></p>');
+}
+
 function getEditor() {
     return document.getElementById('editor');
 }
@@ -501,7 +508,8 @@ export async function insertBlockById(id) {
     if (typeof block.insert === 'function') {
         return !!(await block.insert());
     }
-    return insertHtmlAtCursor(block.template ? block.template() : baseTemplate(block.name, block.description));
+    const rawTemplate = block.template ? block.template() : baseTemplate(block.name, block.description);
+    return insertHtmlAtCursor(ensureWrappedBlock(block.id, rawTemplate));
 }
 
 export function hasInsertBlock(id) {

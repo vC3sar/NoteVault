@@ -506,7 +506,9 @@ body {
     display: flex;
     align-items: center;
     gap: 0.8rem;
+    width: 100%;
     max-width: 680px;
+    box-sizing: border-box;
     padding: 0.75rem 0.85rem;
     border-radius: 1.05rem;
     border: 1px solid #cbd5e1;
@@ -621,6 +623,7 @@ body {
 
 #editor .voice-note-seek {
     flex: 1;
+    min-width: 120px;
     accent-color: #0ea5e9;
     height: 1rem;
 }
@@ -634,6 +637,28 @@ body {
     border-color: #1e3a8a;
     background: #1d4ed8;
     color: #f8fafc;
+}
+
+@media (max-width: 640px) {
+    #editor .voice-note {
+        max-width: 100%;
+        padding: 0.65rem 0.7rem;
+    }
+
+    #editor .voice-note-player {
+        flex-wrap: wrap;
+        gap: 0.45rem;
+    }
+
+    #editor .voice-note-seek {
+        min-width: 100%;
+        order: 3;
+    }
+
+    #editor .voice-note-time {
+        min-width: 0;
+        margin-left: auto;
+    }
 }
 
 .group\/sub.submenu-open .table-submenu {
