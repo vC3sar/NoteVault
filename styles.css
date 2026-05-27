@@ -107,6 +107,43 @@ body {
     line-height: 1.6;
 }
 
+/* Tablas pegadas desde web: mantener apariencia clara y estable */
+#editor table {
+    width: 100%;
+    max-width: 100%;
+    border-collapse: collapse;
+    table-layout: auto;
+    margin: 1rem 0;
+    border: 1px solid rgba(99, 102, 241, 0.28);
+    border-radius: 0.75rem;
+    overflow: hidden;
+    display: block;
+    overflow-x: auto;
+    background: #ffffff;
+}
+
+#editor thead {
+    background: #eef2ff;
+}
+
+#editor th,
+#editor td {
+    border: 1px solid rgba(99, 102, 241, 0.2);
+    padding: 0.55rem 0.7rem;
+    text-align: left;
+    vertical-align: top;
+    min-width: 120px;
+}
+
+#editor th {
+    font-weight: 700;
+    color: #312e81;
+}
+
+#editor tbody tr:nth-child(even) {
+    background: rgba(238, 242, 255, 0.45);
+}
+
 #editor s,
 #editor del,
 #editor strike {
@@ -117,6 +154,28 @@ body {
 .dark #editor,
 .dark #note-title {
     color: #ffffff !important;
+}
+
+.dark #editor table {
+    background: rgba(15, 23, 42, 0.9);
+    border-color: rgba(129, 140, 248, 0.38);
+}
+
+.dark #editor thead {
+    background: rgba(49, 46, 129, 0.55);
+}
+
+.dark #editor th,
+.dark #editor td {
+    border-color: rgba(129, 140, 248, 0.3);
+}
+
+.dark #editor th {
+    color: #e0e7ff;
+}
+
+.dark #editor tbody tr:nth-child(even) {
+    background: rgba(51, 65, 85, 0.35);
 }
 
 [contenteditable]:empty:before {

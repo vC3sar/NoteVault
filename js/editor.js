@@ -1,9 +1,57 @@
 import { state, saveAll } from './state.js';
-import { refreshIcons, cleanHTML, hashString, buildPreview } from './utils.js';
+import { refreshIcons, cleanHTML, sanitizeHTML, escapeHTML, hashString, buildPreview } from './utils.js';
 import { renderNotesList } from './notes.js';
 
 let savedSelectionRange = null;
 let lastRightClickedImage = null;
+
+function capitalizeSentence(text) {
+    const lower = String(text || '').toLocaleLowerCase('es');
+    return lower.replace(/^(\s*)(\S)/, (_, ws, first) => ws + first.toLocaleUpperCase('es'));
+}
+
+function capitalizeWords(text) {
+    return String(text || '')
+        .toLocaleLowerCase('es')
+        .replace(/\b([^\s]+)/g, (word) => word.charAt(0).toLocaleUpperCase('es') + word.slice(1));
+}
+
+function transformSelectedText(mode) {
+    const sel = window.getSelection();
+    if (!sel || !sel.rangeCount) return false;
+    const range = sel.getRangeAt(0);
+    const selected = range.toString();
+    if (!selected) return false;
+
+    let transformed = selected;
+    if (mode === 'upper') transformed = selected.toLocaleUpperCase('es');
+    else if (mode === 'lower') transformed = selected.toLocaleLowerCase('es');
+    else if (mode === 'sentence') transformed = capitalizeSentence(selected);
+    else if (mode === 'title') transformed = capitalizeWords(selected);
+    else return false;
+
+    if (transformed === selected) return false;
+
+    range.deleteContents();
+    const textNode = document.createTextNode(transformed);
+    range.insertNode(textNode);
+
+    const newRange = document.createRange();
+    newRange.selectNodeContents(textNode);
+    sel.removeAllRanges();
+    sel.addRange(newRange);
+    savedSelectionRange = newRange.cloneRange();
+    return true;
+}
+
+function applyBreakWordsToSelection() {
+    const sel = window.getSelection();
+    if (!sel || !sel.rangeCount || sel.toString().length === 0) return false;
+    const text = escapeHTML(sel.toString());
+    const html = `<span style="overflow-wrap:anywhere;word-break:break-word;">${text}</span>`;
+    document.execCommand('insertHTML', false, html);
+    return true;
+}
 
 export function executeEditAction(data) {
     if (!state.activeNoteId) return;
@@ -64,6 +112,12 @@ export function executeEditAction(data) {
     else if (data === 'removeFormat' || (typeof data === 'object' && data.command === 'removeColor')) {
         document.execCommand('removeFormat', false, null);
         handleInput();
+    }
+    else if (data === 'breakWords') {
+        applyBreakWordsToSelection();
+    }
+    else if (typeof data === 'object' && data.command === 'textTransform') {
+        transformSelectedText(data.value);
     }
     else if (typeof data === 'string') {
         document.execCommand(data, false, null);
@@ -306,6 +360,32 @@ export function setupEditor() {
         refreshIcons();
     });
 
+    const insertPlainText = (text) => {
+        const normalized = (text || '').replace(/\r\n/g, '\n');
+        const html = escapeHTML(normalized).replace(/\n/g, '<br>');
+        document.execCommand('insertHTML', false, html);
+        handleInput();
+    };
+
+    const normalizeClipboardHtml = (rawHtml) => {
+        const sanitized = sanitizeHTML(rawHtml || '');
+        const parser = new DOMParser();
+        const doc = parser.parseFromString(sanitized, 'text/html');
+
+        doc.body.querySelectorAll('*').forEach((el) => {
+            el.removeAttribute('style');
+            el.removeAttribute('class');
+            el.removeAttribute('id');
+            Array.from(el.attributes).forEach((attr) => {
+                if (attr.name.toLowerCase().startsWith('data-')) {
+                    el.removeAttribute(attr.name);
+                }
+            });
+        });
+
+        return cleanHTML(doc.body.innerHTML);
+    };
+
     editor.addEventListener('paste', async (e) => {
         const clipboardData = e.clipboardData || window.clipboardData;
         const items = clipboardData.items;
@@ -333,11 +413,13 @@ export function setupEditor() {
         }
 
         if (!imageFound) {
-                const html = clipboardData.getData('text/html');
-                if (html && html.includes('<img')) {
-                    e.preventDefault();
-                    const parser = new DOMParser();
-                    const doc = parser.parseFromString(html, 'text/html');
+            const html = clipboardData.getData('text/html');
+            const plainText = clipboardData.getData('text/plain') || '';
+            e.preventDefault();
+
+            if (html && html.includes('<img')) {
+                const parser = new DOMParser();
+                const doc = parser.parseFromString(html, 'text/html');
                 const images = doc.querySelectorAll('img');
 
                 for (const img of images) {
@@ -363,16 +445,21 @@ export function setupEditor() {
                     img.className = "max-w-full h-auto rounded-2xl shadow-lg my-6 border border-outline-variant/20 block processed";
                     img.style.display = "block";
                     img.style.margin = "1.5rem 0";
-                    }
-                    document.execCommand('insertHTML', false, cleanHTML(doc.body.innerHTML));
-                    handleInput();
                 }
+                document.execCommand('insertHTML', false, cleanHTML(doc.body.innerHTML));
+                handleInput();
+            } else if (html) {
+                const normalizedHtml = normalizeClipboardHtml(html);
+                if (normalizedHtml.trim()) {
+                    document.execCommand('insertHTML', false, normalizedHtml);
+                    handleInput();
+                } else {
+                    insertPlainText(plainText);
+                }
+            } else {
+                insertPlainText(plainText);
             }
-
-        setTimeout(() => {
-            const ed = document.getElementById('editor');
-            if (ed) ed.innerHTML = cleanHTML(ed.innerHTML);
-        }, 10);
+        }
     });
 
     editor.addEventListener('keydown', (e) => {
