@@ -27,6 +27,7 @@ contextBridge.exposeInMainWorld('api', {
     // Assets asociados a libretas y notas.
     uploadCover: (path) => ipcRenderer.invoke('upload-cover', path),
     savePastedImage: (data) => ipcRenderer.invoke('save-pasted-image', data),
+    saveRecordedAudio: (data) => ipcRenderer.invoke('save-recorded-audio', data),
     deleteAttachment: (url) => ipcRenderer.invoke('delete-attachment', url),
     deleteCover: (path) => ipcRenderer.invoke('delete-cover', path),
     deleteNoteFile: (id) => ipcRenderer.invoke('delete-note-file', id),

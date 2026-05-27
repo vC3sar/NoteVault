@@ -173,10 +173,10 @@ function registerIpcHandlers({ DATA_PATH, NOTES_DIR, COVERS_DIR, ATTACHMENTS_DIR
       if (await pathExists(filePath)) {
         const content = await fsp.readFile(filePath, 'utf-8');
         // Eliminar adjuntos locales referenciados por la nota para evitar orfandad.
-        const imgRegex = /src="file:\/\/\/([^"]+attachments\/[^"]+)"/g;
+        const attachmentRegex = /(src|href)="file:\/\/\/([^"]+attachments\/[^"]+)"/g;
         let match;
-        while ((match = imgRegex.exec(content)) !== null) {
-          const fullPath = normalizePath(match[1]);
+        while ((match = attachmentRegex.exec(content)) !== null) {
+          const fullPath = normalizePath(match[2]);
           if (isInsideDir(ATTACHMENTS_DIR, fullPath) && await pathExists(fullPath)) {
             await fsp.unlink(fullPath).catch(() => {});
           }
@@ -259,6 +259,32 @@ function registerIpcHandlers({ DATA_PATH, NOTES_DIR, COVERS_DIR, ATTACHMENTS_DIR
         });
       }
 
+      return { success: true, path: pathToFileURL(destPath).href };
+    } catch (error) {
+      return { success: false, error: error.message };
+    }
+  });
+
+  ipcMain.handle('save-recorded-audio', async (event, { base64, mimeType }) => {
+    try {
+      const mime = String(mimeType || 'audio/webm').toLowerCase();
+      const extMap = {
+        'audio/webm': '.webm',
+        'audio/ogg': '.ogg',
+        'audio/mp4': '.m4a',
+        'audio/mpeg': '.mp3',
+        'audio/wav': '.wav'
+      };
+      const ext = extMap[mime] || '.webm';
+      const fileName = `aud_${Date.now()}_${Math.floor(Math.random() * 1000)}${ext}`;
+      const destPath = path.join(ATTACHMENTS_DIR, fileName);
+
+      const parts = String(base64 || '').split(',');
+      const payload = parts[1] || parts[0] || '';
+      if (!payload) return { success: false, error: 'Empty audio payload' };
+
+      const buffer = Buffer.from(payload, 'base64');
+      await fsp.writeFile(destPath, buffer);
       return { success: true, path: pathToFileURL(destPath).href };
     } catch (error) {
       return { success: false, error: error.message };

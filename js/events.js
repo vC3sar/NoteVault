@@ -4,26 +4,15 @@ import { addNotebook, renderNotebookGrid } from './notebooks.js';
 import { addNote, renderNotesList, selectNote, renderTrashList } from './notes.js';
 import { executeEditAction, setupEditor, handleInput } from './editor.js';
 import { refreshIcons, escapeHTML, stripHTML, showToast } from './utils.js';
+import { renderInsertBlocks, insertBlockById, hasInsertBlock } from './insert-blocks.js';
 
 export function setupEventListeners() {
     setupEditor();
-    const insertTemplates = {
-        'table-3x3': `<table><thead><tr><th style="text-align: center;">Encabezado 1</th><th style="text-align: center;">Encabezado 2</th><th style="text-align: center;">Encabezado 3</th></tr></thead><tbody><tr><td>Dato 1</td><td>Dato 2</td><td>Dato 3</td></tr><tr><td>Dato 4</td><td>Dato 5</td><td>Dato 6</td></tr></tbody></table><p><br></p>`,
-        'table-4x2': `<table><thead><tr><th style="text-align: center;">Campo</th><th style="text-align: center;">Valor</th></tr></thead><tbody><tr><td>Elemento 1</td><td>Detalle</td></tr><tr><td>Elemento 2</td><td>Detalle</td></tr><tr><td>Elemento 3</td><td>Detalle</td></tr><tr><td>Elemento 4</td><td>Detalle</td></tr></tbody></table><p><br></p>`,
-        'h2': `<h2>Título de Sección</h2><p><br></p>`,
-        'h3': `<h3>Subsección</h3><p><br></p>`,
-        'divider': `<hr><p><br></p>`,
-        'bullet-list': `<ul><li>Punto 1</li><li>Punto 2</li><li>Punto 3</li></ul><p><br></p>`,
-        'number-list': `<ol><li>Paso 1</li><li>Paso 2</li><li>Paso 3</li></ol><p><br></p>`,
-        'check-list': `<ul class="editor-check-list"><li><input type="checkbox"> Tarea 1</li><li><input type="checkbox"> Tarea 2</li></ul><p><br></p>`,
-        'blockquote': `<blockquote>Cita o referencia importante...</blockquote><p><br></p>`,
-        'code-block': `<pre><code>// Escribe tu código aquí</code></pre><p><br></p>`,
-        'callout': `<div class="insert-callout" style="border-left:4px solid #6366f1;padding:.5rem .75rem;background:rgba(99,102,241,.08);border-radius:.4rem;display:flex;align-items:center;gap:.5rem;"><span class="insert-callout-icon-wrap" contenteditable="false"><i data-lucide="lightbulb" class="insert-callout-icon" aria-hidden="true"></i></span><div><strong class="insert-callout-label" contenteditable="false">TIP:</strong> <span class="insert-callout-placeholder" data-callout-placeholder="true">Escribe aquí una nota destacada.</span></div></div><p><br></p>`
-    };
 
     const openInsertModal = () => {
         const modal = document.getElementById('insert-modal');
         if (!modal) return;
+        renderInsertBlocks();
         modal.classList.remove('hidden');
         modal.classList.add('flex');
         refreshIcons();
@@ -47,14 +36,6 @@ export function setupEventListeners() {
             const visible = panel.getAttribute('data-insert-panel') === tab;
             panel.classList.toggle('hidden', !visible);
         });
-    };
-
-    const insertHtmlSnippet = (html) => {
-        const editor = document.getElementById('editor');
-        if (!editor) return;
-        editor.focus();
-        document.execCommand('insertHTML', false, html);
-        handleInput();
     };
 
     document.addEventListener('mousedown', (e) => {
@@ -247,9 +228,12 @@ export function setupEventListeners() {
             if (card) {
                 if (!state.activeNoteId) return;
                 const key = card.getAttribute('data-insert-action');
-                const html = insertTemplates[key];
-                if (html) insertHtmlSnippet(html);
-                closeInsertModal();
+                if (hasInsertBlock(key)) {
+                    if (key === 'voice-recorder') closeInsertModal();
+                    await insertBlockById(key);
+                    handleInput();
+                }
+                if (key !== 'voice-recorder') closeInsertModal();
             }
         }
 

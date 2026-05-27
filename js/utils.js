@@ -87,7 +87,7 @@ function unwrapElement(el) {
 const ALLOWED_TAGS = new Set([
     'A', 'ABBR', 'B', 'BLOCKQUOTE', 'BR', 'CAPTION', 'CITE', 'CODE', 'COL',
     'COLGROUP', 'DD', 'DEL', 'DETAILS', 'DIV', 'DL', 'DT', 'EM', 'FIGCAPTION',
-    'FIGURE', 'FONT', 'H1', 'H2', 'H3', 'H4', 'H5', 'H6', 'HR', 'I', 'IMG',
+    'FIGURE', 'FONT', 'H1', 'H2', 'H3', 'H4', 'H5', 'H6', 'HR', 'I', 'IMG', 'AUDIO',
     'INS', 'KBD', 'LABEL', 'LI', 'MARK', 'OL', 'P', 'PRE', 'Q', 'S', 'SAMP',
     'SECTION', 'SMALL', 'SPAN', 'STRONG', 'SUB', 'SUP', 'TABLE', 'TBODY', 'TD',
     'TFOOT', 'TH', 'THEAD', 'TR', 'U', 'UL', 'INPUT', 'STRIKE'
@@ -96,7 +96,8 @@ const ALLOWED_TAGS = new Set([
 const SAFE_ATTRS = new Set([
     'href', 'src', 'alt', 'title', 'class', 'style', 'colspan', 'rowspan',
     'scope', 'loading', 'target', 'rel', 'type', 'checked', 'disabled',
-    'contenteditable', 'data-lucide', 'color', 'size', 'face', 'dir', 'align'
+    'contenteditable', 'data-lucide', 'color', 'size', 'face', 'dir', 'align',
+    'controls', 'preload'
 ]);
 
 export function sanitizeHTML(html) {

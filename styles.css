@@ -296,6 +296,29 @@ body {
     border-color: rgba(129, 140, 248, 0.35);
 }
 
+.dark #editor .insert-block-card,
+.dark #editor .insert-cover {
+    background: rgba(99, 102, 241, 0.14);
+    border-color: rgba(129, 140, 248, 0.35);
+}
+
+.dark #editor .insert-block-desc,
+.dark #editor .insert-block-meta {
+    color: #a5b4fc;
+}
+
+.dark #editor .insert-chip {
+    background: rgba(129, 140, 248, 0.24);
+    color: #e0e7ff;
+}
+
+@media (max-width: 900px) {
+    #editor .insert-columns-2,
+    #editor .insert-columns-3 {
+        grid-template-columns: 1fr;
+    }
+}
+
 .dark #editor tbody tr:nth-child(even) {
     background: rgba(51, 65, 85, 0.35);
 }
@@ -381,6 +404,155 @@ body {
     background: rgba(99, 102, 241, 0.12);
     border-color: rgba(99, 102, 241, 0.32);
     transform: translateY(-1px);
+}
+
+#editor .insert-block-card {
+    border: 1px solid rgba(99, 102, 241, 0.2);
+    background: rgba(99, 102, 241, 0.06);
+    border-radius: 0.75rem;
+    padding: 0.7rem 0.8rem;
+}
+
+#editor .insert-block-title {
+    font-weight: 700;
+    margin-bottom: 0.2rem;
+}
+
+#editor .insert-block-desc,
+#editor .insert-block-meta {
+    font-size: 0.86rem;
+    color: #64748b;
+}
+
+#editor .insert-chip {
+    display: inline-block;
+    border-radius: 999px;
+    padding: 0.18rem 0.55rem;
+    background: rgba(99, 102, 241, 0.12);
+    color: #3730a3;
+    font-weight: 600;
+    font-size: 0.78rem;
+}
+
+#editor .insert-columns {
+    display: grid;
+    gap: 0.7rem;
+}
+
+#editor .insert-columns-2 {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
+#editor .insert-columns-3 {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+}
+
+#editor .insert-aside {
+    border-left: 3px solid rgba(99, 102, 241, 0.55);
+    padding: 0.4rem 0.7rem;
+    background: rgba(99, 102, 241, 0.08);
+    border-radius: 0.5rem;
+}
+
+#editor .insert-cover {
+    border-radius: 0.9rem;
+    padding: 1rem 1.1rem;
+    background: linear-gradient(135deg, rgba(99, 102, 241, 0.16), rgba(14, 165, 233, 0.12));
+    border: 1px solid rgba(99, 102, 241, 0.2);
+}
+
+#editor .insert-progress {
+    height: 10px;
+    border-radius: 999px;
+    background: rgba(99, 102, 241, 0.12);
+    overflow: hidden;
+}
+
+#editor .insert-progress > div {
+    height: 100%;
+    background: #6366f1;
+}
+
+#editor .insert-block audio {
+    width: 100%;
+    margin-top: 0.45rem;
+    border-radius: 0.7rem;
+    background: rgba(99, 102, 241, 0.08);
+    border: 1px solid rgba(99, 102, 241, 0.22);
+    padding: 0.2rem;
+    box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.35);
+}
+
+#editor .insert-block audio::-webkit-media-controls-panel {
+    background: rgba(238, 242, 255, 0.9);
+}
+
+#editor .insert-block audio::-webkit-media-controls-play-button,
+#editor .insert-block audio::-webkit-media-controls-mute-button {
+    filter: saturate(1.15);
+}
+
+.dark #editor .insert-block audio {
+    background: rgba(99, 102, 241, 0.16);
+    border-color: rgba(129, 140, 248, 0.35);
+    box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.08);
+}
+
+.dark #editor .insert-block audio::-webkit-media-controls-panel {
+    background: rgba(30, 41, 59, 0.92);
+}
+
+#editor .voice-note {
+    display: flex;
+    align-items: center;
+    gap: 0.7rem;
+    max-width: 680px;
+    padding: 0.6rem 0.7rem;
+    border-radius: 1rem;
+    border: 1px solid rgba(99, 102, 241, 0.26);
+    background: linear-gradient(135deg, rgba(99, 102, 241, 0.14), rgba(14, 165, 233, 0.1));
+    box-shadow: 0 8px 18px rgba(99, 102, 241, 0.12);
+}
+
+#editor .voice-note-icon {
+    width: 2rem;
+    height: 2rem;
+    border-radius: 999px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: rgba(79, 70, 229, 0.2);
+    border: 1px solid rgba(79, 70, 229, 0.35);
+    font-size: 0.95rem;
+    flex: 0 0 auto;
+}
+
+#editor .voice-note-content {
+    flex: 1;
+    min-width: 0;
+}
+
+#editor .voice-note-meta {
+    font-size: 0.74rem;
+    font-weight: 700;
+    letter-spacing: 0.02em;
+    color: #4338ca;
+    margin-bottom: 0.2rem;
+}
+
+.dark #editor .voice-note {
+    background: linear-gradient(135deg, rgba(99, 102, 241, 0.28), rgba(14, 116, 144, 0.2));
+    border-color: rgba(129, 140, 248, 0.38);
+    box-shadow: 0 10px 22px rgba(2, 6, 23, 0.35);
+}
+
+.dark #editor .voice-note-icon {
+    background: rgba(129, 140, 248, 0.25);
+    border-color: rgba(165, 180, 252, 0.45);
+}
+
+.dark #editor .voice-note-meta {
+    color: #c7d2fe;
 }
 
 .group\/sub.submenu-open .table-submenu {
