@@ -65,6 +65,17 @@ export function executeEditAction(data) {
         handleInput();
         return;
     }
+    if (data === 'copy' || data === 'cut' || data === 'selectAll') {
+        document.execCommand(data, false, null);
+        if (data === 'cut') handleInput();
+        return;
+    }
+    if (data === 'paste') {
+        const pasted = document.execCommand('paste', false, null);
+        if (!pasted) showToast('Usa Ctrl+V para pegar.', 'neutral');
+        else handleInput();
+        return;
+    }
 
     const sel = window.getSelection();
     const hasTextSelection = !!(sel && sel.rangeCount && sel.toString().trim().length > 0);
