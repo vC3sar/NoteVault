@@ -302,12 +302,20 @@ export function setupEditor() {
     if (!editor) return;
     const VIEWPORT_MARGIN = 12;
     const tableToolbar = document.getElementById('table-quick-toolbar');
+    const previewHint = document.getElementById('table-preview-hint');
+    const submenuTimers = new WeakMap();
 
     const hideTableToolbar = () => {
         if (!tableToolbar) return;
         tableToolbar.classList.add('hidden');
         tableToolbar.classList.remove('flex');
         activeTableCell = null;
+        clearTablePreview();
+        if (previewHint) {
+            previewHint.textContent = 'Preview';
+            previewHint.classList.remove('text-green-700', 'text-red-700', 'dark:text-green-300', 'dark:text-red-300');
+            previewHint.classList.add('text-on-surface-variant');
+        }
     };
 
     const placeTableToolbar = (cell) => {
@@ -340,6 +348,75 @@ export function setupEditor() {
         return { table, section, row, rows, rowIndex, colIndex, cellsCount: cells.length };
     };
 
+    const clearTablePreview = () => {
+        editor.querySelectorAll('.table-preview-cell,.table-preview-row,.table-preview-col,.table-preview-resize-plus,.table-preview-resize-minus,.table-preview-row-add,.table-preview-row-del,.table-preview-col-add,.table-preview-col-del,.table-preview-cell-del')
+            .forEach(el => el.classList.remove('table-preview-cell', 'table-preview-row', 'table-preview-col', 'table-preview-resize-plus', 'table-preview-resize-minus', 'table-preview-row-add', 'table-preview-row-del', 'table-preview-col-add', 'table-preview-col-del', 'table-preview-cell-del'));
+    };
+
+    const applyTablePreview = (action) => {
+        clearTablePreview();
+        const info = getTableInfo();
+        if (!info) return;
+        const { table, row, rows, colIndex } = info;
+        const addActions = new Set(['row-above', 'row-below', 'col-left', 'col-right']);
+        const delActions = new Set(['del-row', 'del-col']);
+        const labelMap = {
+            'row-above': 'Preview: añadir fila arriba',
+            'row-below': 'Preview: añadir fila abajo',
+            'col-left': 'Preview: añadir columna izquierda',
+            'col-right': 'Preview: añadir columna derecha',
+            'del-row': 'Preview: eliminar fila',
+            'del-col': 'Preview: eliminar columna',
+            'merge-cells': 'Preview: combinar celdas',
+            'split-cell': 'Preview: dividir celda',
+            'widen': 'Preview: aumentar ancho',
+            'narrow': 'Preview: reducir ancho'
+        };
+        if (previewHint) {
+            previewHint.textContent = labelMap[action] || 'Preview';
+            previewHint.classList.remove('text-on-surface-variant', 'text-green-700', 'text-red-700', 'dark:text-green-300', 'dark:text-red-300');
+            if (addActions.has(action)) previewHint.classList.add('text-green-700', 'dark:text-green-300');
+            else if (delActions.has(action)) previewHint.classList.add('text-red-700', 'dark:text-red-300');
+            else previewHint.classList.add('text-on-surface-variant');
+        }
+
+        if (action === 'row-above' || action === 'row-below' || action === 'del-row') {
+            row.classList.add(action === 'del-row' ? 'table-preview-row-del' : 'table-preview-row-add');
+            return;
+        }
+
+        if (action === 'col-left' || action === 'col-right' || action === 'del-col') {
+            rows.forEach(r => {
+                const rowCells = Array.from(r.children).filter(el => el.tagName === 'TD' || el.tagName === 'TH');
+                const cell = rowCells[Math.min(colIndex, rowCells.length - 1)];
+                if (cell) cell.classList.add(action === 'del-col' ? 'table-preview-col-del' : 'table-preview-col-add');
+            });
+            return;
+        }
+
+        if (action === 'merge-cells') {
+            const rowCells = Array.from(row.children).filter(el => el.tagName === 'TD' || el.tagName === 'TH');
+            const current = activeTableCell;
+            const next = rowCells[colIndex + 1];
+            if (current) current.classList.add('table-preview-cell');
+            if (next) next.classList.add('table-preview-cell');
+            return;
+        }
+
+        if (action === 'split-cell') {
+            if (activeTableCell) activeTableCell.classList.add('table-preview-cell');
+            return;
+        }
+
+        if (action === 'widen') {
+            table.classList.add('table-preview-resize-plus');
+            return;
+        }
+        if (action === 'narrow') {
+            table.classList.add('table-preview-resize-minus');
+        }
+    };
+
     const createCellLike = (sourceCell) => {
         const tag = sourceCell && sourceCell.tagName === 'TH' ? 'th' : 'td';
         const cell = document.createElement(tag);
@@ -351,6 +428,14 @@ export function setupEditor() {
         const info = getTableInfo();
         if (!info) return;
         const { table, section, row, rows, rowIndex, colIndex, cellsCount } = info;
+        const selection = window.getSelection();
+
+        const getSelectedCells = () => {
+            if (!selection || !selection.rangeCount) return [];
+            const range = selection.getRangeAt(0);
+            const rowCells = Array.from(row.children).filter(el => el.tagName === 'TD' || el.tagName === 'TH');
+            return rowCells.filter(cell => range.intersectsNode(cell));
+        };
 
         if (action === 'row-above' || action === 'row-below') {
             const newRow = document.createElement('tr');
@@ -391,6 +476,31 @@ export function setupEditor() {
                 const victim = rowCells[Math.min(colIndex, rowCells.length - 1)];
                 if (victim) victim.remove();
             });
+        } else if (action === 'merge-cells') {
+            const selectedCells = getSelectedCells();
+            const mergeCells = selectedCells.length >= 2 ? selectedCells : (() => {
+                const rowCells = Array.from(row.children).filter(el => el.tagName === 'TD' || el.tagName === 'TH');
+                return rowCells[colIndex + 1] ? [activeTableCell, rowCells[colIndex + 1]] : [activeTableCell];
+            })();
+
+            if (mergeCells.length < 2) return;
+            const first = mergeCells[0];
+            const colspan = mergeCells.reduce((acc, c) => acc + (parseInt(c.getAttribute('colspan'), 10) || 1), 0);
+            first.setAttribute('colspan', String(colspan));
+            const extraHtml = mergeCells.slice(1).map(c => c.innerHTML).filter(Boolean).join(' ');
+            if (extraHtml) {
+                const currentHtml = first.innerHTML.trim();
+                first.innerHTML = currentHtml ? `${currentHtml} ${extraHtml}` : extraHtml;
+            }
+            mergeCells.slice(1).forEach(c => c.remove());
+            activeTableCell = first;
+        } else if (action === 'split-cell') {
+            const span = parseInt(activeTableCell.getAttribute('colspan'), 10) || 1;
+            if (span <= 1) return;
+            activeTableCell.setAttribute('colspan', '1');
+            for (let i = 1; i < span; i++) {
+                row.insertBefore(createCellLike(activeTableCell), activeTableCell.nextSibling);
+            }
         } else if (action === 'widen' || action === 'narrow') {
             const current = parseInt(table.style.width, 10) || table.getBoundingClientRect().width;
             const delta = action === 'widen' ? 60 : -60;
@@ -486,11 +596,42 @@ export function setupEditor() {
         e.preventDefault();
     });
 
+    tableToolbar?.querySelectorAll('.group\\/sub').forEach(group => {
+        group.addEventListener('mouseenter', () => {
+            const t = submenuTimers.get(group);
+            if (t) clearTimeout(t);
+            group.classList.add('submenu-open');
+        });
+
+        group.addEventListener('mouseleave', () => {
+            const t = setTimeout(() => group.classList.remove('submenu-open'), 230);
+            submenuTimers.set(group, t);
+        });
+    });
+
+    tableToolbar?.addEventListener('mouseover', (e) => {
+        const btn = e.target.closest('[data-table-action]');
+        if (!btn) return;
+        applyTablePreview(btn.getAttribute('data-table-action'));
+    });
+
+    tableToolbar?.addEventListener('mouseout', (e) => {
+        const toElement = e.relatedTarget;
+        if (toElement && tableToolbar.contains(toElement)) return;
+        clearTablePreview();
+        if (previewHint) {
+            previewHint.textContent = 'Preview';
+            previewHint.classList.remove('text-green-700', 'text-red-700', 'dark:text-green-300', 'dark:text-red-300');
+            previewHint.classList.add('text-on-surface-variant');
+        }
+    });
+
     tableToolbar?.addEventListener('click', (e) => {
         const btn = e.target.closest('[data-table-action]');
         if (!btn) return;
         e.preventDefault();
         applyTableAction(btn.getAttribute('data-table-action'));
+        clearTablePreview();
     });
 
     const insertPlainText = (text) => {

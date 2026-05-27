@@ -60,11 +60,11 @@
                     <i data-lucide="chevron-down" class="w-3.5 h-3.5 opacity-70"></i>
                 </button>
                 <div class="table-submenu invisible opacity-0 group-hover/sub:visible group-hover/sub:opacity-100">
-                    <button data-table-action="col-left" class="table-tool-btn"><i data-lucide="arrow-left-to-line" class="w-3.5 h-3.5"></i> Columna izquierda</button>
-                    <button data-table-action="col-right" class="table-tool-btn"><i data-lucide="arrow-right-to-line" class="w-3.5 h-3.5"></i> Columna derecha</button>
+                    <button data-table-action="col-left" class="table-tool-btn table-tool-add"><i data-lucide="arrow-left-to-line" class="w-3.5 h-3.5"></i> Columna izquierda</button>
+                    <button data-table-action="col-right" class="table-tool-btn table-tool-add"><i data-lucide="arrow-right-to-line" class="w-3.5 h-3.5"></i> Columna derecha</button>
                     <button data-table-action="merge-cells" class="table-tool-btn"><i data-lucide="combine" class="w-3.5 h-3.5"></i> Combinar celdas</button>
                     <button data-table-action="split-cell" class="table-tool-btn"><i data-lucide="split" class="w-3.5 h-3.5"></i> Dividir celda</button>
-                    <button data-table-action="del-col" class="table-tool-btn text-red-500"><i data-lucide="columns-2" class="w-3.5 h-3.5"></i> Eliminar columna</button>
+                    <button data-table-action="del-col" class="table-tool-btn table-tool-del"><i data-lucide="columns-2" class="w-3.5 h-3.5"></i> Eliminar columna</button>
                     <button data-table-action="narrow" class="table-tool-btn"><i data-lucide="minimize-2" class="w-3.5 h-3.5"></i> Reducir ancho</button>
                     <button data-table-action="widen" class="table-tool-btn"><i data-lucide="maximize-2" class="w-3.5 h-3.5"></i> Aumentar ancho</button>
                 </div>
@@ -75,11 +75,12 @@
                     <i data-lucide="chevron-down" class="w-3.5 h-3.5 opacity-70"></i>
                 </button>
                 <div class="table-submenu invisible opacity-0 group-hover/sub:visible group-hover/sub:opacity-100">
-                    <button data-table-action="row-above" class="table-tool-btn"><i data-lucide="arrow-up-to-line" class="w-3.5 h-3.5"></i> Fila arriba</button>
-                    <button data-table-action="row-below" class="table-tool-btn"><i data-lucide="arrow-down-to-line" class="w-3.5 h-3.5"></i> Fila abajo</button>
-                    <button data-table-action="del-row" class="table-tool-btn text-red-500"><i data-lucide="rows-2" class="w-3.5 h-3.5"></i> Eliminar fila</button>
+                    <button data-table-action="row-above" class="table-tool-btn table-tool-add"><i data-lucide="arrow-up-to-line" class="w-3.5 h-3.5"></i> Fila arriba</button>
+                    <button data-table-action="row-below" class="table-tool-btn table-tool-add"><i data-lucide="arrow-down-to-line" class="w-3.5 h-3.5"></i> Fila abajo</button>
+                    <button data-table-action="del-row" class="table-tool-btn table-tool-del"><i data-lucide="rows-2" class="w-3.5 h-3.5"></i> Eliminar fila</button>
                 </div>
             </div>
+            <span id="table-preview-hint" class="text-[11px] font-semibold px-2 text-on-surface-variant">Preview</span>
         </div>
 
         <div id="editor-status-bar"
