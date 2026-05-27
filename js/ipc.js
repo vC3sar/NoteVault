@@ -2,6 +2,7 @@ import { state, saveAll } from './state.js';
 import { applyTheme, showDashboard, showTrash, showCalendar } from './ui.js';
 import { renderSidebar, renderNotebookGrid, selectNotebook } from './notebooks.js';
 import { renderNotesList, selectNote, cleanupTrash } from './notes.js';
+import { forceSaveNote } from './editor.js';
 import { refreshIcons, showModal, createId, cleanHTML } from './utils.js';
 
 /**
@@ -23,6 +24,40 @@ function getFileLabel(value) {
     if (!raw) return '';
     const cleaned = raw.startsWith('file:') ? decodeURIComponent(raw.replace('file:///', '')) : raw;
     return cleaned.split(/[\\/]/).pop() || cleaned;
+}
+
+function showSaveToast(message, tone = 'neutral') {
+    const existing = document.getElementById('save-toast');
+    if (existing) existing.remove();
+
+    const toast = document.createElement('div');
+    toast.id = 'save-toast';
+    toast.className = 'fixed top-5 right-5 z-[120] rounded-xl px-4 py-2.5 text-sm font-semibold shadow-xl border backdrop-blur-sm transition-opacity duration-200';
+
+    if (tone === 'success') {
+        toast.classList.add(
+            'bg-emerald-500/15', 'text-emerald-700', 'border-emerald-500/30',
+            'dark:bg-emerald-300/20', 'dark:text-emerald-100', 'dark:border-emerald-200/45'
+        );
+    } else if (tone === 'error') {
+        toast.classList.add(
+            'bg-red-500/15', 'text-red-700', 'border-red-500/30',
+            'dark:bg-red-300/20', 'dark:text-red-100', 'dark:border-red-200/45'
+        );
+    } else {
+        toast.classList.add(
+            'bg-surface-container-lowest/95', 'text-on-surface-variant', 'border-outline-variant/30',
+            'dark:bg-slate-800/95', 'dark:text-slate-100', 'dark:border-slate-500/55'
+        );
+    }
+
+    toast.textContent = message;
+    document.body.appendChild(toast);
+
+    setTimeout(() => {
+        toast.style.opacity = '0';
+        setTimeout(() => toast.remove(), 220);
+    }, 1600);
 }
 
 export function setupIPC() {
@@ -209,6 +244,16 @@ export function setupIPC() {
             'view-favorites': () => showDashboard('favorites'),
             'view-trash': () => showTrash(),
             'view-calendar': () => showCalendar(),
+            'manual-save': async () => {
+                if (!state.activeNoteId) {
+                    showSaveToast('No hay nota activa para guardar', 'error');
+                    return;
+                }
+                const result = await forceSaveNote();
+                if (result?.status === 'saved') showSaveToast('Guardado manual completado', 'success');
+                else if (result?.status === 'no-changes') showSaveToast('Sin cambios para guardar', 'neutral');
+                else showSaveToast('Error al guardar', 'error');
+            },
         };
         window.api.onMenuAction((action) => {
             const command = MENU_COMMANDS[action];

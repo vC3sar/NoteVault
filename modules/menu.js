@@ -21,6 +21,12 @@ function setupMenu(mainWindow, debug) {
     {
       label: 'Edición',
       submenu: [
+        {
+          label: 'Guardar',
+          accelerator: 'CmdOrCtrl+S',
+          click: () => { mainWindow.webContents.send('menu-action', 'manual-save'); }
+        },
+        { type: 'separator' },
         { role: 'undo', label: 'Deshacer' },
         { role: 'redo', label: 'Rehacer' },
         { type: 'separator' },

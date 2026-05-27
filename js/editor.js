@@ -4,6 +4,7 @@ import { renderNotesList } from './notes.js';
 
 let savedSelectionRange = null;
 let lastRightClickedImage = null;
+let activeTableCell = null;
 
 function capitalizeSentence(text) {
     const lower = String(text || '').toLocaleLowerCase('es');
@@ -143,11 +144,11 @@ export function executeEditAction(data) {
 }
 
 export async function forceSaveNote() {
-    if (!state.activeNoteId) return;
+    if (!state.activeNoteId) return { status: 'no-note' };
     const notebook = state.notebooks.find(n => n.id === state.activeNotebookId);
-    if (!notebook) return;
+    if (!notebook) return { status: 'no-note' };
     const note = notebook.notes.find(n => n.id === state.activeNoteId);
-    if (!note) return;
+    if (!note) return { status: 'no-note' };
 
     const title = document.getElementById('note-title').value;
     const editor = document.getElementById('editor');
@@ -158,7 +159,7 @@ export async function forceSaveNote() {
     const newHash = hashString(sanitizedContent);
 
     if (!titleChanged && note.previewHash === newHash) {
-        return; // Sin cambios, omitir I/O
+        return { status: 'no-changes' }; // Sin cambios, omitir I/O
     }
 
     note.title = title;
@@ -175,14 +176,20 @@ export async function forceSaveNote() {
         editor.innerHTML = sanitizedContent;
     }
 
-    await window.api.saveNoteContent(state.activeNoteId, sanitizedContent);
-    await saveAll();
+    try {
+        await window.api.saveNoteContent(state.activeNoteId, sanitizedContent);
+        await saveAll();
+    } catch (error) {
+        console.error('Error en guardado manual/auto:', error);
+        return { status: 'error', error };
+    }
 
     if (titleChanged) {
         renderNotesList();
     }
     updateWordCount();
     updateAttachmentsIfNeeded();
+    return { status: 'saved' };
 }
 
 let autosaveTimer;
@@ -294,6 +301,106 @@ export function setupEditor() {
     const editor = document.getElementById('editor');
     if (!editor) return;
     const VIEWPORT_MARGIN = 12;
+    const tableToolbar = document.getElementById('table-quick-toolbar');
+
+    const hideTableToolbar = () => {
+        if (!tableToolbar) return;
+        tableToolbar.classList.add('hidden');
+        tableToolbar.classList.remove('flex');
+        activeTableCell = null;
+    };
+
+    const placeTableToolbar = (cell) => {
+        if (!tableToolbar || !cell) return;
+        const panel = document.getElementById('editor-panel');
+        if (!panel) return;
+        const cellRect = cell.getBoundingClientRect();
+        const panelRect = panel.getBoundingClientRect();
+
+        const top = Math.max(8, cellRect.top - panelRect.top - tableToolbar.offsetHeight - 8);
+        const left = Math.max(8, cellRect.left - panelRect.left);
+
+        tableToolbar.style.top = `${top}px`;
+        tableToolbar.style.left = `${left}px`;
+        tableToolbar.classList.remove('hidden');
+        tableToolbar.classList.add('flex');
+    };
+
+    const getTableInfo = () => {
+        if (!activeTableCell) return null;
+        const row = activeTableCell.parentElement;
+        const section = row?.parentElement;
+        const table = section?.closest('table');
+        if (!row || !section || !table) return null;
+        const rows = Array.from(section.querySelectorAll('tr'));
+        const rowIndex = rows.indexOf(row);
+        const cells = Array.from(row.children).filter(el => el.tagName === 'TD' || el.tagName === 'TH');
+        const colIndex = cells.indexOf(activeTableCell);
+        if (rowIndex < 0 || colIndex < 0) return null;
+        return { table, section, row, rows, rowIndex, colIndex, cellsCount: cells.length };
+    };
+
+    const createCellLike = (sourceCell) => {
+        const tag = sourceCell && sourceCell.tagName === 'TH' ? 'th' : 'td';
+        const cell = document.createElement(tag);
+        cell.innerHTML = '<br>';
+        return cell;
+    };
+
+    const applyTableAction = (action) => {
+        const info = getTableInfo();
+        if (!info) return;
+        const { table, section, row, rows, rowIndex, colIndex, cellsCount } = info;
+
+        if (action === 'row-above' || action === 'row-below') {
+            const newRow = document.createElement('tr');
+            const sourceCells = Array.from(row.children).filter(el => el.tagName === 'TD' || el.tagName === 'TH');
+            sourceCells.forEach(sourceCell => newRow.appendChild(createCellLike(sourceCell)));
+            if (action === 'row-above') section.insertBefore(newRow, row);
+            else section.insertBefore(newRow, row.nextSibling);
+        } else if (action === 'col-left' || action === 'col-right') {
+            rows.forEach(r => {
+                const rowCells = Array.from(r.children).filter(el => el.tagName === 'TD' || el.tagName === 'TH');
+                const ref = rowCells[Math.min(colIndex, rowCells.length - 1)];
+                const newCell = createCellLike(ref || activeTableCell);
+                if (!ref) {
+                    r.appendChild(newCell);
+                } else if (action === 'col-left') {
+                    r.insertBefore(newCell, ref);
+                } else {
+                    r.insertBefore(newCell, ref.nextSibling);
+                }
+            });
+        } else if (action === 'del-row') {
+            if (rows.length <= 1) {
+                table.remove();
+                hideTableToolbar();
+                handleInput();
+                return;
+            }
+            row.remove();
+        } else if (action === 'del-col') {
+            if (cellsCount <= 1) {
+                table.remove();
+                hideTableToolbar();
+                handleInput();
+                return;
+            }
+            rows.forEach(r => {
+                const rowCells = Array.from(r.children).filter(el => el.tagName === 'TD' || el.tagName === 'TH');
+                const victim = rowCells[Math.min(colIndex, rowCells.length - 1)];
+                if (victim) victim.remove();
+            });
+        } else if (action === 'widen' || action === 'narrow') {
+            const current = parseInt(table.style.width, 10) || table.getBoundingClientRect().width;
+            const delta = action === 'widen' ? 60 : -60;
+            table.style.width = `${Math.max(220, current + delta)}px`;
+        }
+
+        handleInput();
+        refreshIcons();
+        if (activeTableCell && document.body.contains(activeTableCell)) placeTableToolbar(activeTableCell);
+    };
 
     const positionContextMenu = (menu, clientX, clientY) => {
         menu.style.left = `${clientX}px`;
@@ -359,6 +466,31 @@ export function setupEditor() {
             });
         }
         refreshIcons();
+    });
+
+    editor.addEventListener('click', (e) => {
+        const cell = e.target.closest('td,th');
+        if (!cell || !editor.contains(cell)) {
+            hideTableToolbar();
+            return;
+        }
+        activeTableCell = cell;
+        if (tableToolbar) {
+            tableToolbar.classList.remove('hidden');
+            tableToolbar.classList.add('flex');
+            placeTableToolbar(cell);
+        }
+    });
+
+    tableToolbar?.addEventListener('mousedown', (e) => {
+        e.preventDefault();
+    });
+
+    tableToolbar?.addEventListener('click', (e) => {
+        const btn = e.target.closest('[data-table-action]');
+        if (!btn) return;
+        e.preventDefault();
+        applyTableAction(btn.getAttribute('data-table-action'));
     });
 
     const insertPlainText = (text) => {
@@ -509,6 +641,8 @@ export function setupEditor() {
     });
 
     editor.addEventListener('input', handleInput);
+
+    window.addEventListener('resize', hideTableToolbar);
 
     // Selector de color: restaurar selección y aplicar `foreColor` sin perder foco.
     const picker = document.getElementById('text-color-picker');
