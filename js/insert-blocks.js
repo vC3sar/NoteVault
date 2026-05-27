@@ -68,23 +68,21 @@ const activeWavePlayers = new Set();
 
 function cleanupWavePlayer(note) {
     if (!note) return;
-    const ws = note._ws;
-    if (ws && typeof ws.destroy === 'function') {
-        try { ws.destroy(); } catch (_) {}
+    const player = note._ws;
+    if (player && typeof player.destroy === 'function') {
+        try { player.destroy(); } catch (_) {}
     }
     note._ws = null;
-    note.dataset.waveReady = 'false';
-    activeWavePlayers.delete(ws);
+    note.dataset.playerReady = 'false';
+    activeWavePlayers.delete(player);
 }
 
 function buildVoiceNoteHtml(src, stamp, durationSec = 0) {
     const time = formatClock(durationSec);
     return wrapBlock('voice-recorder', `
         <div class="voice-note" data-audio-src="${escapeHTML(src)}">
-            <button class="voice-note-play" type="button" aria-label="Reproducir audio">▶</button>
             <div class="voice-note-content">
                 <div class="voice-note-meta">Audio · ${escapeHTML(stamp)}</div>
-                <div class="voice-note-wave"></div>
                 <div class="voice-note-time">${time}</div>
                 <audio controls preload="metadata" src="${escapeHTML(src)}"></audio>
             </div>
@@ -93,95 +91,32 @@ function buildVoiceNoteHtml(src, stamp, durationSec = 0) {
 }
 
 export function initVoiceNotePlayers(root = document) {
-    if (!window.WaveSurfer) return;
+    if (!window.Plyr) return;
     const nodes = root.querySelectorAll('.voice-note[data-audio-src]');
     nodes.forEach((note) => {
-        if (note.dataset.waveReady === 'true') return;
-        const src = note.getAttribute('data-audio-src');
-        if (!src) return;
-
-        const waveEl = note.querySelector('.voice-note-wave');
-        const playBtn = note.querySelector('.voice-note-play');
+        if (note.dataset.playerReady === 'true') return;
+        const audioEl = note.querySelector('audio');
         const timeEl = note.querySelector('.voice-note-time');
-        const fallbackAudio = note.querySelector('audio');
-        if (!waveEl || !playBtn) return;
-
-        const attachWaveEvents = (ws) => {
-            ws.on('ready', () => {
-                if (timeEl) timeEl.textContent = formatClock(ws.getDuration());
+        if (!audioEl) return;
+        try {
+            const player = new window.Plyr(audioEl, {
+                controls: ['play', 'progress', 'current-time', 'duration', 'mute', 'volume'],
+                resetOnEnd: true
             });
-            ws.on('play', () => {
-                playBtn.textContent = '❚❚';
-                note.classList.add('voice-note-playing');
+            note._ws = player;
+            note.dataset.playerReady = 'true';
+            activeWavePlayers.add(player);
+            player.on('play', () => note.classList.add('voice-note-playing'));
+            player.on('pause', () => note.classList.remove('voice-note-playing'));
+            player.on('ended', () => note.classList.remove('voice-note-playing'));
+            player.on('loadedmetadata', () => {
+                if (timeEl) timeEl.textContent = formatClock(player.duration || 0);
             });
-            ws.on('pause', () => {
-                playBtn.textContent = '▶';
-                note.classList.remove('voice-note-playing');
-            });
-            ws.on('finish', () => {
-                playBtn.textContent = '▶';
-                note.classList.remove('voice-note-playing');
-                ws.seekTo(0);
-            });
-            ws.on('timeupdate', (current) => {
-                if (!timeEl) return;
-                const duration = ws.getDuration() || 0;
-                timeEl.textContent = `${formatClock(current)} / ${formatClock(duration)}`;
-            });
-        };
-
-        const fallbackToNative = (error) => {
-            note.dataset.waveReady = 'error';
-            if (waveEl) waveEl.style.display = 'none';
-            if (playBtn) playBtn.style.display = 'none';
-            if (fallbackAudio) fallbackAudio.style.display = 'block';
-            console.warn('WaveSurfer fallback:', error);
-        };
-
-        const createWavePlayerLazy = () => {
-            if (note._ws || note.dataset.waveReady === 'true' || note.dataset.waveReady === 'error') return Promise.resolve(note._ws);
-            if (note.dataset.waveCreating === 'true') return Promise.resolve(null);
-            note.dataset.waveCreating = 'true';
-
-            try {
-                if (fallbackAudio) fallbackAudio.style.display = 'none';
-                const ws = window.WaveSurfer.create({
-                    container: waveEl,
-                    url: src,
-                    backend: 'MediaElement',
-                    mediaControls: false,
-                    height: 34,
-                    normalize: true,
-                    barWidth: 3,
-                    barGap: 2,
-                    barRadius: 2,
-                    cursorWidth: 0,
-                    waveColor: '#a5b4fc',
-                    progressColor: '#4f46e5',
-                    dragToSeek: true
-                });
-                note._ws = ws;
-                note.dataset.waveReady = 'true';
-                activeWavePlayers.add(ws);
-                attachWaveEvents(ws);
-                return Promise.resolve(ws);
-            } catch (error) {
-                fallbackToNative(error);
-                return Promise.resolve(null);
-            } finally {
-                note.dataset.waveCreating = 'false';
-            }
-        };
-
-        playBtn.addEventListener('click', async () => {
-            const ws = note._ws || await createWavePlayerLazy();
-            if (!ws) return;
-            try {
-                ws.playPause();
-            } catch (error) {
-                fallbackToNative(error);
-            }
-        });
+        } catch (error) {
+            note.dataset.playerReady = 'error';
+            console.warn('Plyr fallback:', error);
+            audioEl.controls = true;
+        }
     });
 }
 
