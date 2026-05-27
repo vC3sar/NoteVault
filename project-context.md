@@ -2113,6 +2113,8 @@ body {
 ⋮----
 .dark #editor .voice-note {
 ⋮----
+.dark #editor .voice-note.voice-note-playing {
+⋮----
 .dark #editor .voice-note-meta {
 ⋮----
 .dark #editor .voice-note-title {

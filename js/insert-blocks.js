@@ -181,7 +181,12 @@ export function initVoiceNotePlayers(root = document) {
     normalizeVoiceNoteMarkup(root);
     const nodes = root.querySelectorAll('.voice-note[data-audio-src]');
     nodes.forEach((note) => {
-        if (note.dataset.playerReady === 'true') return;
+        const hasRuntimeCleanup = typeof voiceNoteCleanups.get(note) === 'function';
+        if (note.dataset.playerReady === 'true' && hasRuntimeCleanup) return;
+        if (note.dataset.playerReady === 'true' && !hasRuntimeCleanup) {
+            note.dataset.playerReady = 'false';
+            note.classList.remove('voice-note-playing');
+        }
         const audioEl = note.querySelector('audio');
         const playBtn = note.querySelector('.voice-note-btn');
         const seekEl = note.querySelector('.voice-note-seek');
