@@ -106,27 +106,7 @@ export function initVoiceNotePlayers(root = document) {
         const fallbackAudio = note.querySelector('audio');
         if (!waveEl || !playBtn) return;
 
-        try {
-            if (fallbackAudio) fallbackAudio.style.display = 'none';
-
-            const ws = window.WaveSurfer.create({
-                container: waveEl,
-                url: src,
-                height: 34,
-                normalize: true,
-                barWidth: 3,
-                barGap: 2,
-                barRadius: 2,
-                cursorWidth: 0,
-                waveColor: '#a5b4fc',
-                progressColor: '#4f46e5',
-                dragToSeek: true
-            });
-
-            note._ws = ws;
-            note.dataset.waveReady = 'true';
-            activeWavePlayers.add(ws);
-
+        const attachWaveEvents = (ws) => {
             ws.on('ready', () => {
                 if (timeEl) timeEl.textContent = formatClock(ws.getDuration());
             });
@@ -148,16 +128,60 @@ export function initVoiceNotePlayers(root = document) {
                 const duration = ws.getDuration() || 0;
                 timeEl.textContent = `${formatClock(current)} / ${formatClock(duration)}`;
             });
+        };
 
-            playBtn.addEventListener('click', () => ws.playPause());
-        } catch (error) {
-            // Fallback estable: usar reproductor nativo si falla WaveSurfer.
+        const fallbackToNative = (error) => {
             note.dataset.waveReady = 'error';
             if (waveEl) waveEl.style.display = 'none';
             if (playBtn) playBtn.style.display = 'none';
             if (fallbackAudio) fallbackAudio.style.display = 'block';
             console.warn('WaveSurfer fallback:', error);
-        }
+        };
+
+        const createWavePlayerLazy = () => {
+            if (note._ws || note.dataset.waveReady === 'true' || note.dataset.waveReady === 'error') return Promise.resolve(note._ws);
+            if (note.dataset.waveCreating === 'true') return Promise.resolve(null);
+            note.dataset.waveCreating = 'true';
+
+            try {
+                if (fallbackAudio) fallbackAudio.style.display = 'none';
+                const ws = window.WaveSurfer.create({
+                    container: waveEl,
+                    url: src,
+                    backend: 'MediaElement',
+                    mediaControls: false,
+                    height: 34,
+                    normalize: true,
+                    barWidth: 3,
+                    barGap: 2,
+                    barRadius: 2,
+                    cursorWidth: 0,
+                    waveColor: '#a5b4fc',
+                    progressColor: '#4f46e5',
+                    dragToSeek: true
+                });
+                note._ws = ws;
+                note.dataset.waveReady = 'true';
+                activeWavePlayers.add(ws);
+                attachWaveEvents(ws);
+                return Promise.resolve(ws);
+            } catch (error) {
+                fallbackToNative(error);
+                return Promise.resolve(null);
+            } finally {
+                note.dataset.waveCreating = 'false';
+            }
+        };
+
+        playBtn.addEventListener('click', async () => {
+            const ws = note._ws || await createWavePlayerLazy();
+            if (!ws) return;
+            try {
+                ws.playPause();
+            } catch (error) {
+                fallbackToNative(error);
+            }
+        });
     });
 }
 

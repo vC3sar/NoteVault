@@ -61,6 +61,10 @@ function showSaveToast(message, tone = 'neutral') {
 }
 
 export function setupIPC() {
+    const debugLogs = (localStorage.getItem('NOTEVAULT_DEBUG') === '1') || (location.search.includes('debug=1'));
+    const ilog = (...args) => { if (debugLogs) console.log('[IPC]', ...args); };
+    const ierr = (...args) => { if (debugLogs) console.error('[IPC]', ...args); };
+
     window.api.onNotebookAction(async ({ action, id }) => {
         const nb = state.notebooks.find(n => n.id === id);
         if (!nb) return;
@@ -221,6 +225,7 @@ export function setupIPC() {
 
     if (window.api.onMediaUpdate) {
         window.api.onMediaUpdate((data) => {
+            ilog('onMediaUpdate', data ? { appName: data.appName, title: data.title, status: data.playbackStatus } : null);
             if (window.mediaTempDisabled) return;
             const player = document.getElementById('media-player');
             if (!player) return;
@@ -234,7 +239,11 @@ export function setupIPC() {
             document.getElementById('media-artist').textContent = data.artist || data.appName || 'Sin artista';
             const playIcon = document.getElementById('media-play-icon');
             if (playIcon) playIcon.setAttribute('data-lucide', data.playbackStatus === 'Playing' ? 'pause' : 'play');
-            refreshIcons();
+            try {
+                refreshIcons();
+            } catch (err) {
+                ierr('refreshIcons failed after media update', err);
+            }
         });
     }
 
