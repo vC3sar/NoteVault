@@ -28,7 +28,6 @@
     "electron-builder": "^26.8.1"
   },
   "dependencies": {
-    "plyr": "^3.7.8",
     "win-media-control-enhanced": "latest"
   },
   "pnpm": {

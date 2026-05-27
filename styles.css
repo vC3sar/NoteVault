@@ -528,10 +528,11 @@ body {
 }
 
 #editor .voice-note-time {
-    margin-top: 0.1rem;
     font-size: 0.7rem;
     color: #6366f1;
     font-weight: 700;
+    min-width: 86px;
+    text-align: right;
 }
 
 #editor .voice-note.voice-note-playing {
@@ -552,30 +553,52 @@ body {
     color: #a5b4fc;
 }
 
-#editor .voice-note .plyr {
+#editor .voice-note-player {
+    display: flex;
+    align-items: center;
+    gap: 0.55rem;
     margin-top: 0.35rem;
-    border-radius: 0.7rem;
-    overflow: hidden;
+    padding: 0.32rem 0.45rem;
     border: 1px solid rgba(99, 102, 241, 0.22);
+    border-radius: 0.7rem;
+    background: rgba(238, 242, 255, 0.72);
 }
 
-#editor .voice-note .plyr__controls {
-    background: rgba(238, 242, 255, 0.9);
+#editor .voice-note-btn {
+    width: 1.95rem;
+    height: 1.95rem;
+    border-radius: 999px;
+    border: 1px solid rgba(99, 102, 241, 0.35);
+    background: rgba(99, 102, 241, 0.16);
+    color: #312e81;
+    font-size: 0.82rem;
+    font-weight: 700;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
 }
 
-#editor .voice-note .plyr--audio .plyr__control.plyr__tab-focus,
-#editor .voice-note .plyr--audio .plyr__control:hover,
-#editor .voice-note .plyr--audio .plyr__control[aria-expanded=true] {
-    background: rgba(99, 102, 241, 0.18);
+#editor .voice-note-btn:disabled {
+    opacity: 0.45;
+    cursor: not-allowed;
 }
 
-.dark #editor .voice-note .plyr {
+#editor .voice-note-seek {
+    flex: 1;
+    accent-color: #4f46e5;
+    height: 0.95rem;
+}
+
+.dark #editor .voice-note-player {
     border-color: rgba(129, 140, 248, 0.38);
+    background: rgba(30, 41, 59, 0.72);
 }
 
-.dark #editor .voice-note .plyr__controls {
-    background: rgba(30, 41, 59, 0.92);
-    color: #e2e8f0;
+.dark #editor .voice-note-btn {
+    border-color: rgba(165, 180, 252, 0.45);
+    background: rgba(129, 140, 248, 0.25);
+    color: #e0e7ff;
 }
 
 .group\/sub.submenu-open .table-submenu {

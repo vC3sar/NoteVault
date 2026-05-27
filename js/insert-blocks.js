@@ -64,17 +64,15 @@ function formatClock(sec) {
     return `${mm}:${ss}`;
 }
 
-const activeWavePlayers = new Set();
+const voiceNoteCleanups = new WeakMap();
 
 function cleanupWavePlayer(note) {
     if (!note) return;
-    const player = note._ws;
-    if (player && typeof player.destroy === 'function') {
-        try { player.destroy(); } catch (_) {}
-    }
-    note._ws = null;
+    const cleanup = voiceNoteCleanups.get(note);
+    if (typeof cleanup === 'function') cleanup();
+    voiceNoteCleanups.delete(note);
     note.dataset.playerReady = 'false';
-    activeWavePlayers.delete(player);
+    note.classList.remove('voice-note-playing');
 }
 
 function buildVoiceNoteHtml(src, stamp, durationSec = 0) {
@@ -83,40 +81,102 @@ function buildVoiceNoteHtml(src, stamp, durationSec = 0) {
         <div class="voice-note" data-audio-src="${escapeHTML(src)}">
             <div class="voice-note-content">
                 <div class="voice-note-meta">Audio · ${escapeHTML(stamp)}</div>
-                <div class="voice-note-time">${time}</div>
-                <audio controls preload="metadata" src="${escapeHTML(src)}"></audio>
+                <div class="voice-note-player">
+                    <button class="voice-note-btn" type="button" aria-label="Reproducir">▶</button>
+                    <input class="voice-note-seek" type="range" min="0" max="100" value="0" step="0.1">
+                    <span class="voice-note-time">${time}</span>
+                </div>
+                <audio preload="metadata" src="${escapeHTML(src)}"></audio>
             </div>
         </div>
     `);
 }
 
 export function initVoiceNotePlayers(root = document) {
-    if (!window.Plyr) return;
     const nodes = root.querySelectorAll('.voice-note[data-audio-src]');
     nodes.forEach((note) => {
         if (note.dataset.playerReady === 'true') return;
         const audioEl = note.querySelector('audio');
+        const playBtn = note.querySelector('.voice-note-btn');
+        const seekEl = note.querySelector('.voice-note-seek');
         const timeEl = note.querySelector('.voice-note-time');
-        if (!audioEl) return;
-        try {
-            const player = new window.Plyr(audioEl, {
-                controls: ['play', 'progress', 'current-time', 'duration', 'mute', 'volume'],
-                resetOnEnd: true
-            });
-            note._ws = player;
-            note.dataset.playerReady = 'true';
-            activeWavePlayers.add(player);
-            player.on('play', () => note.classList.add('voice-note-playing'));
-            player.on('pause', () => note.classList.remove('voice-note-playing'));
-            player.on('ended', () => note.classList.remove('voice-note-playing'));
-            player.on('loadedmetadata', () => {
-                if (timeEl) timeEl.textContent = formatClock(player.duration || 0);
-            });
-        } catch (error) {
-            note.dataset.playerReady = 'error';
-            console.warn('Plyr fallback:', error);
-            audioEl.controls = true;
-        }
+        if (!audioEl || !playBtn || !seekEl || !timeEl) return;
+
+        audioEl.controls = false;
+        audioEl.setAttribute('playsinline', 'true');
+        audioEl.style.display = 'none';
+
+        const updateTime = () => {
+            const current = Number.isFinite(audioEl.currentTime) ? audioEl.currentTime : 0;
+            const total = Number.isFinite(audioEl.duration) ? audioEl.duration : 0;
+            const percent = total > 0 ? (current / total) * 100 : 0;
+            seekEl.value = String(percent);
+            timeEl.textContent = total > 0
+                ? `${formatClock(current)} / ${formatClock(total)}`
+                : `${formatClock(current)} / 00:00`;
+        };
+
+        const onPlayPauseClick = async () => {
+            try {
+                if (audioEl.paused) await audioEl.play();
+                else audioEl.pause();
+            } catch (error) {
+                console.warn('Audio play error:', error);
+            }
+        };
+        const onPlay = () => {
+            playBtn.textContent = '❚❚';
+            note.classList.add('voice-note-playing');
+        };
+        const onPause = () => {
+            playBtn.textContent = '▶';
+            note.classList.remove('voice-note-playing');
+        };
+        const onEnded = () => {
+            playBtn.textContent = '▶';
+            note.classList.remove('voice-note-playing');
+            audioEl.currentTime = 0;
+            updateTime();
+        };
+        const onTimeUpdate = () => updateTime();
+        const onLoadedMetadata = () => updateTime();
+        const onSeekInput = () => {
+            const total = Number.isFinite(audioEl.duration) ? audioEl.duration : 0;
+            if (total <= 0) return;
+            const pct = Number(seekEl.value) / 100;
+            audioEl.currentTime = Math.max(0, Math.min(total, pct * total));
+            updateTime();
+        };
+        const onAudioError = () => {
+            playBtn.disabled = true;
+            seekEl.disabled = true;
+            timeEl.textContent = 'No se pudo cargar';
+            note.classList.remove('voice-note-playing');
+        };
+
+        playBtn.addEventListener('click', onPlayPauseClick);
+        seekEl.addEventListener('input', onSeekInput);
+        audioEl.addEventListener('play', onPlay);
+        audioEl.addEventListener('pause', onPause);
+        audioEl.addEventListener('ended', onEnded);
+        audioEl.addEventListener('timeupdate', onTimeUpdate);
+        audioEl.addEventListener('loadedmetadata', onLoadedMetadata);
+        audioEl.addEventListener('error', onAudioError);
+        updateTime();
+
+        voiceNoteCleanups.set(note, () => {
+            audioEl.pause();
+            playBtn.removeEventListener('click', onPlayPauseClick);
+            seekEl.removeEventListener('input', onSeekInput);
+            audioEl.removeEventListener('play', onPlay);
+            audioEl.removeEventListener('pause', onPause);
+            audioEl.removeEventListener('ended', onEnded);
+            audioEl.removeEventListener('timeupdate', onTimeUpdate);
+            audioEl.removeEventListener('loadedmetadata', onLoadedMetadata);
+            audioEl.removeEventListener('error', onAudioError);
+        });
+
+        note.dataset.playerReady = 'true';
     });
 }
 
@@ -213,6 +273,10 @@ async function recordAudioFromMic() {
 
         stopBtn.onclick = () => {
             if (recorder.state === 'recording') recorder.stop();
+            if (timerId) {
+                clearInterval(timerId);
+                timerId = null;
+            }
             recStatus.textContent = 'Procesando audio...';
             recDot.classList.remove('animate-pulse');
             recDot.classList.remove('bg-red-500');
