@@ -57,6 +57,115 @@ function insertHtmlAtCursor(html) {
     return true;
 }
 
+function formatClock(sec) {
+    const total = Math.max(0, Math.floor(Number(sec) || 0));
+    const mm = String(Math.floor(total / 60)).padStart(2, '0');
+    const ss = String(total % 60).padStart(2, '0');
+    return `${mm}:${ss}`;
+}
+
+const activeWavePlayers = new Set();
+
+function cleanupWavePlayer(note) {
+    if (!note) return;
+    const ws = note._ws;
+    if (ws && typeof ws.destroy === 'function') {
+        try { ws.destroy(); } catch (_) {}
+    }
+    note._ws = null;
+    note.dataset.waveReady = 'false';
+    activeWavePlayers.delete(ws);
+}
+
+function buildVoiceNoteHtml(src, stamp, durationSec = 0) {
+    const time = formatClock(durationSec);
+    return wrapBlock('voice-recorder', `
+        <div class="voice-note" data-audio-src="${escapeHTML(src)}">
+            <button class="voice-note-play" type="button" aria-label="Reproducir audio">▶</button>
+            <div class="voice-note-content">
+                <div class="voice-note-meta">Audio · ${escapeHTML(stamp)}</div>
+                <div class="voice-note-wave"></div>
+                <div class="voice-note-time">${time}</div>
+                <audio controls preload="metadata" src="${escapeHTML(src)}"></audio>
+            </div>
+        </div>
+    `);
+}
+
+export function initVoiceNotePlayers(root = document) {
+    if (!window.WaveSurfer) return;
+    const nodes = root.querySelectorAll('.voice-note[data-audio-src]');
+    nodes.forEach((note) => {
+        if (note.dataset.waveReady === 'true') return;
+        const src = note.getAttribute('data-audio-src');
+        if (!src) return;
+
+        const waveEl = note.querySelector('.voice-note-wave');
+        const playBtn = note.querySelector('.voice-note-play');
+        const timeEl = note.querySelector('.voice-note-time');
+        const fallbackAudio = note.querySelector('audio');
+        if (!waveEl || !playBtn) return;
+
+        try {
+            if (fallbackAudio) fallbackAudio.style.display = 'none';
+
+            const ws = window.WaveSurfer.create({
+                container: waveEl,
+                url: src,
+                height: 34,
+                normalize: true,
+                barWidth: 3,
+                barGap: 2,
+                barRadius: 2,
+                cursorWidth: 0,
+                waveColor: '#a5b4fc',
+                progressColor: '#4f46e5',
+                dragToSeek: true
+            });
+
+            note._ws = ws;
+            note.dataset.waveReady = 'true';
+            activeWavePlayers.add(ws);
+
+            ws.on('ready', () => {
+                if (timeEl) timeEl.textContent = formatClock(ws.getDuration());
+            });
+            ws.on('play', () => {
+                playBtn.textContent = '❚❚';
+                note.classList.add('voice-note-playing');
+            });
+            ws.on('pause', () => {
+                playBtn.textContent = '▶';
+                note.classList.remove('voice-note-playing');
+            });
+            ws.on('finish', () => {
+                playBtn.textContent = '▶';
+                note.classList.remove('voice-note-playing');
+                ws.seekTo(0);
+            });
+            ws.on('timeupdate', (current) => {
+                if (!timeEl) return;
+                const duration = ws.getDuration() || 0;
+                timeEl.textContent = `${formatClock(current)} / ${formatClock(duration)}`;
+            });
+
+            playBtn.addEventListener('click', () => ws.playPause());
+        } catch (error) {
+            // Fallback estable: usar reproductor nativo si falla WaveSurfer.
+            note.dataset.waveReady = 'error';
+            if (waveEl) waveEl.style.display = 'none';
+            if (playBtn) playBtn.style.display = 'none';
+            if (fallbackAudio) fallbackAudio.style.display = 'block';
+            console.warn('WaveSurfer fallback:', error);
+        }
+    });
+}
+
+export function destroyVoiceNotePlayers(root = document) {
+    const nodes = root.querySelectorAll('.voice-note[data-audio-src]');
+    nodes.forEach((note) => cleanupWavePlayer(note));
+}
+
 async function recordAudioFromMic() {
     if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
         showToast('Tu entorno no soporta grabación de micrófono.', 'error');
@@ -233,20 +342,13 @@ const BLOCKS = [
                 return false;
             }
             const duration = Math.max(0, Math.floor(Number(recorded.durationSec) || 0));
-            const mm = String(Math.floor(duration / 60)).padStart(2, '0');
-            const ss = String(duration % 60).padStart(2, '0');
             const stamp = new Date().toLocaleString('es-MX');
-            return insertHtmlAtCursor(
-                wrapBlock('voice-recorder', `
-                    <div class="voice-note">
-                        <div class="voice-note-icon">🎤</div>
-                        <div class="voice-note-content">
-                            <div class="voice-note-meta">Audio · ${escapeHTML(stamp)} · ${mm}:${ss}</div>
-                            <audio controls preload="metadata" src="${escapeHTML(res.path)}"></audio>
-                        </div>
-                    </div>
-                `)
-            );
+            const inserted = insertHtmlAtCursor(buildVoiceNoteHtml(res.path, stamp, duration));
+            if (inserted) {
+                const editor = getEditor();
+                if (editor) initVoiceNotePlayers(editor);
+            }
+            return inserted;
         }
     }
 ];

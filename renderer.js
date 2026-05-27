@@ -7,6 +7,23 @@ import { selectNotebook, addNotebook } from './js/notebooks.js';
 import { forceSaveNote } from './js/editor.js';
 import { refreshIcons, cleanHTML, buildPreview, hashString } from './js/utils.js';
 import * as calendarEngine from './js/calendar.js';
+const DEBUG_LOGS = (localStorage.getItem('NOTEVAULT_DEBUG') === '1') || (location.search.includes('debug=1'));
+const rlog = (...args) => { if (DEBUG_LOGS) console.log('[RENDERER]', ...args); };
+const rerr = (...args) => { if (DEBUG_LOGS) console.error('[RENDERER]', ...args); };
+
+window.addEventListener('error', (event) => {
+    rerr('window.error', {
+        message: event?.message,
+        file: event?.filename,
+        line: event?.lineno,
+        col: event?.colno,
+        error: event?.error
+    });
+});
+
+window.addEventListener('unhandledrejection', (event) => {
+    rerr('unhandledrejection', event?.reason);
+});
 
 /**
  * renderer.js — Entry point del renderer (UI).
@@ -44,6 +61,7 @@ window.forceSaveNote = forceSaveNote;
 // se difieren, el evento `partials:ready` puede dispararse antes de registrar este
 // listener. La bandera `window.partialsReady` evita esa condición de carrera.
 async function initApp() {
+    rlog('initApp start');
     let savedData;
     try {
         savedData = normalizeLoadedData(await window.api.loadData());
@@ -88,6 +106,7 @@ async function initApp() {
     
     setupIPC();
     setupEventListeners();
+    rlog('ipc + event listeners ready');
 
     // Regeneración de previews en segundo plano: no bloquea la UI inicial y corrige
     // datos legacy donde el preview/hash aún no existían.

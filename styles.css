@@ -514,16 +514,19 @@ body {
     box-shadow: 0 8px 18px rgba(99, 102, 241, 0.12);
 }
 
-#editor .voice-note-icon {
-    width: 2rem;
-    height: 2rem;
+#editor .voice-note-play {
+    width: 2.15rem;
+    height: 2.15rem;
     border-radius: 999px;
     display: flex;
     align-items: center;
     justify-content: center;
     background: rgba(79, 70, 229, 0.2);
     border: 1px solid rgba(79, 70, 229, 0.35);
-    font-size: 0.95rem;
+    color: #312e81;
+    font-size: 0.85rem;
+    font-weight: 700;
+    cursor: pointer;
     flex: 0 0 auto;
 }
 
@@ -540,19 +543,43 @@ body {
     margin-bottom: 0.2rem;
 }
 
+#editor .voice-note-wave {
+    min-height: 34px;
+}
+
+#editor .voice-note-time {
+    margin-top: 0.1rem;
+    font-size: 0.7rem;
+    color: #6366f1;
+    font-weight: 700;
+}
+
+#editor .voice-note audio {
+    display: none;
+}
+
+#editor .voice-note.voice-note-playing {
+    box-shadow: 0 10px 24px rgba(79, 70, 229, 0.2);
+}
+
 .dark #editor .voice-note {
     background: linear-gradient(135deg, rgba(99, 102, 241, 0.28), rgba(14, 116, 144, 0.2));
     border-color: rgba(129, 140, 248, 0.38);
     box-shadow: 0 10px 22px rgba(2, 6, 23, 0.35);
 }
 
-.dark #editor .voice-note-icon {
+.dark #editor .voice-note-play {
     background: rgba(129, 140, 248, 0.25);
     border-color: rgba(165, 180, 252, 0.45);
+    color: #e0e7ff;
 }
 
 .dark #editor .voice-note-meta {
     color: #c7d2fe;
+}
+
+.dark #editor .voice-note-time {
+    color: #a5b4fc;
 }
 
 .group\/sub.submenu-open .table-submenu {

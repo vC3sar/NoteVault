@@ -26,6 +26,15 @@ const { registerIpcHandlers } = require('./modules/ipc-handlers');
 const { initMedia, checkMedia } = require('./modules/media');
 
 const debug = !app.isPackaged;
+const debugLogs = debug || process.env.NOTEVAULT_DEBUG === '1';
+
+function dlog(...args) {
+  if (debugLogs) console.log('[MAIN]', ...args);
+}
+
+function derr(...args) {
+  if (debugLogs) console.error('[MAIN]', ...args);
+}
 
 // Identidad de aplicación (Windows) y nombre visible.
 app.setAppUserModelId('ovh.vazquezsg.NoteVault');
@@ -44,6 +53,7 @@ const ATTACHMENTS_DIR = path.join(app.getPath('userData'), 'attachments');
 
 // Registrar handlers IPC antes de abrir la ventana para evitar condiciones de carrera.
 registerIpcHandlers({ DATA_PATH, NOTES_DIR, COVERS_DIR, ATTACHMENTS_DIR });
+dlog('IPC handlers registrados');
 
 // En Windows/macOS es común forzar instancia única para evitar corrupción de datos.
 const gotTheLock = app.requestSingleInstanceLock();
@@ -54,6 +64,7 @@ if (!gotTheLock) {
   let mainWindow = null;
 
   app.on('second-instance', () => {
+    dlog('Evento second-instance');
     if (mainWindow) {
       if (mainWindow.isMinimized()) mainWindow.restore();
       mainWindow.show();
@@ -62,6 +73,7 @@ if (!gotTheLock) {
   });
 
   app.whenReady().then(() => {
+    dlog('app.whenReady');
     mainWindow = createWindow(debug, checkMedia);
     setupMenu(mainWindow, debug);
     initMedia(() => mainWindow);
@@ -69,6 +81,23 @@ if (!gotTheLock) {
     // Preferencia de idioma del corrector ortográfico para el renderer.
     if (mainWindow.webContents.session) {
       mainWindow.webContents.session.setSpellCheckerLanguages(['es']);
+      dlog('Spellchecker languages set: es');
     }
   });
 }
+
+process.on('uncaughtException', (err) => {
+  derr('uncaughtException', err);
+});
+
+process.on('unhandledRejection', (reason) => {
+  derr('unhandledRejection', reason);
+});
+
+app.on('render-process-gone', (_event, webContents, details) => {
+  derr('render-process-gone', { id: webContents?.id, details });
+});
+
+app.on('child-process-gone', (_event, details) => {
+  derr('child-process-gone', details);
+});

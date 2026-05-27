@@ -79,16 +79,34 @@ function checkMedia(getWindow) {
   const win = getWindow();
   if (!mediaControl || !win || win.isDestroyed()) return;
 
+  const safeSend = (channel, payload) => {
+    try {
+      if (!win || win.isDestroyed()) return false;
+      const wc = win.webContents;
+      if (!wc || wc.isDestroyed()) return false;
+      if (wc.isCrashed && wc.isCrashed()) return false;
+      wc.send(channel, payload);
+      return true;
+    } catch (error) {
+      const msg = String(error && error.message ? error.message : error);
+      // Ocurre durante recargas/cierre: evitar ruido en consola.
+      if (!msg.includes('Render frame was disposed')) {
+        console.error('Media send error:', error);
+      }
+      return false;
+    }
+  };
+
   if (!mediaControl.listSessions) return;
 
   mediaControl.listSessions()
     .then(sessions => {
       if (!sessions || sessions.length === 0) {
-        win.webContents.send('media-update', null);
+        safeSend('media-update', null);
         return;
       }
       const active = sessions.find(s => s.playbackStatus === 'Playing') || sessions[0];
-      win.webContents.send('media-update', active);
+      safeSend('media-update', active);
     })
     .catch(err => {
       console.error('Media error:', err);
