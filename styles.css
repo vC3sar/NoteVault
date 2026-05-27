@@ -506,14 +506,17 @@ body {
     display: flex;
     align-items: center;
     gap: 0.8rem;
-    width: 100%;
-    max-width: 680px;
+    width: 680px;
+    max-width: 100%;
+    min-height: 92px;
     box-sizing: border-box;
     padding: 0.75rem 0.85rem;
     border-radius: 1.05rem;
     border: 1px solid #cbd5e1;
     background: #f8fafc;
     transition: border-color .2s ease, background-color .2s ease;
+    resize: none;
+    overflow: hidden;
 }
 
 #editor .voice-note-content {
@@ -641,6 +644,8 @@ body {
 
 @media (max-width: 640px) {
     #editor .voice-note {
+        width: calc(100% - 2rem);
+        min-height: 102px;
         max-width: 100%;
         padding: 0.65rem 0.7rem;
     }
@@ -658,6 +663,12 @@ body {
     #editor .voice-note-time {
         min-width: 0;
         margin-left: auto;
+    }
+}
+
+@media (min-width: 641px) and (max-width: 1024px) {
+    #editor .voice-note {
+        width: 560px;
     }
 }
 

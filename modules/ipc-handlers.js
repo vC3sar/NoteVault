@@ -267,7 +267,7 @@ function registerIpcHandlers({ DATA_PATH, NOTES_DIR, COVERS_DIR, ATTACHMENTS_DIR
 
   ipcMain.handle('save-recorded-audio', async (event, { base64, mimeType }) => {
     try {
-      const mime = String(mimeType || 'audio/webm').toLowerCase();
+      const mime = String(mimeType || 'audio/webm').toLowerCase().split(';')[0].trim();
       const extMap = {
         'audio/webm': '.webm',
         'audio/ogg': '.ogg',

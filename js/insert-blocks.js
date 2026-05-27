@@ -1,5 +1,8 @@
 import { createId, escapeHTML, showModal, showToast } from "./utils.js";
 import { handleInput } from "./editor.js";
+const DEBUG_LOGS = (localStorage.getItem("NOTEVAULT_DEBUG") === "1") || (location.search.includes("debug=1"));
+const vlog = (...args) => { if (DEBUG_LOGS) console.log("[VOICE]", ...args); };
+const verr = (...args) => { if (DEBUG_LOGS) console.error("[VOICE]", ...args); };
 
 const CATEGORY_MAP = {
   recommended: "Recomendados",
@@ -88,7 +91,95 @@ function formatClock(sec) {
   return `${mm}:${ss}`;
 }
 
+function parseClockToSec(value) {
+  const raw = String(value || "").trim();
+  const m = raw.match(/^(\d{1,3}):(\d{2})$/);
+  if (!m) return 0;
+  const mm = Number(m[1]);
+  const ss = Number(m[2]);
+  if (!Number.isFinite(mm) || !Number.isFinite(ss)) return 0;
+  return Math.max(0, mm * 60 + ss);
+}
+
+function normalizeIdleTime(value) {
+  const raw = String(value || "").trim();
+  if (!raw) return "00:00 / 00:00";
+  if (raw.includes("/")) {
+    const parts = raw.split("/").map((p) => p.trim()).filter(Boolean);
+    if (parts.length === 2) return `${parts[0]} / ${parts[1]}`;
+  }
+  return `${raw} / ${raw}`;
+}
+
 const voiceNoteCleanups = new WeakMap();
+const audioInfoCache = new Map();
+
+function parseAudioFileLabel(src) {
+  const raw = String(src || "");
+  if (!raw) return "Audio";
+  try {
+    return decodeURIComponent(raw).split("/").pop() || "Audio";
+  } catch (_) {
+    return raw.split("/").pop() || "Audio";
+  }
+}
+
+function parseAudioFormat(src) {
+  const label = parseAudioFileLabel(src);
+  const parts = label.split(".");
+  return parts.length > 1 ? String(parts.pop() || "audio").toUpperCase() : "AUDIO";
+}
+
+function waitForAudioMetadata(audioEl, timeoutMs = 1200) {
+  if (Number.isFinite(audioEl.duration) && audioEl.duration > 0) return Promise.resolve(true);
+  return new Promise((resolve) => {
+    let done = false;
+    const finish = (ok) => {
+      if (done) return;
+      done = true;
+      audioEl.removeEventListener("loadedmetadata", onReady);
+      audioEl.removeEventListener("durationchange", onReady);
+      clearTimeout(timer);
+      resolve(ok);
+    };
+    const onReady = () => finish(true);
+    const timer = setTimeout(() => finish(false), timeoutMs);
+    audioEl.addEventListener("loadedmetadata", onReady, { once: true });
+    audioEl.addEventListener("durationchange", onReady, { once: true });
+  });
+}
+
+async function collectAudioInfoForUi(audioEl) {
+  const src = audioEl.currentSrc || audioEl.getAttribute("src") || "";
+  if (audioInfoCache.has(src)) return audioInfoCache.get(src);
+
+  await waitForAudioMetadata(audioEl, 1200);
+  const info = {
+    format: parseAudioFormat(src),
+    durationSec: Math.max(0, Math.floor(Number(audioEl.duration) || 0)),
+    sampleRate: 0,
+    channels: 0,
+  };
+
+  try {
+    const Ctx = window.AudioContext || window.webkitAudioContext;
+    if (Ctx && src) {
+      const ctx = new Ctx();
+      const timeout = new Promise((_, reject) => setTimeout(() => reject(new Error("decode-timeout")), 1800));
+      const ab = await Promise.race([fetch(src).then((r) => r.arrayBuffer()), timeout]);
+      const decoded = await ctx.decodeAudioData(ab.slice(0));
+      info.sampleRate = Math.max(0, Math.floor(Number(decoded.sampleRate) || 0));
+      info.channels = Math.max(0, Math.floor(Number(decoded.numberOfChannels) || 0));
+      if (!info.durationSec) info.durationSec = Math.max(0, Math.floor(Number(decoded.duration) || 0));
+      try { await ctx.close(); } catch (_) {}
+    }
+  } catch (error) {
+    vlog("audio-info-light-fallback", String(error?.message || error));
+  }
+
+  audioInfoCache.set(src, info);
+  return info;
+}
 
 function cleanupWavePlayer(note) {
   if (!note) return;
@@ -101,17 +192,18 @@ function cleanupWavePlayer(note) {
 
 function buildVoiceNoteHtml(src, stamp, durationSec = 0) {
   const time = formatClock(durationSec);
+  const safeDuration = Math.max(0, Math.floor(Number(durationSec) || 0));
   return wrapBlock(
     "voice-recorder",
     `
-        <div class="voice-note" data-audio-src="${escapeHTML(src)}">
+        <div class="voice-note" data-audio-src="${escapeHTML(src)}" data-audio-duration="${safeDuration}">
             <div class="voice-note-content">
                 <div class="voice-note-title" contenteditable="true">Grabadora de voz</div>
                 <div class="voice-note-meta" contenteditable="false">Audio · ${escapeHTML(stamp)}</div>
                 <div class="voice-note-player" contenteditable="false">
                     <button class="voice-note-btn" type="button" aria-label="Reproducir" title="Reproducir o pausar">▶</button>
                     <input class="voice-note-seek" type="range" min="0" max="100" value="0" step="0.1">
-                    <span class="voice-note-time">${time}</span>
+                    <span class="voice-note-time" data-idle-time="${normalizeIdleTime(time)}">${normalizeIdleTime(time)}</span>
                 </div>
                 <audio preload="metadata" src="${escapeHTML(src)}" contenteditable="false"></audio>
             </div>
@@ -141,7 +233,7 @@ function upgradeNativeAudioPlayers(root = document) {
                 <div class="voice-note-player" contenteditable="false">
                     <button class="voice-note-btn" type="button" aria-label="Reproducir" title="Reproducir o pausar">▶</button>
                     <input class="voice-note-seek" type="range" min="0" max="100" value="0" step="0.1">
-                    <span class="voice-note-time">00:00 / 00:00</span>
+                    <span class="voice-note-time" data-idle-time="00:00 / 00:00">00:00 / 00:00</span>
                 </div>
             </div>
         `;
@@ -200,6 +292,16 @@ function normalizeVoiceNoteMarkup(root = document) {
       timeEl.textContent = "00:00 / 00:00";
       player.appendChild(timeEl);
     }
+    if (!timeEl.dataset.idleTime) {
+      timeEl.dataset.idleTime = normalizeIdleTime(timeEl.textContent || "00:00 / 00:00");
+    }
+    const knownDuration = Math.max(0, Math.floor(Number(note.dataset.audioDuration) || 0));
+    if (knownDuration > 0) {
+      const fastIdle = `00:00 / ${formatClock(knownDuration)}`;
+      timeEl.dataset.idleTime = fastIdle;
+      timeEl.textContent = fastIdle;
+    }
+    timeEl.textContent = normalizeIdleTime(timeEl.textContent || timeEl.dataset.idleTime);
 
     player.setAttribute("contenteditable", "false");
   });
@@ -220,31 +322,152 @@ export function initVoiceNotePlayers(root = document) {
     const playBtn = note.querySelector(".voice-note-btn");
     const seekEl = note.querySelector(".voice-note-seek");
     const timeEl = note.querySelector(".voice-note-time");
+    const metaEl = note.querySelector(".voice-note-meta");
     if (!audioEl || !playBtn || !seekEl || !timeEl) return;
+    if (!timeEl.dataset.idleTime) {
+      timeEl.dataset.idleTime = normalizeIdleTime(timeEl.textContent || "00:00 / 00:00");
+    }
+    timeEl.textContent = normalizeIdleTime(timeEl.textContent || timeEl.dataset.idleTime);
 
     audioEl.controls = false;
     audioEl.setAttribute("playsinline", "true");
     audioEl.style.display = "none";
+    note.classList.remove("voice-note-playing");
+
+    let isProcessing = false;
+    let processingTimer = null;
+    const MAX_PROCESSING_MS = 6000;
+    const MAX_RETRIES = 3;
+    let retryCount = 0;
+    let retryTimer = null;
+    let isSeeking = false;
+    const dbg = (label, extra = {}) => {
+      vlog(label, {
+        src: audioEl.currentSrc || audioEl.getAttribute("src") || "",
+        readyState: audioEl.readyState,
+        networkState: audioEl.networkState,
+        duration: audioEl.duration,
+        paused: audioEl.paused,
+        processing: isProcessing,
+        ...extra,
+      });
+    };
+
+    const setProcessing = (enabled) => {
+      isProcessing = !!enabled;
+      playBtn.disabled = isProcessing;
+      seekEl.disabled = isProcessing;
+      if (isProcessing) {
+        playBtn.textContent = "…";
+        timeEl.textContent = "El recurso se está procesando...";
+        note.classList.remove("voice-note-playing");
+      } else {
+        playBtn.textContent = audioEl.paused ? "▶" : "❚❚";
+        updateTime();
+      }
+      dbg("setProcessing", { enabled: isProcessing });
+    };
 
     const updateTime = () => {
       const current = Number.isFinite(audioEl.currentTime)
         ? audioEl.currentTime
         : 0;
       const total = Number.isFinite(audioEl.duration) ? audioEl.duration : 0;
+      const idle = normalizeIdleTime(timeEl.dataset.idleTime || "00:00 / 00:00");
+      const idleTotalLabel = idle.split("/")[1]?.trim() || "00:00";
+      const idleTotalSec = parseClockToSec(idleTotalLabel);
+      if (total <= 0) {
+        const currentLabel = formatClock(current);
+        if (current <= 0) {
+          timeEl.textContent = idle;
+        } else if (idleTotalSec > 0) {
+          timeEl.textContent = `${currentLabel} / ${formatClock(idleTotalSec)}`;
+        } else {
+          timeEl.textContent = `${currentLabel} / --:--`;
+        }
+        if (!isSeeking) seekEl.value = "0";
+        return;
+      }
       const percent = total > 0 ? (current / total) * 100 : 0;
-      seekEl.value = String(percent);
+      if (!isSeeking) seekEl.value = String(Math.max(0, Math.min(100, percent)));
+      const totalLabel = formatClock(total);
+      const syncedIdle = `00:00 / ${totalLabel}`;
+      if (timeEl.dataset.idleTime !== syncedIdle) {
+        timeEl.dataset.idleTime = syncedIdle;
+      }
+      note.dataset.audioDuration = String(Math.max(0, Math.floor(total)));
       timeEl.textContent =
         total > 0
-          ? `${formatClock(current)} / ${formatClock(total)}`
+          ? `${formatClock(current)} / ${totalLabel}`
           : `${formatClock(current)} / 00:00`;
+    };
+
+    const hasUsableAudio = () => {
+      const durationOk = Number.isFinite(audioEl.duration) && audioEl.duration > 0;
+      const readyOk = audioEl.readyState >= 2;
+      return durationOk || readyOk;
+    };
+
+    const clearRetryTimer = () => {
+      if (retryTimer) {
+        clearTimeout(retryTimer);
+        retryTimer = null;
+      }
+    };
+
+    const scheduleRetry = (reason) => {
+      if (hasUsableAudio()) {
+        setProcessing(false);
+        updateTime();
+        return;
+      }
+      if (retryCount >= MAX_RETRIES) {
+        setProcessing(false);
+        playBtn.disabled = true;
+        seekEl.disabled = true;
+        timeEl.textContent = "No se pudo cargar";
+        verr("audio-retry-exhausted", { reason, retries: retryCount });
+        return;
+      }
+      retryCount += 1;
+      const delay = 450 * retryCount;
+      timeEl.textContent = `Reintentando audio... (${retryCount}/${MAX_RETRIES})`;
+      dbg("audio-retry-scheduled", { reason, retryCount, delay });
+      clearRetryTimer();
+      retryTimer = setTimeout(() => {
+        dbg("audio-retry-load", { retryCount });
+        setProcessing(true);
+        audioEl.load();
+      }, delay);
     };
 
     const onPlayPauseClick = async () => {
       try {
+        if (isProcessing) {
+          dbg("click-during-processing");
+          showToast("El recurso se está procesando...", "neutral");
+          return;
+        }
+        dbg("click-playpause");
+        if (metaEl && metaEl.dataset.enriched !== "true") {
+          const src = audioEl.currentSrc || audioEl.getAttribute("src") || "";
+          const fileLabel = parseAudioFileLabel(src);
+          metaEl.textContent = "Leyendo datos del archivo...";
+          const info = await collectAudioInfoForUi(audioEl);
+          const durationLabel = info.durationSec > 0 ? formatClock(info.durationSec) : "--:--";
+          const srLabel = info.sampleRate > 0 ? `${Math.round(info.sampleRate / 1000)}kHz` : "";
+          const chLabel = info.channels > 0 ? `${info.channels}ch` : "";
+          metaEl.textContent = [fileLabel, info.format, durationLabel, srLabel, chLabel]
+            .filter(Boolean)
+            .join(" · ");
+          metaEl.dataset.enriched = "true";
+          dbg("meta-ui-enriched", info);
+        }
         if (audioEl.paused) await audioEl.play();
         else audioEl.pause();
       } catch (error) {
-        console.warn("Audio play error:", error);
+        verr("Audio play error:", error);
+        showToast("No se pudo reproducir el audio todavía.", "error");
       }
     };
     const onPlay = () => {
@@ -262,41 +485,107 @@ export function initVoiceNotePlayers(root = document) {
       updateTime();
     };
     const onTimeUpdate = () => updateTime();
-    const onLoadedMetadata = () => updateTime();
+    const onLoadedMetadata = () => {
+      if (Number.isFinite(audioEl.duration) && audioEl.duration > 0) {
+        setProcessing(false);
+      } else {
+        scheduleRetry("loadedmetadata-without-duration");
+      }
+      dbg("loadedmetadata");
+      updateTime();
+    };
     const onSeekInput = () => {
+      isSeeking = true;
       const total = Number.isFinite(audioEl.duration) ? audioEl.duration : 0;
       if (total <= 0) return;
-      const pct = Number(seekEl.value) / 100;
+      const pct = Math.max(0, Math.min(100, Number(seekEl.value) || 0)) / 100;
       audioEl.currentTime = Math.max(0, Math.min(total, pct * total));
       updateTime();
     };
-    const onAudioError = () => {
-      playBtn.disabled = true;
-      seekEl.disabled = true;
-      timeEl.textContent = "No se pudo cargar";
-      note.classList.remove("voice-note-playing");
+    const onSeekCommit = () => {
+      isSeeking = false;
+      updateTime();
     };
+    const onAudioError = () => {
+      const err = audioEl.error ? { code: audioEl.error.code, message: audioEl.error.message } : null;
+      verr("audio-error", err);
+      note.classList.remove("voice-note-playing");
+      scheduleRetry("audio-error");
+    };
+    const onCanPlay = () => {
+      if (processingTimer) {
+        clearTimeout(processingTimer);
+        processingTimer = null;
+      }
+      clearRetryTimer();
+      setProcessing(false);
+      dbg("canplay");
+      updateTime();
+    };
+    const onLoadedData = () => dbg("loadeddata");
+    const onStalled = () => dbg("stalled");
+    const onWaiting = () => dbg("waiting");
+    const onSuspend = () => dbg("suspend");
+    const onDurationChange = () => dbg("durationchange");
 
     playBtn.addEventListener("click", onPlayPauseClick);
     seekEl.addEventListener("input", onSeekInput);
+    seekEl.addEventListener("change", onSeekCommit);
+    seekEl.addEventListener("pointerup", onSeekCommit);
+    seekEl.addEventListener("touchend", onSeekCommit);
     audioEl.addEventListener("play", onPlay);
     audioEl.addEventListener("pause", onPause);
     audioEl.addEventListener("ended", onEnded);
     audioEl.addEventListener("timeupdate", onTimeUpdate);
     audioEl.addEventListener("loadedmetadata", onLoadedMetadata);
     audioEl.addEventListener("error", onAudioError);
-    updateTime();
+    audioEl.addEventListener("canplay", onCanPlay);
+    audioEl.addEventListener("canplaythrough", onCanPlay);
+    audioEl.addEventListener("loadeddata", onLoadedData);
+    audioEl.addEventListener("stalled", onStalled);
+    audioEl.addEventListener("waiting", onWaiting);
+    audioEl.addEventListener("suspend", onSuspend);
+    audioEl.addEventListener("durationchange", onDurationChange);
+    setProcessing(true);
+    if (audioEl.readyState === 0) audioEl.load();
+    timeEl.textContent = timeEl.dataset.idleTime || "00:00 / 00:00";
+    processingTimer = setTimeout(() => {
+      if (hasUsableAudio()) {
+        setProcessing(false);
+        updateTime();
+        dbg("processing-timeout-unlock");
+      } else {
+        dbg("processing-timeout-retry");
+        scheduleRetry("processing-timeout");
+      }
+    }, MAX_PROCESSING_MS);
+    dbg("init-player");
 
     voiceNoteCleanups.set(note, () => {
+      if (processingTimer) {
+        clearTimeout(processingTimer);
+        processingTimer = null;
+      }
+      clearRetryTimer();
       audioEl.pause();
       playBtn.removeEventListener("click", onPlayPauseClick);
       seekEl.removeEventListener("input", onSeekInput);
+      seekEl.removeEventListener("change", onSeekCommit);
+      seekEl.removeEventListener("pointerup", onSeekCommit);
+      seekEl.removeEventListener("touchend", onSeekCommit);
       audioEl.removeEventListener("play", onPlay);
       audioEl.removeEventListener("pause", onPause);
       audioEl.removeEventListener("ended", onEnded);
       audioEl.removeEventListener("timeupdate", onTimeUpdate);
       audioEl.removeEventListener("loadedmetadata", onLoadedMetadata);
       audioEl.removeEventListener("error", onAudioError);
+      audioEl.removeEventListener("canplay", onCanPlay);
+      audioEl.removeEventListener("canplaythrough", onCanPlay);
+      audioEl.removeEventListener("loadeddata", onLoadedData);
+      audioEl.removeEventListener("stalled", onStalled);
+      audioEl.removeEventListener("waiting", onWaiting);
+      audioEl.removeEventListener("suspend", onSuspend);
+      audioEl.removeEventListener("durationchange", onDurationChange);
     });
 
     note.dataset.playerReady = "true";
@@ -322,7 +611,27 @@ async function recordAudioFromMic() {
     return null;
   }
 
-  const recorder = new MediaRecorder(stream);
+  const pickRecorderMimeType = () => {
+    if (typeof MediaRecorder === "undefined" || typeof MediaRecorder.isTypeSupported !== "function") return "";
+    const candidates = [
+      "audio/webm;codecs=opus",
+      "audio/webm",
+      "audio/ogg;codecs=opus",
+      "audio/ogg",
+      "audio/mp4"
+    ];
+    return candidates.find((m) => MediaRecorder.isTypeSupported(m)) || "";
+  };
+
+  const selectedMimeType = pickRecorderMimeType();
+  let recorder;
+  try {
+    recorder = selectedMimeType
+      ? new MediaRecorder(stream, { mimeType: selectedMimeType })
+      : new MediaRecorder(stream);
+  } catch (error) {
+    recorder = new MediaRecorder(stream);
+  }
   const chunks = [];
   recorder.ondataavailable = (e) => {
     if (e.data && e.data.size > 0) chunks.push(e.data);
@@ -355,6 +664,7 @@ async function recordAudioFromMic() {
   const recStatus = panel.querySelector("#rec-status");
   const recTimer = panel.querySelector("#rec-timer");
   let startedAt = 0;
+  let elapsedSecAtStop = 0;
   let timerId = null;
 
   const getBlobDurationSec = (blob) =>
@@ -383,7 +693,7 @@ async function recordAudioFromMic() {
 
     startBtn.onclick = () => {
       chunks.length = 0;
-      recorder.start();
+      recorder.start(250);
       startedAt = Date.now();
       recStatus.textContent = "Grabando...";
       recDot.classList.remove("bg-slate-400");
@@ -401,17 +711,21 @@ async function recordAudioFromMic() {
       }, 250);
     };
 
-    stopBtn.onclick = () => {
-      if (recorder.state === "recording") recorder.stop();
-      if (timerId) {
-        clearInterval(timerId);
-        timerId = null;
-      }
-      recStatus.textContent = "Procesando audio...";
-      recDot.classList.remove("animate-pulse");
-      recDot.classList.remove("bg-red-500");
-      recDot.classList.add("bg-amber-500");
-    };
+      stopBtn.onclick = () => {
+        if (recorder.state === "recording") recorder.stop();
+        if (timerId) {
+          clearInterval(timerId);
+          timerId = null;
+        }
+        elapsedSecAtStop = Math.max(
+          0,
+          Math.floor((Date.now() - startedAt) / 1000),
+        );
+        recStatus.textContent = "Procesando audio...";
+        recDot.classList.remove("animate-pulse");
+        recDot.classList.remove("bg-red-500");
+        recDot.classList.add("bg-amber-500");
+      };
 
     closeBtn.onclick = () => {
       if (recorder.state === "recording") recorder.stop();
@@ -425,10 +739,19 @@ async function recordAudioFromMic() {
         resolve(null);
         return;
       }
+      const normalizedMime = String(recorder.mimeType || selectedMimeType || "audio/webm")
+        .toLowerCase()
+        .split(";")[0]
+        .trim();
       const blob = new Blob(chunks, {
-        type: recorder.mimeType || "audio/webm",
+        type: normalizedMime || "audio/webm",
       });
-      const durationSec = await getBlobDurationSec(blob);
+      const measuredDurationSec = await getBlobDurationSec(blob);
+      const durationSec = Math.max(
+        0,
+        Math.floor(Number(measuredDurationSec) || 0),
+        Math.floor(Number(elapsedSecAtStop) || 0),
+      );
       const base64 = await new Promise((res) => {
         const reader = new FileReader();
         reader.onload = (ev) => res(ev.target.result);
@@ -437,7 +760,8 @@ async function recordAudioFromMic() {
       recStatus.textContent = "Audio listo. Cierra este panel cuando quieras.";
       stopBtn.disabled = true;
       closeBtn.classList.add("bg-primary/15");
-      resolve({ base64, mimeType: blob.type || "audio/webm", durationSec });
+      cleanup();
+      resolve({ base64, mimeType: blob.type || normalizedMime || "audio/webm", durationSec });
     };
   });
 }
@@ -714,18 +1038,6 @@ const BLOCKS = [
     icon: "history",
     template: () =>
       wrapBlock("timeline", `<ol><li>Hito 1</li><li>Hito 2</li></ol>`),
-  },
-  {
-    id: "progress-bar",
-    name: "Barra de progreso",
-    category: "blocks",
-    description: "Progreso visual.",
-    icon: "gauge",
-    template: () =>
-      wrapBlock(
-        "progress-bar",
-        `<div class="insert-progress"><div style="width:45%"></div></div><p class="insert-block-desc">45%</p>`,
-      ),
   },
   {
     id: "formula",

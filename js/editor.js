@@ -219,6 +219,15 @@ export async function forceSaveNote() {
 
     if (editor && sanitizedContent !== content) {
         editor.innerHTML = sanitizedContent;
+        // Rehidratar listeners de bloques dinámicos que se pierden al reasignar innerHTML.
+        try {
+            const { initVoiceNotePlayers } = await import('./insert-blocks.js');
+            initVoiceNotePlayers(editor);
+            const dbg = (localStorage.getItem('NOTEVAULT_DEBUG') === '1') || location.search.includes('debug=1');
+            if (dbg) console.log('[EDITOR] Rehydrated voice players after sanitize rewrite');
+        } catch (error) {
+            console.warn('No se pudo rehidratar voice players tras sanitizado:', error);
+        }
         refreshIcons();
     }
 

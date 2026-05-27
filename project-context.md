@@ -1277,80 +1277,6 @@ export function renderScheduleList()
 function renderScheduleModalList()
 ````
 
-## File: js/insert-blocks.js
-````javascript
-const isValidHttpUrl = (value)
-⋮----
-const wrapBlock = (kind, inner)
-⋮----
-const makeListBlock = (title, items)
-⋮----
-const baseTemplate = (title, desc)
-⋮----
-function getEditor()
-⋮----
-function ensureSelectionInEditor(editor)
-⋮----
-function insertHtmlAtCursor(html)
-⋮----
-function formatClock(sec)
-⋮----
-function cleanupWavePlayer(note)
-⋮----
-function buildVoiceNoteHtml(src, stamp, durationSec = 0)
-⋮----
-function upgradeNativeAudioPlayers(root = document)
-⋮----
-function normalizeVoiceNoteMarkup(root = document)
-⋮----
-export function initVoiceNotePlayers(root = document)
-⋮----
-const updateTime = () =>
-⋮----
-const onPlayPauseClick = async () =>
-const onPlay = () =>
-const onPause = () =>
-const onEnded = () =>
-const onTimeUpdate = ()
-const onLoadedMetadata = ()
-const onSeekInput = () =>
-const onAudioError = () =>
-⋮----
-export function destroyVoiceNotePlayers(root = document)
-⋮----
-async function recordAudioFromMic()
-⋮----
-recorder.ondataavailable = (e) =>
-⋮----
-const getBlobDurationSec = (blob) => new Promise((resolveDur) =>
-⋮----
-el.onloadedmetadata = () =>
-el.onerror = () =>
-⋮----
-const cleanup = () =>
-⋮----
-startBtn.onclick = () =>
-⋮----
-stopBtn.onclick = () =>
-⋮----
-closeBtn.onclick = () =>
-⋮----
-recorder.onstop = async () =>
-⋮----
-reader.onload = (ev)
-⋮----
-⋮----
-insert: async () =>
-⋮----
-export function renderInsertBlocks()
-⋮----
-export async function insertBlockById(id)
-⋮----
-export function hasInsertBlock(id)
-⋮----
-export function getInsertBlockSummary()
-````
-
 ## File: js/state.js
 ````javascript
 function normalizeNote(note)
@@ -1396,6 +1322,16 @@ export async function restoreNote(id)
 export async function permanentlyDeleteNote(id)
 ⋮----
 export async function cleanupTrash()
+````
+
+## File: modules/window.js
+````javascript
+function createWindow(debug, checkMedia)
+⋮----
+const wlog = (...args) =>
+const werr = (...args) =>
+⋮----
+click: ()
 ````
 
 ## File: js/utils.js
@@ -1456,16 +1392,6 @@ h = h >>> 0; // keep unsigned 32-bit
  * - Devuelve string vacío para notas en blanco (facilita filtros y evita ruido en UI).
  */
 export function buildPreview(htmlContent)
-````
-
-## File: modules/window.js
-````javascript
-function createWindow(debug, checkMedia)
-⋮----
-const wlog = (...args) =>
-const werr = (...args) =>
-⋮----
-click: ()
 ````
 
 ## File: package.json
@@ -1728,6 +1654,109 @@ click: ()
 </div>
 ````
 
+## File: js/insert-blocks.js
+````javascript
+const vlog = (...args) =>
+const verr = (...args) =>
+⋮----
+const isValidHttpUrl = (value)
+⋮----
+const wrapBlock = (kind, inner)
+⋮----
+const makeListBlock = (title, items)
+⋮----
+const baseTemplate = (title, desc)
+⋮----
+function ensureWrappedBlock(id, html)
+⋮----
+function getEditor()
+⋮----
+function ensureSelectionInEditor(editor)
+⋮----
+function insertHtmlAtCursor(html)
+⋮----
+function formatClock(sec)
+⋮----
+function parseClockToSec(value)
+⋮----
+function normalizeIdleTime(value)
+⋮----
+function cleanupWavePlayer(note)
+⋮----
+function buildVoiceNoteHtml(src, stamp, durationSec = 0)
+⋮----
+function upgradeNativeAudioPlayers(root = document)
+⋮----
+function normalizeVoiceNoteMarkup(root = document)
+⋮----
+export function initVoiceNotePlayers(root = document)
+⋮----
+const dbg = (label, extra =
+⋮----
+const setProcessing = (enabled) =>
+⋮----
+const updateTime = () =>
+⋮----
+const hasUsableAudio = () =>
+⋮----
+const clearRetryTimer = () =>
+⋮----
+const scheduleRetry = (reason) =>
+⋮----
+const onPlayPauseClick = async () =>
+const onPlay = () =>
+const onPause = () =>
+const onEnded = () =>
+const onTimeUpdate = ()
+const onLoadedMetadata = () =>
+const onSeekInput = () =>
+const onSeekCommit = () =>
+const onAudioError = () =>
+const onCanPlay = () =>
+const onLoadedData = ()
+const onStalled = ()
+const onWaiting = ()
+const onSuspend = ()
+const onDurationChange = ()
+⋮----
+export function destroyVoiceNotePlayers(root = document)
+⋮----
+async function recordAudioFromMic()
+⋮----
+const pickRecorderMimeType = () =>
+⋮----
+recorder.ondataavailable = (e) =>
+⋮----
+const getBlobDurationSec = (blob)
+⋮----
+el.onloadedmetadata = () =>
+el.onerror = () =>
+⋮----
+const cleanup = () =>
+⋮----
+startBtn.onclick = () =>
+⋮----
+stopBtn.onclick = () =>
+⋮----
+closeBtn.onclick = () =>
+⋮----
+recorder.onstop = async () =>
+⋮----
+reader.onload = (ev)
+⋮----
+template: ()
+⋮----
+insert: async () =>
+⋮----
+export function renderInsertBlocks()
+⋮----
+export async function insertBlockById(id)
+⋮----
+export function hasInsertBlock(id)
+⋮----
+export function getInsertBlockSummary()
+````
+
 ## File: js/ipc.js
 ````javascript
 function getFileLabel(value)
@@ -1945,6 +1974,8 @@ const setContextMenuMode = (mode) =>
 const getTopLevelElementInEditor = (target) =>
 ⋮----
 const shouldUseNativeContextMenu = (target, hasSelection) =>
+⋮----
+const ensureTrailingEditableLine = () =>
 ⋮----
 const insertPlainText = (text) =>
 ⋮----
