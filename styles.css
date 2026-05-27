@@ -505,13 +505,18 @@ body {
 #editor .voice-note {
     display: flex;
     align-items: center;
-    gap: 0.7rem;
+    gap: 0.8rem;
     max-width: 680px;
-    padding: 0.6rem 0.7rem;
-    border-radius: 1rem;
-    border: 1px solid rgba(99, 102, 241, 0.26);
-    background: linear-gradient(135deg, rgba(99, 102, 241, 0.14), rgba(14, 165, 233, 0.1));
-    box-shadow: 0 8px 18px rgba(99, 102, 241, 0.12);
+    padding: 0.75rem 0.85rem;
+    border-radius: 1.05rem;
+    border: 1px solid rgba(79, 70, 229, 0.24);
+    background:
+        linear-gradient(130deg, rgba(255, 255, 255, 0.78), rgba(238, 242, 255, 0.74)),
+        radial-gradient(120% 120% at 0% 100%, rgba(14, 165, 233, 0.18), transparent 65%);
+    box-shadow:
+        0 12px 24px rgba(79, 70, 229, 0.12),
+        inset 0 1px 0 rgba(255, 255, 255, 0.75);
+    transition: border-color .2s ease, box-shadow .2s ease, transform .2s ease;
 }
 
 #editor .voice-note-content {
@@ -519,64 +524,104 @@ body {
     min-width: 0;
 }
 
+#editor .voice-note-title {
+    font-size: 0.9rem;
+    font-weight: 800;
+    letter-spacing: 0.01em;
+    color: #0f172a;
+    line-height: 1.2;
+}
+
+#editor .voice-note-title:focus {
+    outline: none;
+    border-radius: 0.35rem;
+    box-shadow: 0 0 0 2px rgba(14, 165, 233, 0.22);
+}
+
 #editor .voice-note-meta {
-    font-size: 0.74rem;
+    font-size: 0.72rem;
     font-weight: 700;
-    letter-spacing: 0.02em;
-    color: #4338ca;
-    margin-bottom: 0.2rem;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+    color: #334155;
+    margin-bottom: 0.35rem;
 }
 
 #editor .voice-note-time {
     font-size: 0.7rem;
-    color: #6366f1;
+    color: #475569;
     font-weight: 700;
-    min-width: 86px;
+    min-width: 92px;
     text-align: right;
 }
 
 #editor .voice-note.voice-note-playing {
-    box-shadow: 0 10px 24px rgba(79, 70, 229, 0.2);
+    border-color: rgba(14, 165, 233, 0.45);
+    box-shadow:
+        0 14px 28px rgba(14, 165, 233, 0.2),
+        0 0 0 2px rgba(14, 165, 233, 0.14);
+    transform: translateY(-1px);
 }
 
 .dark #editor .voice-note {
-    background: linear-gradient(135deg, rgba(99, 102, 241, 0.28), rgba(14, 116, 144, 0.2));
-    border-color: rgba(129, 140, 248, 0.38);
-    box-shadow: 0 10px 22px rgba(2, 6, 23, 0.35);
+    background:
+        linear-gradient(130deg, rgba(30, 41, 59, 0.86), rgba(15, 23, 42, 0.8)),
+        radial-gradient(120% 120% at 0% 100%, rgba(14, 165, 233, 0.24), transparent 65%);
+    border-color: rgba(100, 116, 139, 0.5);
+    box-shadow:
+        0 12px 24px rgba(2, 6, 23, 0.45),
+        inset 0 1px 0 rgba(255, 255, 255, 0.06);
 }
 
 .dark #editor .voice-note-meta {
-    color: #c7d2fe;
+    color: #cbd5e1;
+}
+
+.dark #editor .voice-note-title {
+    color: #f1f5f9;
 }
 
 .dark #editor .voice-note-time {
-    color: #a5b4fc;
+    color: #cbd5e1;
 }
 
 #editor .voice-note-player {
     display: flex;
     align-items: center;
-    gap: 0.55rem;
-    margin-top: 0.35rem;
-    padding: 0.32rem 0.45rem;
-    border: 1px solid rgba(99, 102, 241, 0.22);
-    border-radius: 0.7rem;
-    background: rgba(238, 242, 255, 0.72);
+    gap: 0.6rem;
+    margin-top: 0.1rem;
+    padding: 0.42rem 0.52rem;
+    border: 1px solid rgba(148, 163, 184, 0.35);
+    border-radius: 0.78rem;
+    background: rgba(255, 255, 255, 0.76);
+    backdrop-filter: blur(3px);
 }
 
 #editor .voice-note-btn {
-    width: 1.95rem;
-    height: 1.95rem;
+    width: 2.05rem;
+    height: 2.05rem;
     border-radius: 999px;
-    border: 1px solid rgba(99, 102, 241, 0.35);
-    background: rgba(99, 102, 241, 0.16);
-    color: #312e81;
-    font-size: 0.82rem;
+    border: 1px solid rgba(30, 64, 175, 0.28);
+    background: linear-gradient(140deg, #1d4ed8, #0284c7);
+    color: #f8fafc;
+    font-size: 0.78rem;
     font-weight: 700;
     display: inline-flex;
     align-items: center;
     justify-content: center;
     cursor: pointer;
+    box-shadow: 0 6px 12px rgba(37, 99, 235, 0.3);
+    transition: transform .15s ease, box-shadow .15s ease, filter .15s ease;
+}
+
+#editor .voice-note-btn:hover {
+    transform: translateY(-1px) scale(1.02);
+    box-shadow: 0 9px 15px rgba(14, 116, 144, 0.32);
+}
+
+#editor .voice-note-btn:active {
+    transform: translateY(0) scale(0.98);
+    filter: brightness(0.96);
 }
 
 #editor .voice-note-btn:disabled {
@@ -586,19 +631,19 @@ body {
 
 #editor .voice-note-seek {
     flex: 1;
-    accent-color: #4f46e5;
-    height: 0.95rem;
+    accent-color: #0ea5e9;
+    height: 1rem;
 }
 
 .dark #editor .voice-note-player {
-    border-color: rgba(129, 140, 248, 0.38);
-    background: rgba(30, 41, 59, 0.72);
+    border-color: rgba(100, 116, 139, 0.55);
+    background: rgba(15, 23, 42, 0.72);
 }
 
 .dark #editor .voice-note-btn {
-    border-color: rgba(165, 180, 252, 0.45);
-    background: rgba(129, 140, 248, 0.25);
-    color: #e0e7ff;
+    border-color: rgba(125, 211, 252, 0.45);
+    background: linear-gradient(140deg, #0284c7, #0f766e);
+    color: #f8fafc;
 }
 
 .group\/sub.submenu-open .table-submenu {

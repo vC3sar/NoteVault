@@ -80,19 +80,105 @@ function buildVoiceNoteHtml(src, stamp, durationSec = 0) {
     return wrapBlock('voice-recorder', `
         <div class="voice-note" data-audio-src="${escapeHTML(src)}">
             <div class="voice-note-content">
-                <div class="voice-note-meta">Audio · ${escapeHTML(stamp)}</div>
-                <div class="voice-note-player">
-                    <button class="voice-note-btn" type="button" aria-label="Reproducir">▶</button>
+                <div class="voice-note-title" contenteditable="true">Grabadora de voz</div>
+                <div class="voice-note-meta" contenteditable="false">Audio premium · ${escapeHTML(stamp)}</div>
+                <div class="voice-note-player" contenteditable="false">
+                    <button class="voice-note-btn" type="button" aria-label="Reproducir" title="Reproducir o pausar">▶</button>
                     <input class="voice-note-seek" type="range" min="0" max="100" value="0" step="0.1">
                     <span class="voice-note-time">${time}</span>
                 </div>
-                <audio preload="metadata" src="${escapeHTML(src)}"></audio>
+                <audio preload="metadata" src="${escapeHTML(src)}" contenteditable="false"></audio>
             </div>
         </div>
     `);
 }
 
+function upgradeNativeAudioPlayers(root = document) {
+    const audios = root.querySelectorAll('audio[controls]:not([data-voice-upgraded="true"])');
+    audios.forEach((audioEl) => {
+        const src = audioEl.currentSrc || audioEl.getAttribute('src') || '';
+        if (!src) return;
+
+        const host = audioEl.closest('.voice-note');
+        if (host) return;
+
+        const wrapper = document.createElement('div');
+        wrapper.className = 'voice-note';
+        wrapper.dataset.audioSrc = src;
+        wrapper.innerHTML = `
+            <div class="voice-note-content">
+                <div class="voice-note-title" contenteditable="true">Grabadora de voz</div>
+                <div class="voice-note-meta" contenteditable="false">Audio premium · ${new Date().toLocaleString('es-MX')}</div>
+                <div class="voice-note-player" contenteditable="false">
+                    <button class="voice-note-btn" type="button" aria-label="Reproducir" title="Reproducir o pausar">▶</button>
+                    <input class="voice-note-seek" type="range" min="0" max="100" value="0" step="0.1">
+                    <span class="voice-note-time">00:00 / 00:00</span>
+                </div>
+            </div>
+        `;
+
+        const oldParent = audioEl.parentNode;
+        if (!oldParent) return;
+        oldParent.insertBefore(wrapper, audioEl);
+        wrapper.querySelector('.voice-note-content').appendChild(audioEl);
+        audioEl.removeAttribute('controls');
+        audioEl.setAttribute('contenteditable', 'false');
+        audioEl.dataset.voiceUpgraded = 'true';
+    });
+}
+
+function normalizeVoiceNoteMarkup(root = document) {
+    const notes = root.querySelectorAll('.voice-note');
+    notes.forEach((note) => {
+        const content = note.querySelector('.voice-note-content');
+        if (!content) return;
+
+        let player = note.querySelector('.voice-note-player');
+        if (!player) {
+            player = document.createElement('div');
+            player.className = 'voice-note-player';
+            player.setAttribute('contenteditable', 'false');
+            content.appendChild(player);
+        }
+
+        let playBtn = player.querySelector('.voice-note-btn');
+        if (!playBtn) {
+            playBtn = document.createElement('button');
+            playBtn.className = 'voice-note-btn';
+            playBtn.type = 'button';
+            playBtn.setAttribute('aria-label', 'Reproducir');
+            playBtn.setAttribute('title', 'Reproducir o pausar');
+            playBtn.textContent = '▶';
+            player.prepend(playBtn);
+        }
+
+        let seekEl = player.querySelector('.voice-note-seek');
+        if (!seekEl) {
+            seekEl = document.createElement('input');
+            seekEl.className = 'voice-note-seek';
+            player.appendChild(seekEl);
+        }
+        seekEl.type = 'range';
+        seekEl.min = '0';
+        seekEl.max = '100';
+        seekEl.step = '0.1';
+        if (!seekEl.value) seekEl.value = '0';
+
+        let timeEl = player.querySelector('.voice-note-time');
+        if (!timeEl) {
+            timeEl = document.createElement('span');
+            timeEl.className = 'voice-note-time';
+            timeEl.textContent = '00:00 / 00:00';
+            player.appendChild(timeEl);
+        }
+
+        player.setAttribute('contenteditable', 'false');
+    });
+}
+
 export function initVoiceNotePlayers(root = document) {
+    upgradeNativeAudioPlayers(root);
+    normalizeVoiceNoteMarkup(root);
     const nodes = root.querySelectorAll('.voice-note[data-audio-src]');
     nodes.forEach((note) => {
         if (note.dataset.playerReady === 'true') return;
