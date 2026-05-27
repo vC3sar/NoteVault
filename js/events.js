@@ -2,7 +2,7 @@ import { state, saveAll } from './state.js';
 import { applyTheme, showDashboard, showTrash, updateZoom, currentZoom, toggleSidebar, refreshSidebarState, updateGreeting } from './ui.js';
 import { addNotebook, renderNotebookGrid } from './notebooks.js';
 import { addNote, renderNotesList, selectNote, renderTrashList } from './notes.js';
-import { executeEditAction, setupEditor } from './editor.js';
+import { executeEditAction, setupEditor, handleInput } from './editor.js';
 import { refreshIcons, escapeHTML, stripHTML, showToast } from './utils.js';
 
 export function setupEventListeners() {
@@ -54,7 +54,7 @@ export function setupEventListeners() {
         if (!editor) return;
         editor.focus();
         document.execCommand('insertHTML', false, html);
-        if (typeof window.forceSaveNote === 'function') window.forceSaveNote();
+        handleInput();
     };
 
     document.addEventListener('mousedown', (e) => {

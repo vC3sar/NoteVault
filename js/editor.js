@@ -5,6 +5,7 @@ import { renderNotesList } from './notes.js';
 let savedSelectionRange = null;
 let lastRightClickedImage = null;
 let activeTableCell = null;
+let contextTargetElement = null;
 
 function capitalizeSentence(text) {
     const lower = String(text || '').toLocaleLowerCase('es');
@@ -56,6 +57,14 @@ function applyBreakWordsToSelection() {
 
 export function executeEditAction(data) {
     if (!state.activeNoteId) return;
+
+    if (data === 'deleteElement') {
+        if (!contextTargetElement || !document.body.contains(contextTargetElement)) return;
+        contextTargetElement.remove();
+        contextTargetElement = null;
+        handleInput();
+        return;
+    }
 
     const sel = window.getSelection();
     const hasTextSelection = !!(sel && sel.rangeCount && sel.toString().trim().length > 0);
@@ -608,6 +617,27 @@ export function setupEditor() {
 
     setupHighlightSubmenuScroll();
 
+    const setContextMenuMode = (mode) => {
+        const selectionActions = document.getElementById('context-selection-actions');
+        const deleteButton = document.getElementById('context-delete-element');
+        if (!selectionActions || !deleteButton) return;
+        const elementMode = mode === 'element';
+        selectionActions.classList.toggle('hidden', elementMode);
+        deleteButton.classList.toggle('hidden', !elementMode);
+        deleteButton.classList.toggle('flex', elementMode);
+    };
+
+    const getTopLevelElementInEditor = (target) => {
+        let node = target;
+        if (!node) return null;
+        if (node.nodeType === Node.TEXT_NODE) node = node.parentElement;
+        if (!node || !editor.contains(node)) return null;
+        while (node && node.parentElement && node.parentElement !== editor) {
+            node = node.parentElement;
+        }
+        return node && node !== editor ? node : null;
+    };
+
     editor.addEventListener('contextmenu', (e) => {
         if (e.target.tagName === 'IMG') {
             e.preventDefault();
@@ -617,12 +647,21 @@ export function setupEditor() {
         }
 
         const selection = window.getSelection();
-        if (selection.toString().length === 0) return;
+        const hasSelection = selection && selection.toString().length > 0;
+        const targetElement = getTopLevelElementInEditor(e.target);
+        if (!hasSelection && !targetElement) return;
 
-        savedSelectionRange = selection.getRangeAt(0).cloneRange();
         e.preventDefault();
 
         const menu = document.getElementById('custom-context-menu');
+        if (hasSelection && selection.rangeCount > 0) {
+            savedSelectionRange = selection.getRangeAt(0).cloneRange();
+            contextTargetElement = null;
+            setContextMenuMode('selection');
+        } else {
+            contextTargetElement = targetElement;
+            setContextMenuMode('element');
+        }
         menu.classList.remove('hidden');
 
         const { x, width } = positionContextMenu(menu, e.clientX, e.clientY);
