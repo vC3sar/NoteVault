@@ -85,10 +85,18 @@ function insertHtmlAtCursor(html) {
 }
 
 function formatClock(sec) {
-  const total = Math.max(0, Math.floor(Number(sec) || 0));
+  const n = Number(sec);
+  if (!Number.isFinite(n) || n < 0) return "00:00";
+  const total = Math.floor(n);
   const mm = String(Math.floor(total / 60)).padStart(2, "0");
   const ss = String(total % 60).padStart(2, "0");
   return `${mm}:${ss}`;
+}
+
+function sanitizeDurationSec(value) {
+  const n = Number(value);
+  if (!Number.isFinite(n) || n < 0) return 0;
+  return Math.floor(n);
 }
 
 function parseClockToSec(value) {
@@ -151,33 +159,26 @@ function waitForAudioMetadata(audioEl, timeoutMs = 1200) {
 
 async function collectAudioInfoForUi(audioEl) {
   const src = audioEl.currentSrc || audioEl.getAttribute("src") || "";
+  vlog("collect-audio-info:start", { src, rawDuration: audioEl.duration, readyState: audioEl.readyState });
   if (audioInfoCache.has(src)) return audioInfoCache.get(src);
 
   await waitForAudioMetadata(audioEl, 1200);
   const info = {
     format: parseAudioFormat(src),
-    durationSec: Math.max(0, Math.floor(Number(audioEl.duration) || 0)),
+    durationSec: sanitizeDurationSec(audioEl.duration),
     sampleRate: 0,
     channels: 0,
   };
 
-  try {
-    const Ctx = window.AudioContext || window.webkitAudioContext;
-    if (Ctx && src) {
-      const ctx = new Ctx();
-      const timeout = new Promise((_, reject) => setTimeout(() => reject(new Error("decode-timeout")), 1800));
-      const ab = await Promise.race([fetch(src).then((r) => r.arrayBuffer()), timeout]);
-      const decoded = await ctx.decodeAudioData(ab.slice(0));
-      info.sampleRate = Math.max(0, Math.floor(Number(decoded.sampleRate) || 0));
-      info.channels = Math.max(0, Math.floor(Number(decoded.numberOfChannels) || 0));
-      if (!info.durationSec) info.durationSec = Math.max(0, Math.floor(Number(decoded.duration) || 0));
-      try { await ctx.close(); } catch (_) {}
-    }
-  } catch (error) {
-    vlog("audio-info-light-fallback", String(error?.message || error));
-  }
-
   audioInfoCache.set(src, info);
+  vlog("collect-audio-info:done", {
+    src,
+    format: info.format,
+    rawDuration: audioEl.duration,
+    safeDuration: info.durationSec,
+    sampleRate: info.sampleRate,
+    channels: info.channels,
+  });
   return info;
 }
 
@@ -190,16 +191,18 @@ function cleanupWavePlayer(note) {
   note.classList.remove("voice-note-playing");
 }
 
-function buildVoiceNoteHtml(src, stamp, durationSec = 0) {
+function buildVoiceNoteHtml(src, stamp, durationSec = 0, formatLabel = "") {
   const time = formatClock(durationSec);
   const safeDuration = Math.max(0, Math.floor(Number(durationSec) || 0));
+  const safeFormat = String(formatLabel || "").trim().toUpperCase();
+  const metaPrefix = safeFormat ? `Audio (${safeFormat})` : "Audio";
   return wrapBlock(
     "voice-recorder",
     `
         <div class="voice-note" data-audio-src="${escapeHTML(src)}" data-audio-duration="${safeDuration}">
             <div class="voice-note-content">
                 <div class="voice-note-title" contenteditable="true">Grabadora de voz</div>
-                <div class="voice-note-meta" contenteditable="false">Audio · ${escapeHTML(stamp)}</div>
+                <div class="voice-note-meta" contenteditable="false">${escapeHTML(metaPrefix)} · ${escapeHTML(stamp)}</div>
                 <div class="voice-note-player" contenteditable="false">
                     <button class="voice-note-btn" type="button" aria-label="Reproducir" title="Reproducir o pausar">▶</button>
                     <input class="voice-note-seek" type="range" min="0" max="100" value="0" step="0.1">
@@ -373,6 +376,14 @@ export function initVoiceNotePlayers(root = document) {
         ? audioEl.currentTime
         : 0;
       const total = Number.isFinite(audioEl.duration) ? audioEl.duration : 0;
+      if (DEBUG_LOGS && (!Number.isFinite(audioEl.duration) || audioEl.duration < 0)) {
+        vlog("update-time:invalid-duration", {
+          rawDuration: audioEl.duration,
+          current,
+          readyState: audioEl.readyState,
+          networkState: audioEl.networkState,
+        });
+      }
       const idle = normalizeIdleTime(timeEl.dataset.idleTime || "00:00 / 00:00");
       const idleTotalLabel = idle.split("/")[1]?.trim() || "00:00";
       const idleTotalSec = parseClockToSec(idleTotalLabel);
@@ -385,7 +396,17 @@ export function initVoiceNotePlayers(root = document) {
         } else {
           timeEl.textContent = `${currentLabel} / --:--`;
         }
-        if (!isSeeking) seekEl.value = "0";
+        if (!isSeeking) {
+          if (idleTotalSec > 0 && current > 0) {
+            const pseudoPercent = Math.max(
+              0,
+              Math.min(100, (current / idleTotalSec) * 100),
+            );
+            seekEl.value = String(pseudoPercent);
+          } else {
+            seekEl.value = "0";
+          }
+        }
         return;
       }
       const percent = total > 0 ? (current / total) * 100 : 0;
@@ -454,7 +475,8 @@ export function initVoiceNotePlayers(root = document) {
           const fileLabel = parseAudioFileLabel(src);
           metaEl.textContent = "Leyendo datos del archivo...";
           const info = await collectAudioInfoForUi(audioEl);
-          const durationLabel = info.durationSec > 0 ? formatClock(info.durationSec) : "--:--";
+          const durationSec = sanitizeDurationSec(info.durationSec);
+          const durationLabel = durationSec > 0 ? formatClock(durationSec) : "--:--";
           const srLabel = info.sampleRate > 0 ? `${Math.round(info.sampleRate / 1000)}kHz` : "";
           const chLabel = info.channels > 0 ? `${info.channels}ch` : "";
           metaEl.textContent = [fileLabel, info.format, durationLabel, srLabel, chLabel]
@@ -486,6 +508,7 @@ export function initVoiceNotePlayers(root = document) {
     };
     const onTimeUpdate = () => updateTime();
     const onLoadedMetadata = () => {
+      dbg("loadedmetadata:raw", { rawDuration: audioEl.duration, safeDuration: sanitizeDurationSec(audioEl.duration) });
       if (Number.isFinite(audioEl.duration) && audioEl.duration > 0) {
         setProcessing(false);
       } else {
@@ -527,6 +550,9 @@ export function initVoiceNotePlayers(root = document) {
     const onWaiting = () => dbg("waiting");
     const onSuspend = () => dbg("suspend");
     const onDurationChange = () => dbg("durationchange");
+    const onDurationChangeDebug = () => {
+      dbg("durationchange:raw", { rawDuration: audioEl.duration, safeDuration: sanitizeDurationSec(audioEl.duration) });
+    };
 
     playBtn.addEventListener("click", onPlayPauseClick);
     seekEl.addEventListener("input", onSeekInput);
@@ -546,6 +572,7 @@ export function initVoiceNotePlayers(root = document) {
     audioEl.addEventListener("waiting", onWaiting);
     audioEl.addEventListener("suspend", onSuspend);
     audioEl.addEventListener("durationchange", onDurationChange);
+    audioEl.addEventListener("durationchange", onDurationChangeDebug);
     setProcessing(true);
     if (audioEl.readyState === 0) audioEl.load();
     timeEl.textContent = timeEl.dataset.idleTime || "00:00 / 00:00";
@@ -586,6 +613,7 @@ export function initVoiceNotePlayers(root = document) {
       audioEl.removeEventListener("waiting", onWaiting);
       audioEl.removeEventListener("suspend", onSuspend);
       audioEl.removeEventListener("durationchange", onDurationChange);
+      audioEl.removeEventListener("durationchange", onDurationChangeDebug);
     });
 
     note.dataset.playerReady = "true";
@@ -614,6 +642,7 @@ async function recordAudioFromMic() {
   const pickRecorderMimeType = () => {
     if (typeof MediaRecorder === "undefined" || typeof MediaRecorder.isTypeSupported !== "function") return "";
     const candidates = [
+      "audio/mpeg",
       "audio/webm;codecs=opus",
       "audio/webm",
       "audio/ogg;codecs=opus",
@@ -1090,8 +1119,9 @@ const BLOCKS = [
         Math.floor(Number(recorded.durationSec) || 0),
       );
       const stamp = new Date().toLocaleString("es-MX");
+      const savedFormat = parseAudioFormat(res.path || recorded.mimeType || "");
       const inserted = insertHtmlAtCursor(
-        buildVoiceNoteHtml(res.path, stamp, duration),
+        buildVoiceNoteHtml(res.path, stamp, duration, savedFormat),
       );
       if (inserted) {
         const editor = getEditor();
