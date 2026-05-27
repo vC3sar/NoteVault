@@ -31,6 +31,30 @@ export function setupEventListeners() {
         document.getElementById('custom-context-menu').classList.add('hidden');
     });
 
+    document.addEventListener('mousedown', (e) => {
+        const target = e.target.closest('[data-editor-action]');
+        if (!target) return;
+        // Evita perder la selección del editor al presionar el botón del header.
+        e.preventDefault();
+    });
+
+    document.addEventListener('click', (e) => {
+        const target = e.target.closest('[data-editor-action]');
+        if (!target) return;
+        e.preventDefault();
+        if (!state.activeNoteId) return;
+
+        const sel = window.getSelection();
+        const hasSelection = !!(sel && sel.rangeCount && sel.toString().trim().length > 0);
+        if (!hasSelection) {
+            alert('Selecciona texto en la nota para aplicar formato.');
+            return;
+        }
+
+        const action = target.getAttribute('data-editor-action');
+        if (action) executeEditAction(action);
+    });
+
     // Delegación unificada de eventos `click`: reduce listeners y funciona bien con partials dinámicos.
     document.addEventListener('click', async (e) => {
         const target = e.target;

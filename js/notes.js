@@ -81,6 +81,13 @@ export function renderNotesList() {
         list.appendChild(item);
     });
     refreshIcons();
+
+    const headerActions = document.getElementById('note-text-actions');
+    if (headerActions) {
+        const hasActiveNote = !!state.activeNoteId;
+        headerActions.classList.toggle('hidden', !hasActiveNote);
+        headerActions.classList.toggle('flex', hasActiveNote);
+    }
 }
 
 export let currentNoteImagesOnOpen = [];
@@ -118,6 +125,7 @@ export async function selectNote(id) {
     const editorEl = document.getElementById('editor');
     const editorContainer = document.getElementById('editor-container');
     const tb = document.getElementById('formatting-toolbar');
+    const headerActions = document.getElementById('note-text-actions');
 
     if (titleEl) titleEl.value = note.title || '';
     
@@ -136,6 +144,10 @@ export async function selectNote(id) {
     if (toggleAttachments) toggleAttachments.classList.remove('hidden');
 
     if (tb) tb.classList.remove('hidden');
+    if (headerActions) {
+        headerActions.classList.remove('hidden');
+        headerActions.classList.add('flex');
+    }
     
     if (typeof window.updateHighlightsPanel === 'function') window.updateHighlightsPanel();
     updateWordCount();

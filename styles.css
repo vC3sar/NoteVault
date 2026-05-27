@@ -119,7 +119,7 @@ body {
     overflow: hidden;
     display: block;
     overflow-x: auto;
-    background: #ffffff;
+    background: transparent;
 }
 
 #editor thead {
@@ -157,7 +157,7 @@ body {
 }
 
 .dark #editor table {
-    background: rgba(15, 23, 42, 0.9);
+    background: transparent;
     border-color: rgba(129, 140, 248, 0.38);
 }
 

@@ -66,6 +66,11 @@ export function showDashboard(view = state.currentView) {
 
     const searchContainer = document.getElementById('search-container');
     if (searchContainer) searchContainer.classList.add('hidden');
+    const headerActions = document.getElementById('note-text-actions');
+    if (headerActions) {
+        headerActions.classList.add('hidden');
+        headerActions.classList.remove('flex');
+    }
 
     const searchNotebooks = document.getElementById('search-notebooks');
     if (searchNotebooks) searchNotebooks.value = '';
@@ -142,6 +147,11 @@ export function showTrash() {
 
     const searchContainer = document.getElementById('search-container');
     if (searchContainer) searchContainer.classList.add('hidden');
+    const headerActions = document.getElementById('note-text-actions');
+    if (headerActions) {
+        headerActions.classList.add('hidden');
+        headerActions.classList.remove('flex');
+    }
 
     const dashboardActions = document.getElementById('dashboard-actions');
     if (dashboardActions) dashboardActions.style.display = 'none';
@@ -193,6 +203,11 @@ export function showCalendar() {
 
     const searchContainer = document.getElementById('search-container');
     if (searchContainer) searchContainer.classList.add('hidden');
+    const headerActions = document.getElementById('note-text-actions');
+    if (headerActions) {
+        headerActions.classList.add('hidden');
+        headerActions.classList.remove('flex');
+    }
 
     const dashboardActions = document.getElementById('dashboard-actions');
     if (dashboardActions) dashboardActions.style.display = 'none';

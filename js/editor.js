@@ -57,7 +57,8 @@ export function executeEditAction(data) {
     if (!state.activeNoteId) return;
 
     const sel = window.getSelection();
-    if (savedSelectionRange) {
+    const hasLiveSelection = !!(sel && sel.rangeCount && sel.toString().length > 0);
+    if (!hasLiveSelection && savedSelectionRange) {
         sel.removeAllRanges();
         sel.addRange(savedSelectionRange);
     }
@@ -463,6 +464,12 @@ export function setupEditor() {
     });
 
     editor.addEventListener('keydown', (e) => {
+        if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === 'o') {
+            e.preventDefault();
+            executeEditAction('strikethrough');
+            return;
+        }
+
         if (e.key === 'Enter' && !e.shiftKey) {
             e.preventDefault();
             document.execCommand('insertParagraph', false);

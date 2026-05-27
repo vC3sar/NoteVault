@@ -179,6 +179,11 @@ export function selectNotebook(id) {
 
     const dashboardActions = document.getElementById('dashboard-actions');
     if (dashboardActions) dashboardActions.style.display = 'none';
+    const headerActions = document.getElementById('note-text-actions');
+    if (headerActions) {
+        headerActions.classList.add('hidden');
+        headerActions.classList.remove('flex');
+    }
 
     document.getElementById('add-note').style.display = 'flex';
 

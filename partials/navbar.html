@@ -22,6 +22,17 @@
                 class="pl-10 pr-4 py-2 bg-surface-container-high border-none rounded-lg text-sm w-64 focus:ring-2 focus:ring-primary/20 transition-all placeholder:text-on-surface-variant/50 outline-none"
                 placeholder="Buscar en la libreta activa...">
         </div>
+
+        <div id="note-text-actions" class="hidden items-center gap-2">
+            <button data-editor-action="bold"
+                class="px-3 py-2 rounded-lg text-sm bg-surface-container-high hover:bg-surface-container-highest text-on-surface transition-colors"><span class="font-bold">B</span> <span class="text-[10px] opacity-60 ml-1">Ctrl+B</span></button>
+            <button data-editor-action="italic"
+                class="px-3 py-2 rounded-lg text-sm bg-surface-container-high hover:bg-surface-container-highest text-on-surface transition-colors"><span class="italic font-semibold">I</span> <span class="text-[10px] opacity-60 ml-1">Ctrl+I</span></button>
+            <button data-editor-action="underline"
+                class="px-3 py-2 rounded-lg text-sm bg-surface-container-high hover:bg-surface-container-highest text-on-surface transition-colors"><span class="underline font-semibold">U</span> <span class="text-[10px] opacity-60 ml-1">Ctrl+U</span></button>
+            <button data-editor-action="strikethrough"
+                class="px-3 py-2 rounded-lg text-sm bg-surface-container-high hover:bg-surface-container-highest text-on-surface transition-colors"><span class="line-through font-semibold">S</span> <span class="text-[10px] opacity-60 ml-1">Ctrl+O</span></button>
+        </div>
     </div>
 
     <div class="flex items-center gap-4">

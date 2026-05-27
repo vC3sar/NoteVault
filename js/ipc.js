@@ -147,6 +147,11 @@ export function setupIPC() {
                     document.getElementById('editor-container').classList.add('hidden');
                     const tb = document.getElementById('formatting-toolbar');
                     if (tb) tb.classList.add('hidden');
+                    const headerActions = document.getElementById('note-text-actions');
+                    if (headerActions) {
+                        headerActions.classList.add('hidden');
+                        headerActions.classList.remove('flex');
+                    }
                     document.getElementById('note-title').value = '';
                     document.getElementById('editor').innerHTML = '';
                 }
