@@ -3,10 +3,59 @@ import { applyTheme, showDashboard, showTrash, updateZoom, currentZoom, toggleSi
 import { addNotebook, renderNotebookGrid } from './notebooks.js';
 import { addNote, renderNotesList, selectNote, renderTrashList } from './notes.js';
 import { executeEditAction, setupEditor } from './editor.js';
-import { refreshIcons, escapeHTML, stripHTML } from './utils.js';
+import { refreshIcons, escapeHTML, stripHTML, showToast } from './utils.js';
 
 export function setupEventListeners() {
     setupEditor();
+    const insertTemplates = {
+        'table-3x3': `<table><thead><tr><th style="text-align: center;">Encabezado 1</th><th style="text-align: center;">Encabezado 2</th><th style="text-align: center;">Encabezado 3</th></tr></thead><tbody><tr><td>Dato 1</td><td>Dato 2</td><td>Dato 3</td></tr><tr><td>Dato 4</td><td>Dato 5</td><td>Dato 6</td></tr></tbody></table><p><br></p>`,
+        'table-4x2': `<table><thead><tr><th style="text-align: center;">Campo</th><th style="text-align: center;">Valor</th></tr></thead><tbody><tr><td>Elemento 1</td><td>Detalle</td></tr><tr><td>Elemento 2</td><td>Detalle</td></tr><tr><td>Elemento 3</td><td>Detalle</td></tr><tr><td>Elemento 4</td><td>Detalle</td></tr></tbody></table><p><br></p>`,
+        'h2': `<h2>Título de Sección</h2><p><br></p>`,
+        'h3': `<h3>Subsección</h3><p><br></p>`,
+        'divider': `<hr><p><br></p>`,
+        'bullet-list': `<ul><li>Punto 1</li><li>Punto 2</li><li>Punto 3</li></ul><p><br></p>`,
+        'number-list': `<ol><li>Paso 1</li><li>Paso 2</li><li>Paso 3</li></ol><p><br></p>`,
+        'check-list': `<ul class="editor-check-list"><li><input type="checkbox"> Tarea 1</li><li><input type="checkbox"> Tarea 2</li></ul><p><br></p>`,
+        'blockquote': `<blockquote>Cita o referencia importante...</blockquote><p><br></p>`,
+        'code-block': `<pre><code>// Escribe tu código aquí</code></pre><p><br></p>`,
+        'callout': `<div class="insert-callout" style="border-left:4px solid #6366f1;padding:.5rem .75rem;background:rgba(99,102,241,.08);border-radius:.4rem;display:flex;align-items:center;gap:.5rem;"><span class="insert-callout-icon-wrap" contenteditable="false"><i data-lucide="lightbulb" class="insert-callout-icon" aria-hidden="true"></i></span><div><strong class="insert-callout-label" contenteditable="false">TIP:</strong> <span class="insert-callout-placeholder" data-callout-placeholder="true">Escribe aquí una nota destacada.</span></div></div><p><br></p>`
+    };
+
+    const openInsertModal = () => {
+        const modal = document.getElementById('insert-modal');
+        if (!modal) return;
+        modal.classList.remove('hidden');
+        modal.classList.add('flex');
+        refreshIcons();
+    };
+
+    const closeInsertModal = () => {
+        const modal = document.getElementById('insert-modal');
+        if (!modal) return;
+        modal.classList.add('hidden');
+        modal.classList.remove('flex');
+    };
+
+    const setInsertTab = (tab) => {
+        document.querySelectorAll('[data-insert-tab]').forEach(btn => {
+            const active = btn.getAttribute('data-insert-tab') === tab;
+            btn.classList.toggle('bg-primary/10', active);
+            btn.classList.toggle('text-primary', active);
+            btn.classList.toggle('border-primary/30', active);
+        });
+        document.querySelectorAll('[data-insert-panel]').forEach(panel => {
+            const visible = panel.getAttribute('data-insert-panel') === tab;
+            panel.classList.toggle('hidden', !visible);
+        });
+    };
+
+    const insertHtmlSnippet = (html) => {
+        const editor = document.getElementById('editor');
+        if (!editor) return;
+        editor.focus();
+        document.execCommand('insertHTML', false, html);
+        if (typeof window.forceSaveNote === 'function') window.forceSaveNote();
+    };
 
     document.addEventListener('mousedown', (e) => {
         const menu = document.getElementById('custom-context-menu');
@@ -32,7 +81,7 @@ export function setupEventListeners() {
     });
 
     document.addEventListener('mousedown', (e) => {
-        const target = e.target.closest('[data-editor-action]');
+        const target = e.target.closest('[data-editor-action], #open-insert-modal');
         if (!target) return;
         // Evita perder la selección del editor al presionar el botón del header.
         e.preventDefault();
@@ -44,15 +93,24 @@ export function setupEventListeners() {
         e.preventDefault();
         if (!state.activeNoteId) return;
 
+        const action = target.getAttribute('data-editor-action');
+        if (!action) return;
+
+        const requiresSelection = new Set([
+            'bold', 'italic', 'underline', 'strikethrough',
+            'justifyLeft', 'justifyCenter', 'justifyRight', 'justifyFull',
+            'breakWords'
+        ]);
+
         const sel = window.getSelection();
         const hasSelection = !!(sel && sel.rangeCount && sel.toString().trim().length > 0);
-        if (!hasSelection) {
-            alert('Selecciona texto en la nota para aplicar formato.');
+
+        if (requiresSelection.has(action) && !hasSelection) {
+            showToast('Selecciona texto para aplicar esta acción.', 'error');
             return;
         }
 
-        const action = target.getAttribute('data-editor-action');
-        if (action) executeEditAction(action);
+        executeEditAction(action);
     });
 
     // Delegación unificada de eventos `click`: reduce listeners y funciona bien con partials dinámicos.
@@ -163,6 +221,36 @@ export function setupEventListeners() {
 
         if (target.closest('#add-note') || target.closest('#panel-add-note')) {
             addNote();
+        }
+
+        if (target.closest('#open-insert-modal')) {
+            if (!state.activeNoteId) return;
+            setInsertTab('recommended');
+            openInsertModal();
+        }
+
+        if (target.closest('#insert-modal-close')) {
+            closeInsertModal();
+        }
+
+        if (target.id === 'insert-modal') {
+            closeInsertModal();
+        }
+
+        if (target.closest('#insert-modal')) {
+            const tabBtn = target.closest('[data-insert-tab]');
+            if (tabBtn) {
+                setInsertTab(tabBtn.getAttribute('data-insert-tab'));
+            }
+
+            const card = target.closest('[data-insert-action]');
+            if (card) {
+                if (!state.activeNoteId) return;
+                const key = card.getAttribute('data-insert-action');
+                const html = insertTemplates[key];
+                if (html) insertHtmlSnippet(html);
+                closeInsertModal();
+            }
         }
 
         if (target.closest('#toggle-sidebar')) {

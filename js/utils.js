@@ -4,6 +4,40 @@ export function refreshIcons() {
     }
 }
 
+export function showToast(message, tone = 'neutral') {
+    const existing = document.getElementById('app-toast');
+    if (existing) existing.remove();
+
+    const toast = document.createElement('div');
+    toast.id = 'app-toast';
+    toast.className = 'fixed top-5 right-5 z-[120] rounded-xl px-4 py-2.5 text-sm font-semibold shadow-xl border backdrop-blur-sm transition-opacity duration-200';
+
+    if (tone === 'success') {
+        toast.classList.add(
+            'bg-emerald-500/15', 'text-emerald-700', 'border-emerald-500/30',
+            'dark:bg-emerald-300/20', 'dark:text-emerald-100', 'dark:border-emerald-200/45'
+        );
+    } else if (tone === 'error') {
+        toast.classList.add(
+            'bg-red-500/15', 'text-red-700', 'border-red-500/30',
+            'dark:bg-red-300/20', 'dark:text-red-100', 'dark:border-red-200/45'
+        );
+    } else {
+        toast.classList.add(
+            'bg-surface-container-lowest/95', 'text-on-surface-variant', 'border-outline-variant/30',
+            'dark:bg-slate-800/95', 'dark:text-slate-100', 'dark:border-slate-500/55'
+        );
+    }
+
+    toast.textContent = message;
+    document.body.appendChild(toast);
+
+    setTimeout(() => {
+        toast.style.opacity = '0';
+        setTimeout(() => toast.remove(), 220);
+    }, 1600);
+}
+
 export function escapeHTML(value) {
     return String(value ?? '')
         .replace(/&/g, '&amp;')
@@ -240,8 +274,14 @@ export function showModal(title, placeholder, initialValue = '') {
 
 export function cleanHTML(html) {
     if (!html) return '';
-    const sanitized = sanitizeHTML(html);
     const parser = new DOMParser();
+    const preDoc = parser.parseFromString(String(html), 'text/html');
+    preDoc.body.querySelectorAll('.insert-callout-icon-wrap').forEach((wrap) => {
+        wrap.setAttribute('contenteditable', 'false');
+        wrap.innerHTML = '<i data-lucide="lightbulb" class="insert-callout-icon" aria-hidden="true"></i>';
+    });
+
+    const sanitized = sanitizeHTML(preDoc.body.innerHTML);
     const doc = parser.parseFromString(sanitized, 'text/html');
     doc.body.querySelectorAll('*').forEach(el => {
         if (el.classList) {

@@ -1,5 +1,5 @@
 import { state, saveAll } from './state.js';
-import { refreshIcons, cleanHTML, sanitizeHTML, escapeHTML, hashString, buildPreview } from './utils.js';
+import { refreshIcons, cleanHTML, sanitizeHTML, escapeHTML, hashString, buildPreview, showToast } from './utils.js';
 import { renderNotesList } from './notes.js';
 
 let savedSelectionRange = null;
@@ -58,6 +58,13 @@ export function executeEditAction(data) {
     if (!state.activeNoteId) return;
 
     const sel = window.getSelection();
+    const hasTextSelection = !!(sel && sel.rangeCount && sel.toString().trim().length > 0);
+
+    if (typeof data === 'object' && data.command === 'textTransform' && !hasTextSelection) {
+        showToast('Selecciona texto para transformar.', 'error');
+        return;
+    }
+
     const hasLiveSelection = !!(sel && sel.rangeCount && sel.toString().length > 0);
     if (!hasLiveSelection && savedSelectionRange) {
         sel.removeAllRanges();
@@ -174,6 +181,7 @@ export async function forceSaveNote() {
 
     if (editor && sanitizedContent !== content) {
         editor.innerHTML = sanitizedContent;
+        refreshIcons();
     }
 
     try {
@@ -372,6 +380,7 @@ export function setupEditor() {
             'del-col': 'Preview: eliminar columna',
             'merge-cells': 'Preview: combinar celdas',
             'split-cell': 'Preview: dividir celda',
+            'designate-header': 'Preview: designar título',
             'widen': 'Preview: aumentar ancho',
             'narrow': 'Preview: reducir ancho'
         };
@@ -425,6 +434,11 @@ export function setupEditor() {
             return;
         }
 
+        if (action === 'designate-header') {
+            if (activeTableCell) activeTableCell.classList.add('table-preview-cell');
+            return;
+        }
+
         if (action === 'widen') {
             table.classList.add('table-preview-resize-plus');
             return;
@@ -439,6 +453,13 @@ export function setupEditor() {
         const cell = document.createElement(tag);
         cell.innerHTML = '<br>';
         return cell;
+    };
+
+    const clearCalloutPlaceholder = (placeholder) => {
+        if (!placeholder || placeholder.dataset.calloutPlaceholder !== 'true') return;
+        delete placeholder.dataset.calloutPlaceholder;
+        placeholder.classList.remove('insert-callout-placeholder');
+        placeholder.textContent = '';
     };
 
     const applyTableAction = (action) => {
@@ -492,6 +513,32 @@ export function setupEditor() {
                 const rowCells = Array.from(r.children).filter(el => el.tagName === 'TD' || el.tagName === 'TH');
                 const victim = rowCells[Math.min(colIndex, rowCells.length - 1)];
                 if (victim) victim.remove();
+            });
+        } else if (action === 'designate-header') {
+            const selectedCells = (() => {
+                const sel = window.getSelection();
+                if (!sel || !sel.rangeCount) return [activeTableCell].filter(Boolean);
+                const range = sel.getRangeAt(0);
+                const rowCells = Array.from(row.children).filter(el => el.tagName === 'TD' || el.tagName === 'TH');
+                const hit = rowCells.filter(cell => range.intersectsNode(cell));
+                return hit.length ? hit : [activeTableCell].filter(Boolean);
+            })();
+
+            selectedCells.forEach(cell => {
+                if (!cell) return;
+                if (cell.tagName === 'TH') {
+                    cell.style.textAlign = 'center';
+                    return;
+                }
+                const th = document.createElement('th');
+                th.innerHTML = cell.innerHTML;
+                Array.from(cell.attributes).forEach(attr => {
+                    if (attr.name.toLowerCase() === 'style') return;
+                    th.setAttribute(attr.name, attr.value);
+                });
+                th.style.textAlign = 'center';
+                cell.parentNode.replaceChild(th, cell);
+                if (activeTableCell === cell) activeTableCell = th;
             });
         } else if (action === 'merge-cells') {
             const selectedCells = getSelectedCells();
@@ -606,6 +653,18 @@ export function setupEditor() {
             tableToolbar.classList.remove('hidden');
             tableToolbar.classList.add('flex');
             placeTableToolbar(cell);
+        }
+    });
+
+    editor.addEventListener('beforeinput', (e) => {
+        const sel = window.getSelection();
+        let node = sel && sel.anchorNode ? sel.anchorNode : null;
+        if (node && node.nodeType === Node.TEXT_NODE) node = node.parentElement;
+        const placeholder = node && node.closest ? node.closest('[data-callout-placeholder="true"]') : null;
+        if (!placeholder) return;
+        const inputType = e.inputType || '';
+        if (inputType.startsWith('insert') || inputType === 'deleteContentBackward' || inputType === 'deleteByCut') {
+            clearCalloutPlaceholder(placeholder);
         }
     });
 
@@ -799,6 +858,16 @@ export function setupEditor() {
     });
 
     editor.addEventListener('input', handleInput);
+    document.addEventListener('selectionchange', () => {
+        const sel = window.getSelection();
+        if (!sel || !sel.rangeCount) return;
+        const anchorNode = sel.anchorNode;
+        if (!anchorNode) return;
+        const anchorEl = anchorNode.nodeType === Node.TEXT_NODE ? anchorNode.parentElement : anchorNode;
+        if (anchorEl && editor.contains(anchorEl)) {
+            savedSelectionRange = sel.getRangeAt(0).cloneRange();
+        }
+    });
 
     window.addEventListener('resize', hideTableToolbar);
 

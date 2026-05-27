@@ -107,6 +107,36 @@ body {
     line-height: 1.6;
 }
 
+#editor ul,
+#editor ol {
+    margin: 0.75rem 0 0.75rem 1.5rem;
+    padding-left: 1rem;
+}
+
+#editor ul {
+    list-style-type: disc;
+}
+
+#editor ol {
+    list-style-type: decimal;
+}
+
+#editor li {
+    margin: 0.22rem 0;
+}
+
+#editor ul.editor-check-list {
+    list-style: none;
+    margin-left: 0;
+    padding-left: 0;
+}
+
+#editor ul.editor-check-list li {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
 /* Tablas pegadas desde web: mantener apariencia clara y estable */
 #editor table {
     width: auto;
@@ -139,6 +169,32 @@ body {
 #editor th {
     font-weight: 700;
     color: #312e81;
+}
+
+#editor .insert-callout-placeholder {
+    color: #64748b !important;
+    font-style: italic;
+    font-weight: 400 !important;
+}
+
+#editor .insert-callout-label {
+    margin-right: 0.2rem;
+}
+
+#editor .insert-callout-icon-wrap {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    align-self: center;
+}
+
+#editor .insert-callout-icon {
+    width: 1.05rem;
+    height: 1.05rem;
+    margin-top: 0;
+    vertical-align: middle;
+    color: #f59e0b;
+    flex: 0 0 auto;
 }
 
 #editor tbody tr:nth-child(even) {
@@ -225,6 +281,41 @@ body {
     background: rgba(15, 23, 42, 0.96);
     border-color: rgba(148, 163, 184, 0.35);
     box-shadow: 0 12px 26px rgba(2, 6, 23, 0.45);
+}
+
+.insert-tab-btn {
+    border: 1px solid rgba(99, 102, 241, 0.18);
+    background: rgba(99, 102, 241, 0.05);
+    color: inherit;
+    border-radius: 0.6rem;
+    padding: 0.4rem 0.65rem;
+    font-size: 12px;
+    font-weight: 700;
+    transition: all .16s ease;
+    white-space: nowrap;
+}
+
+.insert-tab-btn:hover {
+    background: rgba(99, 102, 241, 0.14);
+}
+
+.insert-card {
+    width: 100%;
+    display: flex;
+    gap: .6rem;
+    align-items: center;
+    text-align: left;
+    border: 1px solid rgba(99, 102, 241, 0.18);
+    background: rgba(99, 102, 241, 0.04);
+    border-radius: 0.9rem;
+    padding: 0.75rem 0.85rem;
+    transition: all .16s ease;
+}
+
+.insert-card:hover {
+    background: rgba(99, 102, 241, 0.12);
+    border-color: rgba(99, 102, 241, 0.32);
+    transform: translateY(-1px);
 }
 
 .group\/sub.submenu-open .table-submenu {
