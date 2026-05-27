@@ -352,6 +352,7 @@ function registerIpcHandlers({ DATA_PATH, NOTES_DIR, COVERS_DIR, ATTACHMENTS_DIR
       { label: 'Negrita', click: () => event.sender.send('edit-action', 'bold') },
       { label: 'Cursiva', click: () => event.sender.send('edit-action', 'italic') },
       { label: 'Subrayado', click: () => event.sender.send('edit-action', 'underline') },
+      { label: 'Tachado', click: () => event.sender.send('edit-action', 'strikethrough') },
       { type: 'separator' },
       {
         label: 'Tamaño de fuente',

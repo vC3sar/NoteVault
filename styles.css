@@ -107,6 +107,13 @@ body {
     line-height: 1.6;
 }
 
+#editor s,
+#editor del,
+#editor strike {
+    opacity: 0.72;
+    text-decoration-thickness: 1.6px;
+}
+
 .dark #editor,
 .dark #note-title {
     color: #ffffff !important;

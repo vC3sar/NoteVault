@@ -56,7 +56,7 @@ const ALLOWED_TAGS = new Set([
     'FIGURE', 'FONT', 'H1', 'H2', 'H3', 'H4', 'H5', 'H6', 'HR', 'I', 'IMG',
     'INS', 'KBD', 'LABEL', 'LI', 'MARK', 'OL', 'P', 'PRE', 'Q', 'S', 'SAMP',
     'SECTION', 'SMALL', 'SPAN', 'STRONG', 'SUB', 'SUP', 'TABLE', 'TBODY', 'TD',
-    'TFOOT', 'TH', 'THEAD', 'TR', 'U', 'UL', 'INPUT'
+    'TFOOT', 'TH', 'THEAD', 'TR', 'U', 'UL', 'INPUT', 'STRIKE'
 ]);
 
 const SAFE_ATTRS = new Set([
