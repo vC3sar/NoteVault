@@ -349,8 +349,11 @@ export function setupEditor() {
     };
 
     const clearTablePreview = () => {
-        editor.querySelectorAll('.table-preview-cell,.table-preview-row,.table-preview-col,.table-preview-resize-plus,.table-preview-resize-minus,.table-preview-row-add,.table-preview-row-del,.table-preview-col-add,.table-preview-col-del,.table-preview-cell-del')
-            .forEach(el => el.classList.remove('table-preview-cell', 'table-preview-row', 'table-preview-col', 'table-preview-resize-plus', 'table-preview-resize-minus', 'table-preview-row-add', 'table-preview-row-del', 'table-preview-col-add', 'table-preview-col-del', 'table-preview-cell-del'));
+        editor.querySelectorAll('.table-preview-cell,.table-preview-row,.table-preview-col,.table-preview-resize-plus,.table-preview-resize-minus,.table-preview-row-add,.table-preview-row-del,.table-preview-col-add,.table-preview-col-del,.table-preview-cell-del,.table-preview-merge,.table-preview-split,.table-preview-merge-anchor,.table-preview-merge-removed')
+            .forEach(el => {
+                el.classList.remove('table-preview-cell', 'table-preview-row', 'table-preview-col', 'table-preview-resize-plus', 'table-preview-resize-minus', 'table-preview-row-add', 'table-preview-row-del', 'table-preview-col-add', 'table-preview-col-del', 'table-preview-cell-del', 'table-preview-merge', 'table-preview-split', 'table-preview-merge-anchor', 'table-preview-merge-removed');
+                if (el.style) el.style.removeProperty('--split-parts');
+            });
     };
 
     const applyTablePreview = (action) => {
@@ -396,15 +399,29 @@ export function setupEditor() {
 
         if (action === 'merge-cells') {
             const rowCells = Array.from(row.children).filter(el => el.tagName === 'TD' || el.tagName === 'TH');
-            const current = activeTableCell;
-            const next = rowCells[colIndex + 1];
-            if (current) current.classList.add('table-preview-cell');
-            if (next) next.classList.add('table-preview-cell');
+            const selection = window.getSelection();
+            let mergeCells = [];
+            if (selection && selection.rangeCount) {
+                const range = selection.getRangeAt(0);
+                mergeCells = rowCells.filter(cell => range.intersectsNode(cell));
+            }
+            if (mergeCells.length < 2) {
+                const current = activeTableCell;
+                const next = rowCells[colIndex + 1];
+                mergeCells = next ? [current, next] : [current].filter(Boolean);
+            }
+            if (!mergeCells.length) return;
+            mergeCells[0].classList.add('table-preview-merge-anchor');
+            mergeCells.slice(1).forEach(cell => cell.classList.add('table-preview-merge-removed'));
             return;
         }
 
         if (action === 'split-cell') {
-            if (activeTableCell) activeTableCell.classList.add('table-preview-cell');
+            if (activeTableCell) {
+                const span = parseInt(activeTableCell.getAttribute('colspan'), 10) || 1;
+                if (span > 1) activeTableCell.style.setProperty('--split-parts', String(span));
+                activeTableCell.classList.add('table-preview-split');
+            }
             return;
         }
 
