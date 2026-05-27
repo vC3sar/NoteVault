@@ -65,9 +65,27 @@ export function executeEditAction(data) {
         handleInput();
         return;
     }
-    if (data === 'copy' || data === 'cut' || data === 'selectAll') {
+    if (data === 'copy' || data === 'cut') {
         document.execCommand(data, false, null);
         if (data === 'cut') handleInput();
+        return;
+    }
+    if (data === 'selectAll') {
+        const target = contextTargetElement && document.body.contains(contextTargetElement)
+            ? contextTargetElement
+            : null;
+
+        if (target) {
+            const sel = window.getSelection();
+            const range = document.createRange();
+            range.selectNodeContents(target);
+            sel.removeAllRanges();
+            sel.addRange(range);
+            savedSelectionRange = range.cloneRange();
+            return;
+        }
+
+        document.execCommand('selectAll', false, null);
         return;
     }
     if (data === 'paste') {
@@ -649,6 +667,20 @@ export function setupEditor() {
         return node && node !== editor ? node : null;
     };
 
+    const shouldUseNativeContextMenu = (target, hasSelection) => {
+        if (hasSelection) return false;
+        let node = target;
+        if (!node) return false;
+        if (node.nodeType === Node.TEXT_NODE) return true;
+        if (node.nodeType !== Node.ELEMENT_NODE) return false;
+
+        const el = node;
+        if (el.closest('img, table, hr, pre, code, .insert-callout, [contenteditable="false"]')) {
+            return false;
+        }
+        return true;
+    };
+
     editor.addEventListener('contextmenu', (e) => {
         if (e.target.tagName === 'IMG') {
             e.preventDefault();
@@ -659,6 +691,10 @@ export function setupEditor() {
 
         const selection = window.getSelection();
         const hasSelection = selection && selection.toString().length > 0;
+        if (shouldUseNativeContextMenu(e.target, hasSelection)) {
+            contextTargetElement = null;
+            return; // Permite menú nativo (incluye corrector ortográfico)
+        }
         const targetElement = getTopLevelElementInEditor(e.target);
         if (!hasSelection && !targetElement) return;
 
@@ -667,7 +703,7 @@ export function setupEditor() {
         const menu = document.getElementById('custom-context-menu');
         if (hasSelection && selection.rangeCount > 0) {
             savedSelectionRange = selection.getRangeAt(0).cloneRange();
-            contextTargetElement = null;
+            contextTargetElement = getTopLevelElementInEditor(e.target);
             setContextMenuMode('selection');
         } else {
             contextTargetElement = targetElement;
@@ -867,6 +903,19 @@ export function setupEditor() {
             e.preventDefault();
             executeEditAction('strikethrough');
             return;
+        }
+
+        if (e.key === 'Enter') {
+            const sel = window.getSelection();
+            let node = sel && sel.anchorNode ? sel.anchorNode : null;
+            if (node && node.nodeType === Node.TEXT_NODE) node = node.parentElement;
+            const insideCodeBlock = node && node.closest ? node.closest('pre, code') : null;
+            if (insideCodeBlock) {
+                e.preventDefault();
+                document.execCommand('insertLineBreak', false, null);
+                handleInput();
+                return;
+            }
         }
 
         if (e.key === 'Enter' && !e.shiftKey) {
