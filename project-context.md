@@ -45,6 +45,7 @@ index.html
 js/calendar.js
 js/editor.js
 js/events.js
+js/insert-blocks.js
 js/ipc.js
 js/notebooks.js
 js/notes.js
@@ -65,6 +66,7 @@ modules/window.js
 mp4/notevault.mp4
 package.json
 partials/context-menu.html
+partials/modal-insert.html
 partials/modal-notebook.html
 partials/modal-profile.html
 partials/modal-settings.html
@@ -300,50 +302,6 @@ Desarrollado por vC3sar - vazquezsg.ovh
 </div>
 ````
 
-## File: partials/navbar.html
-````html
-<header
-    class="w-full h-16 shrink-0 bg-slate-50/50 dark:bg-slate-950/50 backdrop-blur-md shadow-[0_12px_32px_rgba(42,20,180,0.04)] flex items-center justify-between px-8 z-20">
-    <div class="flex items-center gap-8">
-        <button id="toggle-sidebar"
-            class="p-2 hover:bg-surface-container-highest rounded-full transition-colors hidden md:block text-on-surface-variant">
-            <i data-lucide="panel-left"></i>
-        </button>
-        <div id="navbar-view-info" class="hidden">
-            <span id="navbar-subtitle"
-                class="text-xs font-black text-indigo-700 dark:text-indigo-400 uppercase tracking-[0.2em]">Todas
-                tus libretas</span>
-        </div>
-        <div id="search-container" class="relative group hidden">
-            <i data-lucide="search"
-                class="absolute left-3 top-1/2 -translate-y-1/2 text-on-surface-variant text-sm group-focus-within:text-primary transition-colors"></i>
-            <input type="text" id="search-notes"
-                class="pl-10 pr-4 py-2 bg-surface-container-high border-none rounded-lg text-sm w-64 focus:ring-2 focus:ring-primary/20 transition-all placeholder:text-on-surface-variant/50 outline-none"
-                placeholder="Buscar en la libreta activa...">
-        </div>
-    </div>
-    <div class="flex items-center gap-4">
-        <div id="dashboard-actions" class="flex items-center gap-4">
-            <div id="search-notebooks-container-nav" class="relative group">
-                <i data-lucide="search"
-                    class="absolute left-3 top-1/2 -translate-y-1/2 text-on-surface-variant text-sm group-focus-within:text-primary transition-colors"></i>
-                <input type="text" id="search-notebooks"
-                    class="pl-10 pr-4 py-2 bg-surface-container-high border-none rounded-lg text-sm w-64 focus:ring-2 focus:ring-primary/20 transition-all placeholder:text-on-surface-variant/50 outline-none"
-                    placeholder="Buscar libreta...">
-            </div>
-            <button id="add-notebook"
-                class="bg-indigo-600 hover:bg-indigo-700 text-white px-5 py-2 rounded-lg text-sm font-bold shadow-md shadow-indigo-200 dark:shadow-none transition-all active:scale-95 flex items-center gap-2">
-                <i data-lucide="plus" style="width:16px;height:16px;"></i> Nueva Libreta
-            </button>
-        </div>
-        <button id="add-note" style="display:none;"
-            class="bg-indigo-600 hover:bg-indigo-700 text-white px-5 py-2 rounded-lg text-sm font-bold shadow-md shadow-indigo-200 dark:shadow-none transition-all active:scale-95 flex items-center gap-2">
-            <i data-lucide="plus-circle" style="width:16px;height:16px;"></i> Nueva Nota
-        </button>
-    </div>
-</header>
-````
-
 ## File: partials/view-calendar.html
 ````html
 <div id="calendar-view" class="hidden flex-1 overflow-hidden">
@@ -438,96 +396,6 @@ Desarrollado por vC3sar - vazquezsg.ovh
 </div>
 ````
 
-## File: partials/view-notebook.html
-````html
-<div id="notebook-view" class="flex-1 flex overflow-hidden" style="display:none;">
-    <section id="notes-panel"
-        class="w-72 md:w-80 border-r border-outline-variant/10 bg-surface-container-lowest flex flex-col overflow-hidden shrink-0 transition-all duration-300">
-        <div class="p-4 border-b border-outline-variant/10 flex items-center justify-between gap-1">
-            <h3 id="panel-notebook-name" class="font-bold text-lg text-on-surface truncate flex-1">Nombre
-                Libreta</h3>
-            <button id="panel-add-note" title="Nueva nota"
-                class="shrink-0 flex items-center justify-center w-8 h-8 rounded-lg bg-primary/10 hover:bg-primary/20 text-primary transition-colors active:scale-95">
-                <i data-lucide="plus" style="width:16px;height:16px;"></i>
-            </button>
-            <button id="collapse-notes-panel" title="Ocultar notas" onclick="window.toggleNotesPanel()"
-                class="shrink-0 flex items-center justify-center w-8 h-8 rounded-lg hover:bg-surface-container-high text-on-surface-variant transition-colors active:scale-95">
-                <i data-lucide="panel-left-close" class="w-4 h-4"></i>
-            </button>
-        </div>
-        <div class="relative flex-1 overflow-hidden">
-            <div id="notes-list" class="absolute inset-0 overflow-y-auto custom-scrollbar p-3 space-y-1"></div>
-            <div id="notes-empty-state"
-                class="hidden absolute inset-0 flex-col items-center justify-center p-8 text-center text-on-surface-variant pointer-events-none select-none">
-                <i data-lucide="notebook-pen" class="w-10 h-10 mb-3 opacity-30"></i>
-                <p class="text-sm font-medium opacity-60">Aún no hay notas,<br>crea una para comenzar.</p>
-            </div>
-        </div>
-    </section>
-    <section id="editor-panel" class="flex-1 bg-surface-container-low flex flex-col overflow-hidden relative">
-        <button id="show-notes-panel-btn" title="Ver Lista de Notas" onclick="window.toggleNotesPanel()"
-            class="hidden absolute top-6 left-6 md:left-8 p-2.5 bg-surface-container/80 backdrop-blur-sm rounded-xl shadow-sm border border-outline-variant/20 text-on-surface-variant hover:text-primary hover:bg-surface-container-high transition-colors z-20">
-            <i data-lucide="panel-left" class="w-5 h-5"></i>
-        </button>
-        <button id="toggle-attachments" title="Ver Adjuntos"
-            class="hidden absolute top-6 right-8 p-2.5 bg-surface-container/80 backdrop-blur-sm rounded-xl shadow-sm border border-outline-variant/20 text-on-surface-variant hover:text-primary hover:bg-surface-container-high transition-colors z-20">
-            <i data-lucide="paperclip" class="w-5 h-5"></i>
-        </button>
-        <div id="editor-empty-state"
-            class="absolute inset-0 flex flex-col items-center justify-center p-8 text-center text-on-surface-variant z-10 bg-surface-container-low">
-            <i data-lucide="file-edit" class="w-16 h-16 mb-4 opacity-40"></i>
-            <h3 class="text-xl font-bold text-on-surface">Ninguna nota seleccionada</h3>
-            <p class="text-sm mt-2 opacity-80">Selecciona una nota de la lista o crea una nueva.</p>
-        </div>
-        <div id="editor-container" class="flex-1 overflow-y-auto p-8 md:p-12 xl:px-16 w-full mb-20">
-            <input type="text" id="note-title" placeholder="Título de la nota..."
-                class="text-4xl font-extrabold tracking-tight text-on-surface bg-transparent border-none outline-none mb-6 w-full placeholder:text-on-surface-variant/30 leading-tight">
-            <div id="editor" contenteditable="true" spellcheck="true" placeholder="Escribe tus apuntes aquí..."
-                class="text-lg text-on-surface leading-relaxed outline-none min-h-[50vh]"></div>
-        </div>
-        <div id="editor-status-bar"
-            class="hidden absolute bottom-6 right-8 flex items-center bg-surface-container-lowest border border-outline-variant/20 rounded-full px-4 py-2 shadow-lg gap-3 z-20">
-            <div class="flex items-center gap-1.5 px-3 border-r border-outline-variant/20 mr-1">
-                <i data-lucide="type" class="w-4 h-4 text-primary"></i>
-                <span id="word-count" class="text-sm font-semibold text-on-surface-variant">0 palabras</span>
-            </div>
-            <button id="zoom-out" title="Alejar"
-                class="text-on-surface-variant hover:text-primary transition-colors"><i
-                    data-lucide="minus"></i></button>
-            <input type="range" id="zoom-slider" min="50" max="200" value="100" step="10"
-                class="w-24 accent-primary">
-            <button id="zoom-in" title="Acercar"
-                class="text-on-surface-variant hover:text-primary transition-colors"><i
-                    data-lucide="plus"></i></button>
-            <span id="zoom-label"
-                class="text-sm font-semibold min-w-[3ch] text-right text-on-surface-variant">100%</span>
-        </div>
-    </section>
-    <section id="attachments-panel"
-        class="w-72 border-l border-outline-variant/10 bg-surface-container-lowest hidden flex-col overflow-hidden shrink-0 transition-all duration-300">
-        <div
-            class="p-4 border-b border-outline-variant/10 flex justify-between items-center bg-surface/50 backdrop-blur-sm shrink-0">
-            <h3 class="font-bold text-sm text-on-surface flex items-center gap-2 uppercase tracking-wide"><i
-                    data-lucide="paperclip" class="w-4 h-4 text-primary"></i> Adjuntos</h3>
-            <button id="close-attachments"
-                class="text-on-surface-variant hover:text-error hover:bg-error-container rounded-lg p-1.5 transition-colors"><i
-                    data-lucide="x" class="w-4 h-4"></i></button>
-        </div>
-        <div class="px-4 py-3 border-b border-outline-variant/10 shrink-0">
-            <div class="relative group">
-                <i data-lucide="search"
-                    class="absolute left-3 top-1/2 -translate-y-1/2 text-on-surface-variant w-4 h-4 group-focus-within:text-primary transition-colors"></i>
-                <input type="text" id="search-attachments"
-                    class="w-full pl-9 pr-3 py-2 bg-surface-container border-none rounded-lg text-sm focus:ring-2 focus:ring-primary/20 transition-all outline-none placeholder:text-on-surface-variant/60"
-                    placeholder="Buscar imágenes...">
-            </div>
-        </div>
-        <div id="attachments-list" class="flex-1 overflow-y-auto custom-scrollbar p-3 space-y-2">
-        </div>
-    </section>
-</div>
-````
-
 ## File: partials/view-trash.html
 ````html
 <div id="trash-view" class="flex-1 overflow-y-auto p-8 custom-scrollbar relative hidden">
@@ -554,13 +422,6 @@ Desarrollado por vC3sar - vazquezsg.ovh
 </div>
 ````
 
-## File: pnpm-workspace.yaml
-````yaml
-allowBuilds:
-  electron: false
-  electron-winstaller: false
-````
-
 ## File: js/partials-loader.js
 ````javascript
 function loadPartialSync(name)
@@ -579,6 +440,35 @@ click: () =>
 function destroyTray()
 ⋮----
 function notifyMinimized()
+````
+
+## File: partials/modal-insert.html
+````html
+<div id="insert-modal" class="fixed inset-0 bg-black/45 backdrop-blur-sm hidden items-center justify-center z-50">
+    <div class="w-[760px] max-w-[92vw] max-h-[82vh] overflow-hidden rounded-2xl border border-outline-variant/20 bg-surface-container-lowest shadow-2xl">
+        <div class="px-5 py-4 border-b border-outline-variant/15 flex items-center justify-between">
+            <div>
+                <h4 class="text-lg font-extrabold text-on-surface tracking-tight">Insertar Elemento</h4>
+                <p class="text-xs text-on-surface-variant mt-0.5">Elige una categoría y agrega bloques en la nota.</p>
+            </div>
+            <button id="insert-modal-close" class="p-2 rounded-lg hover:bg-surface-container-high text-on-surface-variant">
+                <i data-lucide="x" class="w-4 h-4"></i>
+            </button>
+        </div>
+        <div class="px-4 pt-3 pb-2 border-b border-outline-variant/10 flex gap-2 overflow-x-auto">
+            <button data-insert-tab="recommended" class="insert-tab-btn bg-primary/10 text-primary border-primary/30">Recomendados</button>
+            <button data-insert-tab="structure" class="insert-tab-btn">Estructura</button>
+            <button data-insert-tab="lists" class="insert-tab-btn">Listas</button>
+            <button data-insert-tab="blocks" class="insert-tab-btn">Bloques</button>
+        </div>
+        <div class="p-4 overflow-y-auto custom-scrollbar max-h-[58vh] space-y-4">
+            <div data-insert-panel="recommended" class="insert-panel grid grid-cols-1 md:grid-cols-2 gap-3"></div>
+            <div data-insert-panel="structure" class="insert-panel hidden grid grid-cols-1 md:grid-cols-2 gap-3"></div>
+            <div data-insert-panel="lists" class="insert-panel hidden grid grid-cols-1 md:grid-cols-2 gap-3"></div>
+            <div data-insert-panel="blocks" class="insert-panel hidden grid grid-cols-1 md:grid-cols-2 gap-3"></div>
+        </div>
+    </div>
+</div>
 ````
 
 ## File: partials/modal-notebook.html
@@ -866,6 +756,72 @@ function notifyMinimized()
 </div>
 ````
 
+## File: pnpm-workspace.yaml
+````yaml
+allowBuilds:
+  core-js: true
+  electron: false
+  electron-winstaller: false
+````
+
+## File: partials/navbar.html
+````html
+<header
+    class="w-full h-16 shrink-0 bg-slate-50/50 dark:bg-slate-950/50 backdrop-blur-md shadow-[0_12px_32px_rgba(42,20,180,0.04)] flex items-center justify-between px-8 z-20">
+    <div class="flex items-center gap-8">
+        <button id="toggle-sidebar"
+            class="p-2 hover:bg-surface-container-highest rounded-full transition-colors hidden md:block text-on-surface-variant">
+            <i data-lucide="panel-left"></i>
+        </button>
+        <div id="navbar-view-info" class="hidden">
+            <span id="navbar-subtitle"
+                class="text-xs font-black text-indigo-700 dark:text-indigo-400 uppercase tracking-[0.2em]">Todas
+                tus libretas</span>
+        </div>
+        <div id="search-container" class="relative group hidden">
+            <i data-lucide="search"
+                class="absolute left-3 top-1/2 -translate-y-1/2 text-on-surface-variant text-sm group-focus-within:text-primary transition-colors"></i>
+            <input type="text" id="search-notes"
+                class="pl-10 pr-4 py-2 bg-surface-container-high border-none rounded-lg text-sm w-64 focus:ring-2 focus:ring-primary/20 transition-all placeholder:text-on-surface-variant/50 outline-none"
+                placeholder="Buscar en la libreta activa...">
+        </div>
+        <div id="note-text-actions" class="hidden items-center gap-2">
+            <button data-editor-action="bold"
+                class="px-3 py-2 rounded-lg text-sm bg-surface-container-high hover:bg-surface-container-highest text-on-surface transition-colors"><span class="font-bold">B</span> <span class="text-[10px] opacity-60 ml-1">Ctrl+B</span></button>
+            <button data-editor-action="italic"
+                class="px-3 py-2 rounded-lg text-sm bg-surface-container-high hover:bg-surface-container-highest text-on-surface transition-colors"><span class="italic font-semibold">I</span> <span class="text-[10px] opacity-60 ml-1">Ctrl+I</span></button>
+            <button data-editor-action="underline"
+                class="px-3 py-2 rounded-lg text-sm bg-surface-container-high hover:bg-surface-container-highest text-on-surface transition-colors"><span class="underline font-semibold">U</span> <span class="text-[10px] opacity-60 ml-1">Ctrl+U</span></button>
+            <button data-editor-action="strikethrough"
+                class="px-3 py-2 rounded-lg text-sm bg-surface-container-high hover:bg-surface-container-highest text-on-surface transition-colors"><span class="line-through font-semibold">S</span> <span class="text-[10px] opacity-60 ml-1">Ctrl+O</span></button>
+            <button id="open-insert-modal"
+                class="px-3 py-2 rounded-lg text-sm bg-primary/10 hover:bg-primary/20 text-primary border border-primary/20 transition-colors flex items-center gap-1.5">
+                <i data-lucide="plus-square" class="w-4 h-4"></i> Insertar
+            </button>
+        </div>
+    </div>
+    <div class="flex items-center gap-4">
+        <div id="dashboard-actions" class="flex items-center gap-4">
+            <div id="search-notebooks-container-nav" class="relative group">
+                <i data-lucide="search"
+                    class="absolute left-3 top-1/2 -translate-y-1/2 text-on-surface-variant text-sm group-focus-within:text-primary transition-colors"></i>
+                <input type="text" id="search-notebooks"
+                    class="pl-10 pr-4 py-2 bg-surface-container-high border-none rounded-lg text-sm w-64 focus:ring-2 focus:ring-primary/20 transition-all placeholder:text-on-surface-variant/50 outline-none"
+                    placeholder="Buscar libreta...">
+            </div>
+            <button id="add-notebook"
+                class="bg-indigo-600 hover:bg-indigo-700 text-white px-5 py-2 rounded-lg text-sm font-bold shadow-md shadow-indigo-200 dark:shadow-none transition-all active:scale-95 flex items-center gap-2">
+                <i data-lucide="plus" style="width:16px;height:16px;"></i> Nueva Libreta
+            </button>
+        </div>
+        <button id="add-note" style="display:none;"
+            class="bg-indigo-600 hover:bg-indigo-700 text-white px-5 py-2 rounded-lg text-sm font-bold shadow-md shadow-indigo-200 dark:shadow-none transition-all active:scale-95 flex items-center gap-2">
+            <i data-lucide="plus-circle" style="width:16px;height:16px;"></i> Nueva Nota
+        </button>
+    </div>
+</header>
+````
+
 ## File: preload.js
 ````javascript
 saveData: (data)
@@ -876,6 +832,7 @@ loadNote: (id)
 ⋮----
 uploadCover: (path)
 savePastedImage: (data)
+saveRecordedAudio: (data)
 deleteAttachment: (url)
 deleteCover: (path)
 deleteNoteFile: (id)
@@ -932,6 +889,8 @@ click: () =>
 function initMedia(getWindow)
 ⋮----
 function checkMedia(getWindow)
+⋮----
+const safeSend = (channel, payload) =>
 ````
 
 ## File: modules/menu.js
@@ -941,266 +900,125 @@ function setupMenu(mainWindow, debug)
 click: () =>
 ````
 
-## File: partials/context-menu.html
+## File: partials/view-notebook.html
 ````html
-<div id="custom-context-menu"
-    class="fixed hidden z-[100] bg-surface-container-lowest/90 dark:bg-slate-900/95 backdrop-blur-xl border border-outline-variant/30 dark:border-white/10 rounded-2xl shadow-2xl min-w-[220px] py-2 animate-[fadeIn_0.15s_ease-out] overflow-visible">
-    <div class="flex flex-col">
-        <button data-action="bold"
-            class="menu-item flex items-center justify-between px-4 py-2 hover:bg-primary/10 dark:hover:bg-primary/20 transition-colors text-sm font-medium text-on-surface dark:text-slate-200">
-            <div class="flex items-center gap-3"><i data-lucide="bold" class="w-4 h-4 text-primary"></i> Negrita
-            </div>
-            <span class="text-[10px] opacity-40 font-bold">Ctrl+B</span>
-        </button>
-        <button data-action="italic"
-            class="menu-item flex items-center justify-between px-4 py-2 hover:bg-primary/10 dark:hover:bg-primary/20 transition-colors text-sm font-medium text-on-surface dark:text-slate-200">
-            <div class="flex items-center gap-3"><i data-lucide="italic" class="w-4 h-4 text-primary"></i> Cursiva
-            </div>
-            <span class="text-[10px] opacity-40 font-bold">Ctrl+I</span>
-        </button>
-        <button data-action="underline"
-            class="menu-item flex items-center justify-between px-4 py-2 hover:bg-primary/10 dark:hover:bg-primary/20 transition-colors text-sm font-medium text-on-surface dark:text-slate-200">
-            <div class="flex items-center gap-3"><i data-lucide="underline" class="w-4 h-4 text-primary"></i>
-                Subrayado</div>
-            <span class="text-[10px] opacity-40 font-bold">Ctrl+U</span>
-        </button>
-        <button data-action="strikethrough"
-            class="menu-item flex items-center justify-between px-4 py-2 hover:bg-primary/10 dark:hover:bg-primary/20 transition-colors text-sm font-medium text-on-surface dark:text-slate-200">
-            <div class="flex items-center gap-3"><i data-lucide="strikethrough" class="w-4 h-4 text-primary"></i>
-                Tachado</div>
-        </button>
-        <div class="h-px bg-outline-variant/10 dark:bg-white/5 my-1 mx-2"></div>
-        <div class="group/sub relative">
-            <div
-                class="menu-item flex items-center justify-between px-4 py-2 hover:bg-primary/10 dark:hover:bg-primary/20 transition-colors text-sm font-medium text-on-surface dark:text-slate-200 cursor-default">
-                <div class="flex items-center gap-3"><i data-lucide="text-quote" class="w-4 h-4 text-primary"></i>
-                    Tamaño de fuente</div>
-                <i data-lucide="chevron-right" class="w-3 h-3 opacity-40"></i>
-            </div>
-            <div
-                class="invisible opacity-0 group-hover/sub:visible group-hover/sub:opacity-100 transition-all duration-200 flex flex-col absolute left-full top-0 ml-[-2px] bg-surface-container-lowest/95 dark:bg-slate-900/98 backdrop-blur-xl border border-outline-variant/30 dark:border-white/10 rounded-2xl shadow-2xl min-w-[160px] py-2">
-                <button data-action="fontSize" data-value="12px"
-                    class="px-4 py-2 hover:bg-primary/10 dark:hover:bg-primary/20 text-xs font-medium text-on-surface dark:text-slate-200 text-left">Pequeño
-                    (12px)</button>
-                <button data-action="fontSize" data-value="18px"
-                    class="px-4 py-2 hover:bg-primary/10 dark:hover:bg-primary/20 text-xs font-medium text-on-surface dark:text-slate-200 text-left">Normal
-                    (18px)</button>
-                <button data-action="fontSize" data-value="20px"
-                    class="px-4 py-2 hover:bg-primary/10 dark:hover:bg-primary/20 text-xs font-medium text-on-surface dark:text-slate-200 text-left">Mediano
-                    (20px)</button>
-                <button data-action="fontSize" data-value="28px"
-                    class="px-4 py-2 hover:bg-primary/10 dark:hover:bg-primary/20 text-xs font-medium text-on-surface dark:text-slate-200 text-left">Grande
-                    (28px)</button>
-                <button data-action="fontSize" data-value="36px"
-                    class="px-4 py-2 hover:bg-primary/10 dark:hover:bg-primary/20 text-xs font-medium text-on-surface dark:text-slate-200 text-left">Extra
-                    Grande (36px)</button>
+<div id="notebook-view" class="flex-1 flex overflow-hidden" style="display:none;">
+    <section id="notes-panel"
+        class="w-72 md:w-80 border-r border-outline-variant/10 bg-surface-container-lowest flex flex-col overflow-hidden shrink-0 transition-all duration-300">
+        <div class="p-4 border-b border-outline-variant/10 flex items-center justify-between gap-1">
+            <h3 id="panel-notebook-name" class="font-bold text-lg text-on-surface truncate flex-1">Nombre
+                Libreta</h3>
+            <button id="panel-add-note" title="Nueva nota"
+                class="shrink-0 flex items-center justify-center w-8 h-8 rounded-lg bg-primary/10 hover:bg-primary/20 text-primary transition-colors active:scale-95">
+                <i data-lucide="plus" style="width:16px;height:16px;"></i>
+            </button>
+            <button id="collapse-notes-panel" title="Ocultar notas" onclick="window.toggleNotesPanel()"
+                class="shrink-0 flex items-center justify-center w-8 h-8 rounded-lg hover:bg-surface-container-high text-on-surface-variant transition-colors active:scale-95">
+                <i data-lucide="panel-left-close" class="w-4 h-4"></i>
+            </button>
+        </div>
+        <div class="relative flex-1 overflow-hidden">
+            <div id="notes-list" class="absolute inset-0 overflow-y-auto custom-scrollbar p-3 space-y-1"></div>
+            <div id="notes-empty-state"
+                class="hidden absolute inset-0 flex-col items-center justify-center p-8 text-center text-on-surface-variant pointer-events-none select-none">
+                <i data-lucide="notebook-pen" class="w-10 h-10 mb-3 opacity-30"></i>
+                <p class="text-sm font-medium opacity-60">Aún no hay notas,<br>crea una para comenzar.</p>
             </div>
         </div>
-        <div class="group/sub relative">
-            <div
-                class="menu-item flex items-center justify-between px-4 py-2 hover:bg-primary/10 dark:hover:bg-primary/20 transition-colors text-sm font-medium text-on-surface dark:text-slate-200 cursor-default">
-                <div class="flex items-center gap-3"><i data-lucide="highlighter" class="w-4 h-4 text-primary"></i>
-                    Resaltar texto</div>
-                <i data-lucide="chevron-right" class="w-3 h-3 opacity-40"></i>
-            </div>
-            <div
-                id="highlight-submenu"
-                class="invisible opacity-0 group-hover/sub:visible group-hover/sub:opacity-100 transition-all duration-200 flex flex-col absolute left-full top-0 ml-[-2px] bg-surface-container-lowest/95 dark:bg-slate-900/98 backdrop-blur-xl border border-outline-variant/30 dark:border-white/10 rounded-2xl shadow-2xl min-w-[160px] py-2 max-h-72 overflow-y-auto overflow-x-hidden custom-scrollbar overscroll-contain">
-                <button data-action="highlight" data-value="yellow"
-                    class="flex items-center gap-2 px-4 py-2 hover:bg-primary/10 dark:hover:bg-primary/20 text-xs font-medium text-on-surface dark:text-slate-200 text-left">
-                    <div class="w-3 h-3 rounded-full bg-[#fef08a] border border-black/10"></div> Amarillo
-                </button>
-                <button data-action="highlight" data-value="green"
-                    class="flex items-center gap-2 px-4 py-2 hover:bg-primary/10 dark:hover:bg-primary/20 text-xs font-medium text-on-surface dark:text-slate-200 text-left">
-                    <div class="w-3 h-3 rounded-full bg-[#86efac] border border-black/10"></div> Verde
-                </button>
-                <button data-action="highlight" data-value="blue"
-                    class="flex items-center gap-2 px-4 py-2 hover:bg-primary/10 dark:hover:bg-primary/20 text-xs font-medium text-on-surface dark:text-slate-200 text-left">
-                    <div class="w-3 h-3 rounded-full bg-[#bfdbfe] border border-black/10"></div> Azul
-                </button>
-                <button data-action="highlight" data-value="red"
-                    class="flex items-center gap-2 px-4 py-2 hover:bg-primary/10 dark:hover:bg-primary/20 text-xs font-medium text-on-surface dark:text-slate-200 text-left">
-                    <div class="w-3 h-3 rounded-full bg-[#fecaca] border border-black/10"></div> Rojo
-                </button>
-                <button data-action="highlight" data-value="orange"
-                    class="flex items-center gap-2 px-4 py-2 hover:bg-primary/10 dark:hover:bg-primary/20 text-xs font-medium text-on-surface dark:text-slate-200 text-left">
-                    <div class="w-3 h-3 rounded-full bg-[#fdba74] border border-black/10"></div> Naranja
-                </button>
-                <button data-action="highlight" data-value="pink"
-                    class="flex items-center gap-2 px-4 py-2 hover:bg-primary/10 dark:hover:bg-primary/20 text-xs font-medium text-on-surface dark:text-slate-200 text-left">
-                    <div class="w-3 h-3 rounded-full bg-[#f9a8d4] border border-black/10"></div> Rosa
-                </button>
-                <button data-action="highlight" data-value="purple"
-                    class="flex items-center gap-2 px-4 py-2 hover:bg-primary/10 dark:hover:bg-primary/20 text-xs font-medium text-on-surface dark:text-slate-200 text-left">
-                    <div class="w-3 h-3 rounded-full bg-[#d8b4fe] border border-black/10"></div> Morado
-                </button>
-                <button data-action="highlight" data-value="indigo"
-                    class="flex items-center gap-2 px-4 py-2 hover:bg-primary/10 dark:hover:bg-primary/20 text-xs font-medium text-on-surface dark:text-slate-200 text-left">
-                    <div class="w-3 h-3 rounded-full bg-[#c7d2fe] border border-black/10"></div> Índigo
-                </button>
-                <button data-action="highlight" data-value="teal"
-                    class="flex items-center gap-2 px-4 py-2 hover:bg-primary/10 dark:hover:bg-primary/20 text-xs font-medium text-on-surface dark:text-slate-200 text-left">
-                    <div class="w-3 h-3 rounded-full bg-[#99f6e4] border border-black/10"></div> Verde azulado
-                </button>
-                <button data-action="highlight" data-value="cyan"
-                    class="flex items-center gap-2 px-4 py-2 hover:bg-primary/10 dark:hover:bg-primary/20 text-xs font-medium text-on-surface dark:text-slate-200 text-left">
-                    <div class="w-3 h-3 rounded-full bg-[#a5f3fc] border border-black/10"></div> Cian
-                </button>
-                <button data-action="highlight" data-value="lime"
-                    class="flex items-center gap-2 px-4 py-2 hover:bg-primary/10 dark:hover:bg-primary/20 text-xs font-medium text-on-surface dark:text-slate-200 text-left">
-                    <div class="w-3 h-3 rounded-full bg-[#d9f99d] border border-black/10"></div> Lima
-                </button>
-                <button data-action="highlight" data-value="amber"
-                    class="flex items-center gap-2 px-4 py-2 hover:bg-primary/10 dark:hover:bg-primary/20 text-xs font-medium text-on-surface dark:text-slate-200 text-left">
-                    <div class="w-3 h-3 rounded-full bg-[#fde68a] border border-black/10"></div> Ámbar
-                </button>
-                <button data-action="highlight" data-value="rose"
-                    class="flex items-center gap-2 px-4 py-2 hover:bg-primary/10 dark:hover:bg-primary/20 text-xs font-medium text-on-surface dark:text-slate-200 text-left">
-                    <div class="w-3 h-3 rounded-full bg-[#fecdd3] border border-black/10"></div> Rosa fuerte
-                </button>
-                <button data-action="highlight" data-value="gray"
-                    class="flex items-center gap-2 px-4 py-2 hover:bg-primary/10 dark:hover:bg-primary/20 text-xs font-medium text-on-surface dark:text-slate-200 text-left">
-                    <div class="w-3 h-3 rounded-full bg-[#e5e7eb] border border-black/10"></div> Gris
-                </button>
-                <button data-action="highlight" data-value="brown"
-                    class="flex items-center gap-2 px-4 py-2 hover:bg-primary/10 dark:hover:bg-primary/20 text-xs font-medium text-on-surface dark:text-slate-200 text-left">
-                    <div class="w-3 h-3 rounded-full bg-[#d6b38a] border border-black/10"></div> Café
-                </button>
-                <button data-action="highlight" data-value="mint"
-                    class="flex items-center gap-2 px-4 py-2 hover:bg-primary/10 dark:hover:bg-primary/20 text-xs font-medium text-on-surface dark:text-slate-200 text-left">
-                    <div class="w-3 h-3 rounded-full bg-[#bbf7d0] border border-black/10"></div> Menta
-                </button>
-                <button data-action="highlight" data-value="none"
-                    class="flex items-center gap-2 px-4 py-2 hover:bg-primary/10 dark:hover:bg-primary/20 text-xs font-medium text-on-surface dark:text-slate-200 text-left"><i
-                        data-lucide="eraser" class="w-3 h-3"></i> Quitar resaltado</button>
-            </div>
-        </div>
-        <div class="group/sub relative">
-            <div
-                class="menu-item flex items-center justify-between px-4 py-2 hover:bg-primary/10 dark:hover:bg-primary/20 transition-colors text-sm font-medium text-on-surface dark:text-slate-200 cursor-default">
-                <div class="flex items-center gap-3"><i data-lucide="palette" class="w-4 h-4 text-primary"></i>
-                    Color de texto</div>
-                <i data-lucide="chevron-right" class="w-3 h-3 opacity-40"></i>
-            </div>
-            <div
-                class="invisible opacity-0 group-hover/sub:visible group-hover/sub:opacity-100 transition-all duration-200 flex flex-col absolute left-full top-0 ml-[-2px] bg-surface-container-lowest/95 dark:bg-slate-900/98 backdrop-blur-xl border border-outline-variant/30 dark:border-white/10 rounded-2xl shadow-2xl min-w-[160px] py-2">
-                <button data-action="foreColor" data-value="#e74c3c"
-                    class="flex items-center gap-2 px-4 py-2 hover:bg-primary/10 dark:hover:bg-primary/20 text-xs font-medium text-on-surface dark:text-slate-200 text-left">
-                    <div class="w-3 h-3 rounded-full bg-[#e74c3c]"></div> Rojo
-                </button>
-                <button data-action="foreColor" data-value="#2383e2"
-                    class="flex items-center gap-2 px-4 py-2 hover:bg-primary/10 dark:hover:bg-primary/20 text-xs font-medium text-on-surface dark:text-slate-200 text-left">
-                    <div class="w-3 h-3 rounded-full bg-[#2383e2]"></div> Azul
-                </button>
-                <button data-action="foreColor" data-value="#2ecc71"
-                    class="flex items-center gap-2 px-4 py-2 hover:bg-primary/10 dark:hover:bg-primary/20 text-xs font-medium text-on-surface dark:text-slate-200 text-left">
-                    <div class="w-3 h-3 rounded-full bg-[#2ecc71]"></div> Verde
-                </button>
-                <button data-action="foreColor" data-value="#f39c12"
-                    class="flex items-center gap-2 px-4 py-2 hover:bg-primary/10 dark:hover:bg-primary/20 text-xs font-medium text-on-surface dark:text-slate-200 text-left">
-                    <div class="w-3 h-3 rounded-full bg-[#f39c12]"></div> Naranja
-                </button>
-                <button data-action="pick-custom-color"
-                    class="flex items-center gap-2 px-4 py-2 hover:bg-primary/10 dark:hover:bg-primary/20 text-xs font-medium text-on-surface dark:text-slate-200 text-left"><i
-                        data-lucide="pipette" class="w-3 h-3"></i> Personalizado...</button>
-                <button data-action="removeColor"
-                    class="flex items-center gap-2 px-4 py-2 hover:bg-primary/10 dark:hover:bg-primary/20 text-xs font-medium text-on-surface dark:text-slate-200 text-left"><i
-                        data-lucide="undo" class="w-3 h-3"></i> Quitar color</button>
-            </div>
-        </div>
-        <div class="h-px bg-outline-variant/10 dark:bg-white/5 my-1 mx-2"></div>
-        <button data-action="removeFormat"
-            class="menu-item flex items-center gap-3 px-4 py-2.5 hover:bg-red-500/10 dark:hover:bg-red-500/20 transition-colors text-sm font-bold text-red-500 dark:text-red-400">
-            <i data-lucide="eraser" class="w-4 h-4"></i> Limpiar todo el formato
+    </section>
+    <section id="editor-panel" class="flex-1 bg-surface-container-low flex flex-col overflow-hidden relative">
+        <button id="show-notes-panel-btn" title="Ver Lista de Notas" onclick="window.toggleNotesPanel()"
+            class="hidden absolute top-6 left-6 md:left-8 p-2.5 bg-surface-container/80 backdrop-blur-sm rounded-xl shadow-sm border border-outline-variant/20 text-on-surface-variant hover:text-primary hover:bg-surface-container-high transition-colors z-20">
+            <i data-lucide="panel-left" class="w-5 h-5"></i>
         </button>
-    </div>
+        <button id="toggle-attachments" title="Ver Adjuntos"
+            class="hidden absolute top-6 right-8 p-2.5 bg-surface-container/80 backdrop-blur-sm rounded-xl shadow-sm border border-outline-variant/20 text-on-surface-variant hover:text-primary hover:bg-surface-container-high transition-colors z-20">
+            <i data-lucide="paperclip" class="w-5 h-5"></i>
+        </button>
+        <div id="editor-empty-state"
+            class="absolute inset-0 flex flex-col items-center justify-center p-8 text-center text-on-surface-variant z-10 bg-surface-container-low">
+            <i data-lucide="file-edit" class="w-16 h-16 mb-4 opacity-40"></i>
+            <h3 class="text-xl font-bold text-on-surface">Ninguna nota seleccionada</h3>
+            <p class="text-sm mt-2 opacity-80">Selecciona una nota de la lista o crea una nueva.</p>
+        </div>
+        <div id="editor-container" class="flex-1 overflow-y-auto p-8 md:p-12 xl:px-16 w-full mb-20">
+            <input type="text" id="note-title" placeholder="Título de la nota..."
+                class="text-4xl font-extrabold tracking-tight text-on-surface bg-transparent border-none outline-none mb-6 w-full placeholder:text-on-surface-variant/30 leading-tight">
+            <div id="editor" contenteditable="true" spellcheck="true" placeholder="Escribe tus apuntes aquí..."
+                class="text-lg text-on-surface leading-relaxed outline-none min-h-[50vh]"></div>
+        </div>
+        <div id="table-quick-toolbar"
+            class="hidden absolute z-[70] items-center gap-1.5 bg-surface-container-lowest/95 dark:bg-slate-900/95 border border-outline-variant/30 dark:border-white/10 rounded-xl px-2 py-1.5 shadow-xl backdrop-blur-sm">
+            <div class="group/sub relative">
+                <button class="table-tool-btn table-tool-parent">
+                    <i data-lucide="layout-grid" class="w-3.5 h-3.5"></i> Celdas
+                    <i data-lucide="chevron-down" class="w-3.5 h-3.5 opacity-70"></i>
+                </button>
+                <div class="table-submenu invisible opacity-0 group-hover/sub:visible group-hover/sub:opacity-100">
+                    <button data-table-action="col-left" class="table-tool-btn"><i data-lucide="arrow-left-to-line" class="w-3.5 h-3.5"></i> Columna izquierda</button>
+                    <button data-table-action="col-right" class="table-tool-btn"><i data-lucide="arrow-right-to-line" class="w-3.5 h-3.5"></i> Columna derecha</button>
+                    <button data-table-action="merge-cells" class="table-tool-btn"><i data-lucide="combine" class="w-3.5 h-3.5"></i> Combinar celdas</button>
+                    <button data-table-action="split-cell" class="table-tool-btn"><i data-lucide="split" class="w-3.5 h-3.5"></i> Dividir celda</button>
+                    <button data-table-action="designate-header" class="table-tool-btn"><i data-lucide="heading-1" class="w-3.5 h-3.5"></i> Designar título</button>
+                    <button data-table-action="del-col" class="table-tool-btn"><i data-lucide="columns-2" class="w-3.5 h-3.5"></i> Eliminar columna</button>
+                    <button data-table-action="narrow" class="table-tool-btn"><i data-lucide="minimize-2" class="w-3.5 h-3.5"></i> Reducir ancho</button>
+                    <button data-table-action="widen" class="table-tool-btn"><i data-lucide="maximize-2" class="w-3.5 h-3.5"></i> Aumentar ancho</button>
+                </div>
+            </div>
+            <div class="group/sub relative">
+                <button class="table-tool-btn table-tool-parent">
+                    <i data-lucide="rows-3" class="w-3.5 h-3.5"></i> Filas
+                    <i data-lucide="chevron-down" class="w-3.5 h-3.5 opacity-70"></i>
+                </button>
+                <div class="table-submenu invisible opacity-0 group-hover/sub:visible group-hover/sub:opacity-100">
+                    <button data-table-action="row-above" class="table-tool-btn"><i data-lucide="arrow-up-to-line" class="w-3.5 h-3.5"></i> Fila arriba</button>
+                    <button data-table-action="row-below" class="table-tool-btn"><i data-lucide="arrow-down-to-line" class="w-3.5 h-3.5"></i> Fila abajo</button>
+                    <button data-table-action="del-row" class="table-tool-btn"><i data-lucide="rows-2" class="w-3.5 h-3.5"></i> Eliminar fila</button>
+                </div>
+            </div>
+            <span id="table-preview-hint" class="text-[11px] font-semibold px-2 text-on-surface-variant">Preview</span>
+        </div>
+        <div id="editor-status-bar"
+            class="hidden absolute bottom-6 right-8 flex items-center bg-surface-container-lowest border border-outline-variant/20 rounded-full px-4 py-2 shadow-lg gap-3 z-20">
+            <div class="flex items-center gap-1.5 px-3 border-r border-outline-variant/20 mr-1">
+                <i data-lucide="type" class="w-4 h-4 text-primary"></i>
+                <span id="word-count" class="text-sm font-semibold text-on-surface-variant">0 palabras</span>
+            </div>
+            <button id="zoom-out" title="Alejar"
+                class="text-on-surface-variant hover:text-primary transition-colors"><i
+                    data-lucide="minus"></i></button>
+            <input type="range" id="zoom-slider" min="50" max="200" value="100" step="10"
+                class="w-24 accent-primary">
+            <button id="zoom-in" title="Acercar"
+                class="text-on-surface-variant hover:text-primary transition-colors"><i
+                    data-lucide="plus"></i></button>
+            <span id="zoom-label"
+                class="text-sm font-semibold min-w-[3ch] text-right text-on-surface-variant">100%</span>
+        </div>
+    </section>
+    <section id="attachments-panel"
+        class="w-72 border-l border-outline-variant/10 bg-surface-container-lowest hidden flex-col overflow-hidden shrink-0 transition-all duration-300">
+        <div
+            class="p-4 border-b border-outline-variant/10 flex justify-between items-center bg-surface/50 backdrop-blur-sm shrink-0">
+            <h3 class="font-bold text-sm text-on-surface flex items-center gap-2 uppercase tracking-wide"><i
+                    data-lucide="paperclip" class="w-4 h-4 text-primary"></i> Adjuntos</h3>
+            <button id="close-attachments"
+                class="text-on-surface-variant hover:text-error hover:bg-error-container rounded-lg p-1.5 transition-colors"><i
+                    data-lucide="x" class="w-4 h-4"></i></button>
+        </div>
+        <div class="px-4 py-3 border-b border-outline-variant/10 shrink-0">
+            <div class="relative group">
+                <i data-lucide="search"
+                    class="absolute left-3 top-1/2 -translate-y-1/2 text-on-surface-variant w-4 h-4 group-focus-within:text-primary transition-colors"></i>
+                <input type="text" id="search-attachments"
+                    class="w-full pl-9 pr-3 py-2 bg-surface-container border-none rounded-lg text-sm focus:ring-2 focus:ring-primary/20 transition-all outline-none placeholder:text-on-surface-variant/60"
+                    placeholder="Buscar imágenes...">
+            </div>
+        </div>
+        <div id="attachments-list" class="flex-1 overflow-y-auto custom-scrollbar p-3 space-y-2">
+        </div>
+    </section>
 </div>
-````
-
-## File: js/notes.js
-````javascript
-export function renderNotesList()
-⋮----
-item.onclick = (e) =>
-⋮----
-item.querySelector('.item-options').onclick = (e) =>
-⋮----
-item.oncontextmenu = (e) =>
-⋮----
-export function cleanupOrphans()
-⋮----
-export async function selectNote(id)
-⋮----
-export async function addNote()
-⋮----
-export function renderTrashList()
-⋮----
-card.querySelector('.restore-btn').onclick = ()
-card.querySelector('.delete-forever-btn').onclick = ()
-⋮----
-export async function restoreNote(id)
-⋮----
-export async function permanentlyDeleteNote(id)
-⋮----
-export async function cleanupTrash()
-````
-
-## File: js/utils.js
-````javascript
-export function refreshIcons()
-⋮----
-export function escapeHTML(value)
-⋮----
-export function stripHTML(html)
-⋮----
-function sanitizeStyleValue(styleValue)
-⋮----
-function sanitizeUrlAttribute(value, allowData = false)
-⋮----
-function unwrapElement(el)
-⋮----
-export function sanitizeHTML(html)
-⋮----
-export function showModal(title, placeholder, initialValue = '')
-⋮----
-const closeModal = (value) =>
-⋮----
-const tryConfirm = () =>
-⋮----
-newCancelBtn.onclick = ()
-⋮----
-const onKeydown = (e) =>
-⋮----
-input.oninput = () =>
-⋮----
-export function cleanHTML(html)
-⋮----
-export function createId()
-⋮----
-export function safeHexColor(value, fallback = '#2b2d2e')
-⋮----
-export function hexToRgba(value, alpha = 1, fallback = 'rgba(43,45,46,1)')
-⋮----
-/**
- * Hash djb2 sobre un string.
- *
- * Uso:
- * - Fingerprints rápidos para detectar cambios (no criptográfico).
- * - Salida en base-36 para almacenamiento compacto (ej: "3q4r7a").
- *
- * Nota: no usar para seguridad, firmas o autenticación.
- */
-export function hashString(str)
-⋮----
-h = h >>> 0; // keep unsigned 32-bit
-⋮----
-/**
- * Genera un preview en texto plano (máx. 150 chars) a partir de HTML.
- *
- * Convención:
- * - Devuelve string vacío para notas en blanco (facilita filtros y evita ruido en UI).
- */
-export function buildPreview(htmlContent)
 ````
 
 ## File: README.md
@@ -1459,18 +1277,78 @@ export function renderScheduleList()
 function renderScheduleModalList()
 ````
 
-## File: js/events.js
+## File: js/insert-blocks.js
 ````javascript
-export function setupEventListeners()
+const isValidHttpUrl = (value)
 ⋮----
-item.onclick = ()
+const wrapBlock = (kind, inner)
 ⋮----
-// Preferencia del SO: reaccionar sólo cuando el tema está configurado como `system`.
-````
-
-## File: js/ipc.js
-````javascript
-
+const makeListBlock = (title, items)
+⋮----
+const baseTemplate = (title, desc)
+⋮----
+function getEditor()
+⋮----
+function ensureSelectionInEditor(editor)
+⋮----
+function insertHtmlAtCursor(html)
+⋮----
+function formatClock(sec)
+⋮----
+function cleanupWavePlayer(note)
+⋮----
+function buildVoiceNoteHtml(src, stamp, durationSec = 0)
+⋮----
+function upgradeNativeAudioPlayers(root = document)
+⋮----
+function normalizeVoiceNoteMarkup(root = document)
+⋮----
+export function initVoiceNotePlayers(root = document)
+⋮----
+const updateTime = () =>
+⋮----
+const onPlayPauseClick = async () =>
+const onPlay = () =>
+const onPause = () =>
+const onEnded = () =>
+const onTimeUpdate = ()
+const onLoadedMetadata = ()
+const onSeekInput = () =>
+const onAudioError = () =>
+⋮----
+export function destroyVoiceNotePlayers(root = document)
+⋮----
+async function recordAudioFromMic()
+⋮----
+recorder.ondataavailable = (e) =>
+⋮----
+const getBlobDurationSec = (blob) => new Promise((resolveDur) =>
+⋮----
+el.onloadedmetadata = () =>
+el.onerror = () =>
+⋮----
+const cleanup = () =>
+⋮----
+startBtn.onclick = () =>
+⋮----
+stopBtn.onclick = () =>
+⋮----
+closeBtn.onclick = () =>
+⋮----
+recorder.onstop = async () =>
+⋮----
+reader.onload = (ev)
+⋮----
+⋮----
+insert: async () =>
+⋮----
+export function renderInsertBlocks()
+⋮----
+export async function insertBlockById(id)
+⋮----
+export function hasInsertBlock(id)
+⋮----
+export function getInsertBlockSummary()
 ````
 
 ## File: js/state.js
@@ -1492,9 +1370,100 @@ function serializeNoteForDisk(note)
 export async function saveAll()
 ````
 
+## File: js/notes.js
+````javascript
+export function renderNotesList()
+⋮----
+item.onclick = (e) =>
+⋮----
+item.querySelector('.item-options').onclick = (e) =>
+⋮----
+item.oncontextmenu = (e) =>
+⋮----
+export function cleanupOrphans()
+⋮----
+export async function selectNote(id)
+⋮----
+export async function addNote()
+⋮----
+export function renderTrashList()
+⋮----
+card.querySelector('.restore-btn').onclick = ()
+card.querySelector('.delete-forever-btn').onclick = ()
+⋮----
+export async function restoreNote(id)
+⋮----
+export async function permanentlyDeleteNote(id)
+⋮----
+export async function cleanupTrash()
+````
+
+## File: js/utils.js
+````javascript
+export function refreshIcons()
+⋮----
+export function showToast(message, tone = 'neutral')
+⋮----
+export function escapeHTML(value)
+⋮----
+export function stripHTML(html)
+⋮----
+function sanitizeStyleValue(styleValue)
+⋮----
+function sanitizeUrlAttribute(value, allowData = false)
+⋮----
+function unwrapElement(el)
+⋮----
+export function sanitizeHTML(html)
+⋮----
+export function showModal(title, placeholder, initialValue = '')
+⋮----
+const closeModal = (value) =>
+⋮----
+const tryConfirm = () =>
+⋮----
+newCancelBtn.onclick = ()
+⋮----
+const onKeydown = (e) =>
+⋮----
+input.oninput = () =>
+⋮----
+export function cleanHTML(html)
+⋮----
+export function createId()
+⋮----
+export function safeHexColor(value, fallback = '#2b2d2e')
+⋮----
+export function hexToRgba(value, alpha = 1, fallback = 'rgba(43,45,46,1)')
+⋮----
+/**
+ * Hash djb2 sobre un string.
+ *
+ * Uso:
+ * - Fingerprints rápidos para detectar cambios (no criptográfico).
+ * - Salida en base-36 para almacenamiento compacto (ej: "3q4r7a").
+ *
+ * Nota: no usar para seguridad, firmas o autenticación.
+ */
+export function hashString(str)
+⋮----
+h = h >>> 0; // keep unsigned 32-bit
+⋮----
+/**
+ * Genera un preview en texto plano (máx. 150 chars) a partir de HTML.
+ *
+ * Convención:
+ * - Devuelve string vacío para notas en blanco (facilita filtros y evita ruido en UI).
+ */
+export function buildPreview(htmlContent)
+````
+
 ## File: modules/window.js
 ````javascript
 function createWindow(debug, checkMedia)
+⋮----
+const wlog = (...args) =>
+const werr = (...args) =>
 ⋮----
 click: ()
 ````
@@ -1544,40 +1513,253 @@ click: ()
 }
 ````
 
-## File: js/editor.js
+## File: partials/context-menu.html
+````html
+<div id="custom-context-menu"
+    class="fixed hidden z-[100] bg-surface-container-lowest/90 dark:bg-slate-900/95 backdrop-blur-xl border border-outline-variant/30 dark:border-white/10 rounded-2xl shadow-2xl min-w-[220px] py-2 animate-[fadeIn_0.15s_ease-out] overflow-visible">
+    <div class="flex flex-col">
+        <div id="context-selection-actions">
+        <div class="group/sub relative">
+            <div
+                class="menu-item flex items-center justify-between px-4 py-2 hover:bg-primary/10 dark:hover:bg-primary/20 transition-colors text-sm font-medium text-on-surface dark:text-slate-200 cursor-default">
+                <div class="flex items-center gap-3"><i data-lucide="text-quote" class="w-4 h-4 text-primary"></i>
+                    Tamaño de fuente</div>
+                <i data-lucide="chevron-right" class="w-3 h-3 opacity-40"></i>
+            </div>
+            <div
+                class="invisible opacity-0 group-hover/sub:visible group-hover/sub:opacity-100 transition-all duration-200 flex flex-col absolute left-full top-0 ml-[-2px] bg-surface-container-lowest/95 dark:bg-slate-900/98 backdrop-blur-xl border border-outline-variant/30 dark:border-white/10 rounded-2xl shadow-2xl min-w-[160px] py-2">
+                <button data-action="fontSize" data-value="12px"
+                    class="px-4 py-2 hover:bg-primary/10 dark:hover:bg-primary/20 text-xs font-medium text-on-surface dark:text-slate-200 text-left">Pequeño
+                    (12px)</button>
+                <button data-action="fontSize" data-value="18px"
+                    class="px-4 py-2 hover:bg-primary/10 dark:hover:bg-primary/20 text-xs font-medium text-on-surface dark:text-slate-200 text-left">Normal
+                    (18px)</button>
+                <button data-action="fontSize" data-value="20px"
+                    class="px-4 py-2 hover:bg-primary/10 dark:hover:bg-primary/20 text-xs font-medium text-on-surface dark:text-slate-200 text-left">Mediano
+                    (20px)</button>
+                <button data-action="fontSize" data-value="28px"
+                    class="px-4 py-2 hover:bg-primary/10 dark:hover:bg-primary/20 text-xs font-medium text-on-surface dark:text-slate-200 text-left">Grande
+                    (28px)</button>
+                <button data-action="fontSize" data-value="36px"
+                    class="px-4 py-2 hover:bg-primary/10 dark:hover:bg-primary/20 text-xs font-medium text-on-surface dark:text-slate-200 text-left">Extra
+                    Grande (36px)</button>
+            </div>
+        </div>
+        <div class="group/sub relative">
+            <div
+                class="menu-item flex items-center justify-between px-4 py-2 hover:bg-primary/10 dark:hover:bg-primary/20 transition-colors text-sm font-medium text-on-surface dark:text-slate-200 cursor-default">
+                <div class="flex items-center gap-3"><i data-lucide="align-center" class="w-4 h-4 text-primary"></i>
+                    Alineación</div>
+                <i data-lucide="chevron-right" class="w-3 h-3 opacity-40"></i>
+            </div>
+            <div
+                class="invisible opacity-0 group-hover/sub:visible group-hover/sub:opacity-100 transition-all duration-200 flex flex-col absolute left-full top-0 ml-[-2px] bg-surface-container-lowest/95 dark:bg-slate-900/98 backdrop-blur-xl border border-outline-variant/30 dark:border-white/10 rounded-2xl shadow-2xl min-w-[180px] py-2">
+                <button data-action="justifyCenter"
+                    class="px-4 py-2 hover:bg-primary/10 dark:hover:bg-primary/20 text-xs font-medium text-on-surface dark:text-slate-200 text-left">Centrado</button>
+                <button data-action="justifyFull"
+                    class="px-4 py-2 hover:bg-primary/10 dark:hover:bg-primary/20 text-xs font-medium text-on-surface dark:text-slate-200 text-left">Justificado</button>
+                <button data-action="justifyLeft"
+                    class="px-4 py-2 hover:bg-primary/10 dark:hover:bg-primary/20 text-xs font-medium text-on-surface dark:text-slate-200 text-left">Izquierda</button>
+                <button data-action="justifyRight"
+                    class="px-4 py-2 hover:bg-primary/10 dark:hover:bg-primary/20 text-xs font-medium text-on-surface dark:text-slate-200 text-left">Derecha</button>
+                <button data-action="breakWords"
+                    class="px-4 py-2 hover:bg-primary/10 dark:hover:bg-primary/20 text-xs font-medium text-on-surface dark:text-slate-200 text-left">Break-words</button>
+            </div>
+        </div>
+        <div class="group/sub relative">
+            <div
+                class="menu-item flex items-center justify-between px-4 py-2 hover:bg-primary/10 dark:hover:bg-primary/20 transition-colors text-sm font-medium text-on-surface dark:text-slate-200 cursor-default">
+                <div class="flex items-center gap-3"><i data-lucide="case-sensitive" class="w-4 h-4 text-primary"></i>
+                    Formatos de texto</div>
+                <i data-lucide="chevron-right" class="w-3 h-3 opacity-40"></i>
+            </div>
+            <div
+                class="invisible opacity-0 group-hover/sub:visible group-hover/sub:opacity-100 transition-all duration-200 flex flex-col absolute left-full top-0 ml-[-2px] bg-surface-container-lowest/95 dark:bg-slate-900/98 backdrop-blur-xl border border-outline-variant/30 dark:border-white/10 rounded-2xl shadow-2xl min-w-[210px] py-2">
+                <button data-action="textTransform" data-value="sentence"
+                    class="px-4 py-2 hover:bg-primary/10 dark:hover:bg-primary/20 text-xs font-medium text-on-surface dark:text-slate-200 text-left">Capitalizar oración</button>
+                <button data-action="textTransform" data-value="upper"
+                    class="px-4 py-2 hover:bg-primary/10 dark:hover:bg-primary/20 text-xs font-medium text-on-surface dark:text-slate-200 text-left">Convertir a MAYÚSCULAS</button>
+                <button data-action="textTransform" data-value="lower"
+                    class="px-4 py-2 hover:bg-primary/10 dark:hover:bg-primary/20 text-xs font-medium text-on-surface dark:text-slate-200 text-left">Convertir a minúsculas</button>
+                <button data-action="textTransform" data-value="title"
+                    class="px-4 py-2 hover:bg-primary/10 dark:hover:bg-primary/20 text-xs font-medium text-on-surface dark:text-slate-200 text-left">Capitalizar Cada Palabra</button>
+            </div>
+        </div>
+        <div class="group/sub relative">
+            <div
+                class="menu-item flex items-center justify-between px-4 py-2 hover:bg-primary/10 dark:hover:bg-primary/20 transition-colors text-sm font-medium text-on-surface dark:text-slate-200 cursor-default">
+                <div class="flex items-center gap-3"><i data-lucide="highlighter" class="w-4 h-4 text-primary"></i>
+                    Resaltar texto</div>
+                <i data-lucide="chevron-right" class="w-3 h-3 opacity-40"></i>
+            </div>
+            <div
+                id="highlight-submenu"
+                class="invisible opacity-0 group-hover/sub:visible group-hover/sub:opacity-100 transition-all duration-200 flex flex-col absolute left-full top-0 ml-[-2px] bg-surface-container-lowest/95 dark:bg-slate-900/98 backdrop-blur-xl border border-outline-variant/30 dark:border-white/10 rounded-2xl shadow-2xl min-w-[160px] py-2 max-h-72 overflow-y-auto overflow-x-hidden custom-scrollbar overscroll-contain">
+                <button data-action="highlight" data-value="yellow"
+                    class="flex items-center gap-2 px-4 py-2 hover:bg-primary/10 dark:hover:bg-primary/20 text-xs font-medium text-on-surface dark:text-slate-200 text-left">
+                    <div class="w-3 h-3 rounded-full bg-[#fef08a] border border-black/10"></div> Amarillo
+                </button>
+                <button data-action="highlight" data-value="green"
+                    class="flex items-center gap-2 px-4 py-2 hover:bg-primary/10 dark:hover:bg-primary/20 text-xs font-medium text-on-surface dark:text-slate-200 text-left">
+                    <div class="w-3 h-3 rounded-full bg-[#86efac] border border-black/10"></div> Verde
+                </button>
+                <button data-action="highlight" data-value="blue"
+                    class="flex items-center gap-2 px-4 py-2 hover:bg-primary/10 dark:hover:bg-primary/20 text-xs font-medium text-on-surface dark:text-slate-200 text-left">
+                    <div class="w-3 h-3 rounded-full bg-[#bfdbfe] border border-black/10"></div> Azul
+                </button>
+                <button data-action="highlight" data-value="red"
+                    class="flex items-center gap-2 px-4 py-2 hover:bg-primary/10 dark:hover:bg-primary/20 text-xs font-medium text-on-surface dark:text-slate-200 text-left">
+                    <div class="w-3 h-3 rounded-full bg-[#fecaca] border border-black/10"></div> Rojo
+                </button>
+                <button data-action="highlight" data-value="orange"
+                    class="flex items-center gap-2 px-4 py-2 hover:bg-primary/10 dark:hover:bg-primary/20 text-xs font-medium text-on-surface dark:text-slate-200 text-left">
+                    <div class="w-3 h-3 rounded-full bg-[#fdba74] border border-black/10"></div> Naranja
+                </button>
+                <button data-action="highlight" data-value="pink"
+                    class="flex items-center gap-2 px-4 py-2 hover:bg-primary/10 dark:hover:bg-primary/20 text-xs font-medium text-on-surface dark:text-slate-200 text-left">
+                    <div class="w-3 h-3 rounded-full bg-[#f9a8d4] border border-black/10"></div> Rosa
+                </button>
+                <button data-action="highlight" data-value="purple"
+                    class="flex items-center gap-2 px-4 py-2 hover:bg-primary/10 dark:hover:bg-primary/20 text-xs font-medium text-on-surface dark:text-slate-200 text-left">
+                    <div class="w-3 h-3 rounded-full bg-[#d8b4fe] border border-black/10"></div> Morado
+                </button>
+                <button data-action="highlight" data-value="indigo"
+                    class="flex items-center gap-2 px-4 py-2 hover:bg-primary/10 dark:hover:bg-primary/20 text-xs font-medium text-on-surface dark:text-slate-200 text-left">
+                    <div class="w-3 h-3 rounded-full bg-[#c7d2fe] border border-black/10"></div> Índigo
+                </button>
+                <button data-action="highlight" data-value="teal"
+                    class="flex items-center gap-2 px-4 py-2 hover:bg-primary/10 dark:hover:bg-primary/20 text-xs font-medium text-on-surface dark:text-slate-200 text-left">
+                    <div class="w-3 h-3 rounded-full bg-[#99f6e4] border border-black/10"></div> Verde azulado
+                </button>
+                <button data-action="highlight" data-value="cyan"
+                    class="flex items-center gap-2 px-4 py-2 hover:bg-primary/10 dark:hover:bg-primary/20 text-xs font-medium text-on-surface dark:text-slate-200 text-left">
+                    <div class="w-3 h-3 rounded-full bg-[#a5f3fc] border border-black/10"></div> Cian
+                </button>
+                <button data-action="highlight" data-value="lime"
+                    class="flex items-center gap-2 px-4 py-2 hover:bg-primary/10 dark:hover:bg-primary/20 text-xs font-medium text-on-surface dark:text-slate-200 text-left">
+                    <div class="w-3 h-3 rounded-full bg-[#d9f99d] border border-black/10"></div> Lima
+                </button>
+                <button data-action="highlight" data-value="amber"
+                    class="flex items-center gap-2 px-4 py-2 hover:bg-primary/10 dark:hover:bg-primary/20 text-xs font-medium text-on-surface dark:text-slate-200 text-left">
+                    <div class="w-3 h-3 rounded-full bg-[#fde68a] border border-black/10"></div> Ámbar
+                </button>
+                <button data-action="highlight" data-value="rose"
+                    class="flex items-center gap-2 px-4 py-2 hover:bg-primary/10 dark:hover:bg-primary/20 text-xs font-medium text-on-surface dark:text-slate-200 text-left">
+                    <div class="w-3 h-3 rounded-full bg-[#fecdd3] border border-black/10"></div> Rosa fuerte
+                </button>
+                <button data-action="highlight" data-value="gray"
+                    class="flex items-center gap-2 px-4 py-2 hover:bg-primary/10 dark:hover:bg-primary/20 text-xs font-medium text-on-surface dark:text-slate-200 text-left">
+                    <div class="w-3 h-3 rounded-full bg-[#e5e7eb] border border-black/10"></div> Gris
+                </button>
+                <button data-action="highlight" data-value="brown"
+                    class="flex items-center gap-2 px-4 py-2 hover:bg-primary/10 dark:hover:bg-primary/20 text-xs font-medium text-on-surface dark:text-slate-200 text-left">
+                    <div class="w-3 h-3 rounded-full bg-[#d6b38a] border border-black/10"></div> Café
+                </button>
+                <button data-action="highlight" data-value="mint"
+                    class="flex items-center gap-2 px-4 py-2 hover:bg-primary/10 dark:hover:bg-primary/20 text-xs font-medium text-on-surface dark:text-slate-200 text-left">
+                    <div class="w-3 h-3 rounded-full bg-[#bbf7d0] border border-black/10"></div> Menta
+                </button>
+                <button data-action="highlight" data-value="none"
+                    class="flex items-center gap-2 px-4 py-2 hover:bg-primary/10 dark:hover:bg-primary/20 text-xs font-medium text-on-surface dark:text-slate-200 text-left"><i
+                        data-lucide="eraser" class="w-3 h-3"></i> Quitar resaltado</button>
+            </div>
+        </div>
+        <div class="group/sub relative">
+            <div
+                class="menu-item flex items-center justify-between px-4 py-2 hover:bg-primary/10 dark:hover:bg-primary/20 transition-colors text-sm font-medium text-on-surface dark:text-slate-200 cursor-default">
+                <div class="flex items-center gap-3"><i data-lucide="palette" class="w-4 h-4 text-primary"></i>
+                    Color de texto</div>
+                <i data-lucide="chevron-right" class="w-3 h-3 opacity-40"></i>
+            </div>
+            <div
+                class="invisible opacity-0 group-hover/sub:visible group-hover/sub:opacity-100 transition-all duration-200 flex flex-col absolute left-full top-0 ml-[-2px] bg-surface-container-lowest/95 dark:bg-slate-900/98 backdrop-blur-xl border border-outline-variant/30 dark:border-white/10 rounded-2xl shadow-2xl min-w-[160px] py-2">
+                <button data-action="foreColor" data-value="#e74c3c"
+                    class="flex items-center gap-2 px-4 py-2 hover:bg-primary/10 dark:hover:bg-primary/20 text-xs font-medium text-on-surface dark:text-slate-200 text-left">
+                    <div class="w-3 h-3 rounded-full bg-[#e74c3c]"></div> Rojo
+                </button>
+                <button data-action="foreColor" data-value="#2383e2"
+                    class="flex items-center gap-2 px-4 py-2 hover:bg-primary/10 dark:hover:bg-primary/20 text-xs font-medium text-on-surface dark:text-slate-200 text-left">
+                    <div class="w-3 h-3 rounded-full bg-[#2383e2]"></div> Azul
+                </button>
+                <button data-action="foreColor" data-value="#2ecc71"
+                    class="flex items-center gap-2 px-4 py-2 hover:bg-primary/10 dark:hover:bg-primary/20 text-xs font-medium text-on-surface dark:text-slate-200 text-left">
+                    <div class="w-3 h-3 rounded-full bg-[#2ecc71]"></div> Verde
+                </button>
+                <button data-action="foreColor" data-value="#f39c12"
+                    class="flex items-center gap-2 px-4 py-2 hover:bg-primary/10 dark:hover:bg-primary/20 text-xs font-medium text-on-surface dark:text-slate-200 text-left">
+                    <div class="w-3 h-3 rounded-full bg-[#f39c12]"></div> Naranja
+                </button>
+                <button data-action="pick-custom-color"
+                    class="flex items-center gap-2 px-4 py-2 hover:bg-primary/10 dark:hover:bg-primary/20 text-xs font-medium text-on-surface dark:text-slate-200 text-left"><i
+                        data-lucide="pipette" class="w-3 h-3"></i> Personalizado...</button>
+                <button data-action="removeColor"
+                    class="flex items-center gap-2 px-4 py-2 hover:bg-primary/10 dark:hover:bg-primary/20 text-xs font-medium text-on-surface dark:text-slate-200 text-left"><i
+                        data-lucide="undo" class="w-3 h-3"></i> Quitar color</button>
+            </div>
+        </div>
+        <div class="h-px bg-outline-variant/10 dark:bg-white/5 my-1 mx-2"></div>
+        <button data-action="removeFormat"
+            class="menu-item flex items-center gap-3 px-4 py-2.5 hover:bg-red-500/10 dark:hover:bg-red-500/20 transition-colors text-sm font-bold text-red-500 dark:text-red-400">
+            <i data-lucide="eraser" class="w-4 h-4"></i> Limpiar todo el formato
+        </button>
+        </div>
+        <button id="context-delete-element" data-action="deleteElement"
+            class="menu-item hidden items-center gap-3 px-4 py-2.5 hover:bg-red-500/10 dark:hover:bg-red-500/20 transition-colors text-sm font-bold text-red-500 dark:text-red-400">
+            <i data-lucide="trash-2" class="w-4 h-4"></i> Borrar elemento
+        </button>
+        <div class="h-px bg-outline-variant/10 dark:bg-white/5 my-1 mx-2"></div>
+        <button data-action="copy"
+            class="menu-item flex items-center gap-3 px-4 py-2 hover:bg-primary/10 dark:hover:bg-primary/20 transition-colors text-sm font-medium text-on-surface dark:text-slate-200">
+            <i data-lucide="copy" class="w-4 h-4"></i> Copiar
+        </button>
+        <button data-action="cut"
+            class="menu-item flex items-center gap-3 px-4 py-2 hover:bg-primary/10 dark:hover:bg-primary/20 transition-colors text-sm font-medium text-on-surface dark:text-slate-200">
+            <i data-lucide="scissors" class="w-4 h-4"></i> Cortar
+        </button>
+        <button data-action="paste"
+            class="menu-item flex items-center gap-3 px-4 py-2 hover:bg-primary/10 dark:hover:bg-primary/20 transition-colors text-sm font-medium text-on-surface dark:text-slate-200">
+            <i data-lucide="clipboard-paste" class="w-4 h-4"></i> Pegar
+        </button>
+        <button data-action="selectAll"
+            class="menu-item flex items-center gap-3 px-4 py-2 hover:bg-primary/10 dark:hover:bg-primary/20 transition-colors text-sm font-medium text-on-surface dark:text-slate-200">
+            <i data-lucide="square-dashed-mouse-pointer" class="w-4 h-4"></i> Seleccionar todo
+        </button>
+    </div>
+</div>
+````
+
+## File: js/ipc.js
 ````javascript
-export function executeEditAction(data)
+function getFileLabel(value)
+````
+
+## File: js/events.js
+````javascript
+export function setupEventListeners()
 ⋮----
-export async function forceSaveNote()
+const openInsertModal = () =>
 ⋮----
-return; // Sin cambios, omitir I/O
+const closeInsertModal = () =>
 ⋮----
-export const handleInput = () =>
+const setInsertTab = (tab) =>
 ⋮----
-export function updateWordCount()
+item.onclick = ()
 ⋮----
-export function updateAttachmentsIfNeeded(resetSearch = false)
-⋮----
-export function renderAttachments(searchTerm = '')
-⋮----
-div.onclick = () =>
-⋮----
-export function setupEditor()
-⋮----
-const positionContextMenu = (menu, clientX, clientY) =>
-⋮----
-const setupHighlightSubmenuScroll = () =>
-⋮----
-reader.onload = (ev)
+// Preferencia del SO: reaccionar sólo cuando el tema está configurado como `system`.
 ````
 
 ## File: main.js
 ````javascript
-
+function dlog(...args)
+⋮----
+function derr(...args)
 ````
 
 ## File: renderer.js
 ````javascript
+const rlog = (...args) =>
+const rerr = (...args) =>
+⋮----
 async function initApp()
 ⋮----
 async function backfillPreviews()
@@ -1656,7 +1838,7 @@ export function toggleNotesPanel()
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta http-equiv="Content-Security-Policy"
-        content="default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com; img-src 'self' data: file: blob:;">
+        content="default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com; img-src 'self' data: file: blob:; media-src 'self' data: file: blob: https:;">
     <title>NoteVault - University Manager</title>
     <script src="lib/tailwind.min.js"></script>
     <link
@@ -1682,6 +1864,7 @@ export function toggleNotesPanel()
     <div data-partial="modal-settings"></div>
     <div data-partial="modal-profile"></div>
     <div data-partial="modal-notebook"></div>
+    <div data-partial="modal-insert"></div>
     <div data-partial="context-menu"></div>
     <script src="lib/lucide.min.js"></script>
     <script src="js/partials-loader.js"></script>
@@ -1709,6 +1892,67 @@ export function toggleNotesPanel()
 </html>
 ````
 
+## File: js/editor.js
+````javascript
+function capitalizeSentence(text)
+⋮----
+function capitalizeWords(text)
+⋮----
+function transformSelectedText(mode)
+⋮----
+function applyBreakWordsToSelection()
+⋮----
+export function executeEditAction(data)
+⋮----
+export async function forceSaveNote()
+⋮----
+export const handleInput = () =>
+⋮----
+export function updateWordCount()
+⋮----
+export function updateAttachmentsIfNeeded(resetSearch = false)
+⋮----
+export function renderAttachments(searchTerm = '')
+⋮----
+div.onclick = () =>
+⋮----
+export function setupEditor()
+⋮----
+const hideTableToolbar = () =>
+⋮----
+const placeTableToolbar = (cell) =>
+⋮----
+const getTableInfo = () =>
+⋮----
+const clearTablePreview = () =>
+⋮----
+const applyTablePreview = (action) =>
+⋮----
+const createCellLike = (sourceCell) =>
+⋮----
+const clearCalloutPlaceholder = (placeholder) =>
+⋮----
+const applyTableAction = (action) =>
+⋮----
+const getSelectedCells = () =>
+⋮----
+const positionContextMenu = (menu, clientX, clientY) =>
+⋮----
+const setupHighlightSubmenuScroll = () =>
+⋮----
+const setContextMenuMode = (mode) =>
+⋮----
+const getTopLevelElementInEditor = (target) =>
+⋮----
+const shouldUseNativeContextMenu = (target, hasSelection) =>
+⋮----
+const insertPlainText = (text) =>
+⋮----
+const normalizeClipboardHtml = (rawHtml) =>
+⋮----
+reader.onload = (ev)
+````
+
 ## File: styles.css
 ````css
 body {
@@ -1733,9 +1977,187 @@ body {
 ⋮----
 #editor {
 ⋮----
+#editor h2 {
+⋮----
+#editor h3 {
+⋮----
+#editor ul,
+⋮----
+#editor ul {
+⋮----
+#editor ol {
+⋮----
+#editor li {
+⋮----
+#editor ul.editor-check-list {
+⋮----
+#editor ul.editor-check-list li {
+⋮----
+#editor blockquote {
+⋮----
+#editor pre {
+⋮----
+#editor pre code,
+⋮----
+#editor :not(pre) > code {
+⋮----
+#editor table {
+⋮----
+#editor thead {
+⋮----
+#editor th,
+⋮----
+#editor th {
+⋮----
+#editor .insert-callout-placeholder {
+⋮----
+#editor .insert-callout-label {
+⋮----
+#editor .insert-callout-icon-wrap {
+⋮----
+#editor .insert-callout-icon {
+⋮----
+#editor tbody tr:nth-child(even) {
+⋮----
 #editor s,
 ⋮----
 .dark #editor,
+⋮----
+.dark #editor table {
+⋮----
+.dark #editor thead {
+⋮----
+.dark #editor th,
+⋮----
+.dark #editor th {
+⋮----
+.dark #editor h2,
+⋮----
+.dark #editor blockquote {
+⋮----
+.dark #editor pre {
+⋮----
+.dark #editor .insert-block-card,
+⋮----
+.dark #editor .insert-block-desc,
+⋮----
+.dark #editor .insert-chip {
+⋮----
+#editor .insert-columns-2,
+⋮----
+.dark #editor tbody tr:nth-child(even) {
+⋮----
+.table-tool-btn {
+⋮----
+.table-tool-btn:hover {
+⋮----
+.table-tool-parent {
+⋮----
+.table-submenu {
+⋮----
+.dark .table-submenu {
+⋮----
+.insert-tab-btn {
+⋮----
+.insert-tab-btn:hover {
+⋮----
+.insert-card {
+⋮----
+.insert-card:hover {
+⋮----
+#editor .insert-block-card {
+⋮----
+#editor .insert-block-title {
+⋮----
+#editor .insert-block-desc,
+⋮----
+#editor .insert-chip {
+⋮----
+#editor .insert-columns {
+⋮----
+#editor .insert-columns-2 {
+⋮----
+#editor .insert-columns-3 {
+⋮----
+#editor .insert-aside {
+⋮----
+#editor .insert-cover {
+⋮----
+#editor .insert-progress {
+⋮----
+#editor .insert-progress > div {
+⋮----
+#editor .insert-block audio {
+⋮----
+#editor .insert-block audio::-webkit-media-controls-panel {
+⋮----
+#editor .insert-block audio::-webkit-media-controls-play-button,
+⋮----
+.dark #editor .insert-block audio {
+⋮----
+.dark #editor .insert-block audio::-webkit-media-controls-panel {
+⋮----
+#editor .voice-note {
+⋮----
+#editor .voice-note-content {
+⋮----
+#editor .voice-note-title {
+⋮----
+#editor .voice-note-title:focus {
+⋮----
+#editor .voice-note-meta {
+⋮----
+#editor .voice-note-time {
+⋮----
+#editor .voice-note.voice-note-playing {
+⋮----
+.dark #editor .voice-note {
+⋮----
+.dark #editor .voice-note-meta {
+⋮----
+.dark #editor .voice-note-title {
+⋮----
+.dark #editor .voice-note-time {
+⋮----
+#editor .voice-note-player {
+⋮----
+#editor .voice-note-btn {
+⋮----
+#editor .voice-note-btn:hover {
+⋮----
+#editor .voice-note-btn:active {
+⋮----
+#editor .voice-note-btn:disabled {
+⋮----
+#editor .voice-note-seek {
+⋮----
+.dark #editor .voice-note-player {
+⋮----
+.dark #editor .voice-note-btn {
+⋮----
+.group\/sub.submenu-open .table-submenu {
+⋮----
+#editor td.table-preview-cell,
+⋮----
+#editor tr.table-preview-row > td,
+⋮----
+#editor td.table-preview-col,
+⋮----
+#editor tr.table-preview-row-add > td,
+⋮----
+#editor tr.table-preview-row-del > td,
+⋮----
+#editor table.table-preview-resize-plus {
+⋮----
+#editor table.table-preview-resize-minus {
+⋮----
+#editor td.table-preview-merge,
+⋮----
+#editor td.table-preview-merge-anchor,
+⋮----
+#editor td.table-preview-merge-removed,
+⋮----
+#editor td.table-preview-split,
 ⋮----
 [contenteditable]:empty:before {
 ⋮----
