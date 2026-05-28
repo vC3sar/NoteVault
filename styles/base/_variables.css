@@ -1,0 +1,208 @@
+/* Dark Mode Graphite */
+:root {
+    --surface-container-lowest: #f8f9fa;
+    --notebook-spine-overlay: rgba(255, 255, 255, 0.25);
+}
+
+.dark {
+    --surface-container-lowest: #1e1f22;
+    --notebook-spine-overlay: rgba(0, 0, 0, 0.4);
+}
+
+.dark .bg-surface {
+    background-color: #27282c !important;
+}
+
+.dark .text-on-surface {
+    color: #ffffff !important;
+}
+
+.dark .bg-surface-container-low {
+    background-color: #232428 !important;
+}
+
+.dark .bg-surface-container {
+    background-color: #2b2d30 !important;
+}
+
+.dark .bg-surface-container-high {
+    background-color: #313338 !important;
+}
+
+.dark .bg-surface-container-highest {
+    background-color: #383a40 !important;
+}
+
+.dark .bg-surface-container-lowest {
+    background-color: #1e1f22 !important;
+}
+
+.dark .bg-surface-bright {
+    background-color: #3f4148 !important;
+}
+
+.dark .text-on-surface-variant {
+    color: #e0e0e0 !important;
+}
+
+.dark .bg-surface-variant {
+    background-color: #43454a !important;
+}
+
+.dark .hover\:bg-surface:hover {
+    background-color: #27282c !important;
+}
+
+.dark .hover\:bg-surface-container-low:hover {
+    background-color: #232428 !important;
+}
+
+.dark .hover\:bg-surface-container:hover {
+    background-color: #2b2d30 !important;
+}
+
+.dark .hover\:bg-surface-container-high:hover {
+    background-color: #313338 !important;
+}
+
+.dark .hover\:bg-surface-container-highest:hover {
+    background-color: #383a40 !important;
+}
+
+.dark .hover\:bg-surface-container-lowest:hover {
+    background-color: #1e1f22 !important;
+}
+
+.dark .hover\:bg-surface-bright:hover {
+    background-color: #3f4148 !important;
+}
+
+.dark .hover\:bg-surface-variant:hover {
+    background-color: #43454a !important;
+}
+
+.dark .border-outline-variant\/5 {
+    border-color: rgba(224, 224, 224, 0.05) !important;
+}
+
+.dark .border-outline-variant\/10 {
+    border-color: rgba(224, 224, 224, 0.1) !important;
+}
+
+.dark .border-outline-variant\/20 {
+    border-color: rgba(224, 224, 224, 0.2) !important;
+}
+
+.dark .border-outline-variant\/30 {
+    border-color: rgba(224, 224, 224, 0.3) !important;
+}
+
+.dark .text-on-surface-variant\/30 {
+    color: rgba(224, 224, 224, 0.3) !important;
+}
+
+.dark .text-on-surface-variant\/50 {
+    color: rgba(224, 224, 224, 0.5) !important;
+}
+
+.dark .text-on-surface-variant\/60 {
+    color: rgba(224, 224, 224, 0.6) !important;
+}
+
+.dark .bg-surface-container\/80 {
+    background-color: rgba(43, 45, 48, 0.8) !important;
+}
+
+.dark .hover\:bg-surface-container\/80:hover {
+    background-color: rgba(43, 45, 48, 0.8) !important;
+}
+
+.dark .hover\:bg-surface-container\/50:hover {
+    background-color: rgba(43, 45, 48, 0.5) !important;
+}
+
+.dark .hover\:bg-surface\/50:hover {
+    background-color: rgba(39, 40, 44, 0.5) !important;
+}
+
+.dark .bg-surface-container\/50 {
+    background-color: rgba(43, 45, 48, 0.5) !important;
+}
+
+.dark .bg-surface\/50 {
+    background-color: rgba(39, 40, 44, 0.5) !important;
+}
+
+.dark input, .dark select, .dark textarea {
+    color: #ffffff;
+}
+
+.dark select option {
+    background-color: #1c1d21 !important;
+    color: #ffffff !important;
+}
+
+.dark ::placeholder {
+    color: rgba(224, 224, 224, 0.5) !important;
+}
+
+.dark .text-primary {
+    color: #a5b4fc !important;
+}
+
+.dark .bg-primary {
+    background-color: #a5b4fc !important;
+}
+
+.dark .text-on-primary {
+    color: #1e1e2e !important;
+}
+
+.dark .border-primary {
+    border-color: #a5b4fc !important;
+}
+
+.dark .accent-primary {
+    accent-color: #a5b4fc !important;
+}
+
+.dark .group-focus-within\:text-primary:focus-within {
+    color: #a5b4fc !important;
+}
+
+.dark .group-hover\:text-primary:hover {
+    color: #a5b4fc !important;
+}
+
+.dark .hover\:text-primary:hover {
+    color: #a5b4fc !important;
+}
+
+.dark .focus\:ring-primary\/20:focus {
+    --tw-ring-color: rgba(165, 180, 252, 0.2) !important;
+}
+
+.dark .bg-primary\/5 {
+    background-color: rgba(165, 180, 252, 0.05) !important;
+}
+
+.dark .bg-primary\/10 {
+    background-color: rgba(165, 180, 252, 0.1) !important;
+}
+
+.dark .bg-primary\/20 {
+    background-color: rgba(165, 180, 252, 0.2) !important;
+}
+
+.dark .border-primary\/10 {
+    border-color: rgba(165, 180, 252, 0.1) !important;
+}
+
+.dark .border-primary\/20 {
+    border-color: rgba(165, 180, 252, 0.2) !important;
+}
+
+.dark .shadow-primary\/20 {
+    --tw-shadow-color: rgba(165, 180, 252, 0.2) !important;
+}
+

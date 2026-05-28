@@ -1,0 +1,17 @@
+/* ===== Flash al navegar a un destacado ===== */
+.flash-highlight {
+    animation: flashBg 1s ease-out;
+}
+
+@keyframes flashBg {
+
+    0%,
+    100% {
+        opacity: 1;
+    }
+
+    50% {
+        opacity: 0.3;
+    }
+}
+

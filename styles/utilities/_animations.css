@@ -1,0 +1,40 @@
+/* Animaciones Globales */
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(10px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+@keyframes gold-letter-anim {
+    0% {
+        color: inherit;
+    }
+
+    50% {
+        color: #daa520;
+    }
+
+    100% {
+        color: inherit;
+    }
+}
+
+.gold-letter {
+    display: inline-block;
+    animation: gold-letter-anim 1s ease-in-out;
+}
+
+#notebook-view {
+    animation: fadeIn 0.3s ease-out;
+}
+
+#dashboard {
+    animation: fadeIn 0.3s ease-out;
+}
+

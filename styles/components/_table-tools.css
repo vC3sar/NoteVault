@@ -1,0 +1,48 @@
+.table-tool-btn {
+    border: 1px solid rgba(99, 102, 241, 0.2);
+    background: rgba(99, 102, 241, 0.06);
+    color: inherit;
+    border-radius: 0.5rem;
+    font-size: 11px;
+    font-weight: 700;
+    line-height: 1;
+    padding: 0.35rem 0.45rem;
+    transition: background-color 0.18s ease, border-color 0.18s ease;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.35rem;
+}
+
+.table-tool-btn:hover {
+    background: rgba(99, 102, 241, 0.16);
+    border-color: rgba(99, 102, 241, 0.35);
+}
+
+.table-tool-parent {
+    font-size: 12px;
+    padding: 0.42rem 0.55rem;
+}
+
+.table-submenu {
+    position: absolute;
+    top: calc(100% + 2px);
+    left: 0;
+    min-width: 188px;
+    background: rgba(255, 255, 255, 0.95);
+    border: 1px solid rgba(99, 102, 241, 0.22);
+    border-radius: 0.7rem;
+    box-shadow: 0 12px 26px rgba(15, 23, 42, 0.18);
+    backdrop-filter: blur(4px);
+    padding: 0.4rem;
+    display: flex;
+    flex-direction: column;
+    gap: 0.3rem;
+    transition: opacity 0.15s ease;
+}
+
+.dark .table-submenu {
+    background: rgba(15, 23, 42, 0.96);
+    border-color: rgba(148, 163, 184, 0.35);
+    box-shadow: 0 12px 26px rgba(2, 6, 23, 0.45);
+}
+

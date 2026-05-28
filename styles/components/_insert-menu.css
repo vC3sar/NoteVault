@@ -1,0 +1,35 @@
+.insert-tab-btn {
+    border: 1px solid rgba(99, 102, 241, 0.18);
+    background: rgba(99, 102, 241, 0.05);
+    color: inherit;
+    border-radius: 0.6rem;
+    padding: 0.4rem 0.65rem;
+    font-size: 12px;
+    font-weight: 700;
+    transition: all .16s ease;
+    white-space: nowrap;
+}
+
+.insert-tab-btn:hover {
+    background: rgba(99, 102, 241, 0.14);
+}
+
+.insert-card {
+    width: 100%;
+    display: flex;
+    gap: .6rem;
+    align-items: center;
+    text-align: left;
+    border: 1px solid rgba(99, 102, 241, 0.18);
+    background: rgba(99, 102, 241, 0.04);
+    border-radius: 0.9rem;
+    padding: 0.75rem 0.85rem;
+    transition: all .16s ease;
+}
+
+.insert-card:hover {
+    background: rgba(99, 102, 241, 0.12);
+    border-color: rgba(99, 102, 241, 0.32);
+    transform: translateY(-1px);
+}
+

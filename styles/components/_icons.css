@@ -1,0 +1,8 @@
+/* Estilos base para iconos Lucide */
+[data-lucide] {
+    width: 18px;
+    height: 18px;
+    stroke-width: 2px;
+    flex-shrink: 0;
+}
+

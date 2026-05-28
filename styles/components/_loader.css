@@ -1,0 +1,40 @@
+/* Pantalla de Carga (Tres puntos) */
+.dots-loader {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 8px;
+    padding: 20px;
+}
+
+.dots-loader div {
+    width: 14px;
+    height: 14px;
+    background-color: var(--primary, #4338ca);
+    border-radius: 50%;
+    animation: bounce 1.4s infinite ease-in-out both;
+}
+
+.dots-loader div:nth-child(1) {
+    animation-delay: -0.32s;
+}
+
+.dots-loader div:nth-child(2) {
+    animation-delay: -0.16s;
+}
+
+@keyframes bounce {
+
+    0%,
+    80%,
+    100% {
+        transform: scale(0);
+        opacity: 0.5;
+    }
+
+    40% {
+        transform: scale(1);
+        opacity: 1;
+    }
+}
+

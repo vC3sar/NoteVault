@@ -1,0 +1,18 @@
+/* ===== Custom Context Menu Dark Mode Fix ===== */
+.dark #custom-context-menu,
+.dark #custom-context-menu div.absolute {
+    background-color: rgba(15, 23, 42, 0.98) !important;
+    border-color: rgba(255, 255, 255, 0.1) !important;
+    color: #e2e8f0 !important;
+}
+
+.dark #custom-context-menu .menu-item:hover,
+.dark #custom-context-menu button:hover {
+    background-color: rgba(67, 56, 202, 0.2) !important;
+    color: #ffffff !important;
+}
+
+.dark #custom-context-menu .h-px {
+    background-color: rgba(255, 255, 255, 0.05) !important;
+}
+

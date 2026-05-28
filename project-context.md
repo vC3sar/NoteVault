@@ -86,9 +86,603 @@ preload.js
 README.md
 renderer.js
 styles.css
+styles/base/_reset.css
+styles/base/_typography.css
+styles/base/_variables.css
+styles/components/_context-menu.css
+styles/components/_editor-formatting.css
+styles/components/_editor.css
+styles/components/_forms.css
+styles/components/_icons.css
+styles/components/_insert-blocks.css
+styles/components/_insert-menu.css
+styles/components/_loader.css
+styles/components/_media-player.css
+styles/components/_navigation.css
+styles/components/_notebook.css
+styles/components/_table-preview.css
+styles/components/_table-tools.css
+styles/components/_voice-note.css
+styles/layout/_sidebar.css
+styles/main.css
+styles/utilities/_animations.css
+styles/utilities/_contenteditable.css
+styles/utilities/_helpers.css
+styles/utilities/_scrollbars.css
 ```
 
 # Files
+
+## File: styles/base/_reset.css
+````css
+body {
+````
+
+## File: styles/base/_typography.css
+````css
+.logo-font {
+````
+
+## File: styles/base/_variables.css
+````css
+:root {
+⋮----
+.dark {
+⋮----
+.dark .bg-surface {
+⋮----
+.dark .text-on-surface {
+⋮----
+.dark .bg-surface-container-low {
+⋮----
+.dark .bg-surface-container {
+⋮----
+.dark .bg-surface-container-high {
+⋮----
+.dark .bg-surface-container-highest {
+⋮----
+.dark .bg-surface-container-lowest {
+⋮----
+.dark .bg-surface-bright {
+⋮----
+.dark .text-on-surface-variant {
+⋮----
+.dark .bg-surface-variant {
+⋮----
+.dark .hover\:bg-surface:hover {
+⋮----
+.dark .hover\:bg-surface-container-low:hover {
+⋮----
+.dark .hover\:bg-surface-container:hover {
+⋮----
+.dark .hover\:bg-surface-container-high:hover {
+⋮----
+.dark .hover\:bg-surface-container-highest:hover {
+⋮----
+.dark .hover\:bg-surface-container-lowest:hover {
+⋮----
+.dark .hover\:bg-surface-bright:hover {
+⋮----
+.dark .hover\:bg-surface-variant:hover {
+⋮----
+.dark .border-outline-variant\/5 {
+⋮----
+.dark .border-outline-variant\/10 {
+⋮----
+.dark .border-outline-variant\/20 {
+⋮----
+.dark .border-outline-variant\/30 {
+⋮----
+.dark .text-on-surface-variant\/30 {
+⋮----
+.dark .text-on-surface-variant\/50 {
+⋮----
+.dark .text-on-surface-variant\/60 {
+⋮----
+.dark .bg-surface-container\/80 {
+⋮----
+.dark .hover\:bg-surface-container\/80:hover {
+⋮----
+.dark .hover\:bg-surface-container\/50:hover {
+⋮----
+.dark .hover\:bg-surface\/50:hover {
+⋮----
+.dark .bg-surface-container\/50 {
+⋮----
+.dark .bg-surface\/50 {
+⋮----
+.dark input, .dark select, .dark textarea {
+⋮----
+.dark select option {
+⋮----
+.dark ::placeholder {
+⋮----
+.dark .text-primary {
+⋮----
+.dark .bg-primary {
+⋮----
+.dark .text-on-primary {
+⋮----
+.dark .border-primary {
+⋮----
+.dark .accent-primary {
+⋮----
+.dark .group-focus-within\:text-primary:focus-within {
+⋮----
+.dark .group-hover\:text-primary:hover {
+⋮----
+.dark .hover\:text-primary:hover {
+⋮----
+.dark .focus\:ring-primary\/20:focus {
+⋮----
+.dark .bg-primary\/5 {
+⋮----
+.dark .bg-primary\/10 {
+⋮----
+.dark .bg-primary\/20 {
+⋮----
+.dark .border-primary\/10 {
+⋮----
+.dark .border-primary\/20 {
+⋮----
+.dark .shadow-primary\/20 {
+````
+
+## File: styles/components/_context-menu.css
+````css
+.dark #custom-context-menu,
+⋮----
+.dark #custom-context-menu .menu-item:hover,
+⋮----
+.dark #custom-context-menu .h-px {
+````
+
+## File: styles/components/_editor-formatting.css
+````css
+.dark #editor font[color="#37352f"],
+⋮----
+#editor font[size="1"] {
+⋮----
+#editor font[size="2"] {
+⋮----
+#editor font[size="3"] {
+⋮----
+#editor font[size="4"] {
+⋮----
+#editor font[size="5"] {
+⋮----
+#editor font[size="6"] {
+⋮----
+#editor font[size="7"] {
+⋮----
+.highlight-yellow,
+⋮----
+.highlight-blue,
+⋮----
+.highlight-green,
+⋮----
+.highlight-red,
+⋮----
+.highlight-orange,
+⋮----
+.highlight-pink,
+⋮----
+.highlight-purple,
+⋮----
+.highlight-indigo,
+⋮----
+.highlight-teal,
+⋮----
+.highlight-cyan,
+⋮----
+.highlight-lime,
+⋮----
+.highlight-amber,
+⋮----
+.highlight-rose,
+⋮----
+.highlight-gray,
+⋮----
+.highlight-brown,
+⋮----
+.highlight-mint,
+⋮----
+.dark .highlight-yellow,
+⋮----
+.dark .highlight-blue,
+⋮----
+.dark .highlight-green,
+⋮----
+.dark .highlight-red,
+⋮----
+.dark .highlight-orange,
+⋮----
+.dark .highlight-pink,
+⋮----
+.dark .highlight-purple,
+⋮----
+.dark .highlight-indigo,
+⋮----
+.dark .highlight-teal,
+⋮----
+.dark .highlight-cyan,
+⋮----
+.dark .highlight-lime,
+⋮----
+.dark .highlight-amber,
+⋮----
+.dark .highlight-rose,
+⋮----
+.dark .highlight-gray,
+⋮----
+.dark .highlight-brown,
+⋮----
+.dark .highlight-mint,
+````
+
+## File: styles/components/_editor.css
+````css
+#editor {
+⋮----
+#editor h2 {
+⋮----
+#editor h3 {
+⋮----
+#editor ul,
+⋮----
+#editor ul {
+⋮----
+#editor ol {
+⋮----
+#editor li {
+⋮----
+#editor ul.editor-check-list {
+⋮----
+#editor ul.editor-check-list li {
+⋮----
+#editor blockquote {
+⋮----
+#editor pre {
+⋮----
+#editor pre code,
+⋮----
+#editor :not(pre) > code {
+⋮----
+#editor table {
+⋮----
+#editor thead {
+⋮----
+#editor th,
+⋮----
+#editor th {
+⋮----
+#editor .insert-callout-placeholder {
+⋮----
+#editor .insert-callout-label {
+⋮----
+#editor .insert-callout-icon-wrap {
+⋮----
+#editor .insert-callout-icon {
+⋮----
+#editor tbody tr:nth-child(even) {
+⋮----
+#editor s,
+⋮----
+.dark #editor,
+⋮----
+.dark #editor table {
+⋮----
+.dark #editor thead {
+⋮----
+.dark #editor th,
+⋮----
+.dark #editor th {
+⋮----
+.dark #editor h2,
+⋮----
+.dark #editor blockquote {
+⋮----
+.dark #editor pre {
+⋮----
+.dark #editor .insert-block-card,
+⋮----
+.dark #editor .insert-block-desc,
+⋮----
+.dark #editor .insert-chip {
+⋮----
+#editor .insert-columns-2,
+⋮----
+.dark #editor tbody tr:nth-child(even) {
+````
+
+## File: styles/components/_forms.css
+````css
+input[type="color"]::-webkit-color-swatch-wrapper {
+⋮----
+input[type="color"]::-webkit-color-swatch {
+````
+
+## File: styles/components/_icons.css
+````css
+[data-lucide] {
+````
+
+## File: styles/components/_insert-blocks.css
+````css
+#editor .insert-block-card {
+⋮----
+#editor .insert-block-title {
+⋮----
+#editor .insert-block-desc,
+⋮----
+#editor .insert-chip {
+⋮----
+#editor .insert-columns {
+⋮----
+#editor .insert-columns-2 {
+⋮----
+#editor .insert-columns-3 {
+⋮----
+#editor .insert-aside {
+⋮----
+#editor .insert-cover {
+⋮----
+#editor .insert-progress {
+⋮----
+#editor .insert-progress > div {
+⋮----
+#editor .insert-block audio {
+⋮----
+#editor .insert-block audio::-webkit-media-controls-panel {
+⋮----
+#editor .insert-block audio::-webkit-media-controls-play-button,
+⋮----
+.dark #editor .insert-block audio {
+⋮----
+.dark #editor .insert-block audio::-webkit-media-controls-panel {
+````
+
+## File: styles/components/_insert-menu.css
+````css
+.insert-tab-btn {
+⋮----
+.insert-tab-btn:hover {
+⋮----
+.insert-card {
+⋮----
+.insert-card:hover {
+````
+
+## File: styles/components/_loader.css
+````css
+.dots-loader {
+⋮----
+.dots-loader div {
+⋮----
+.dots-loader div:nth-child(1) {
+⋮----
+.dots-loader div:nth-child(2) {
+````
+
+## File: styles/components/_media-player.css
+````css
+.glass-player-card {
+⋮----
+.dark .glass-player-card {
+⋮----
+.glass-player-card:hover {
+⋮----
+.player-btn-secondary {
+⋮----
+.dark .player-btn-secondary {
+⋮----
+.player-btn-secondary:hover {
+⋮----
+.dark .player-btn-secondary:hover {
+⋮----
+.player-btn-secondary:active {
+⋮----
+.player-play-btn {
+⋮----
+.player-play-btn:hover {
+⋮----
+.player-play-btn:active {
+⋮----
+.player-play-btn::after {
+⋮----
+.player-play-btn:hover::after {
+````
+
+## File: styles/components/_navigation.css
+````css
+.nav-item.active {
+⋮----
+.dark .nav-item.active {
+````
+
+## File: styles/components/_notebook.css
+````css
+.notebook-spine {
+⋮----
+.notebook-spine::after {
+⋮----
+.notebook-ring {
+⋮----
+.dark .notebook-ring {
+````
+
+## File: styles/components/_table-preview.css
+````css
+.group\/sub.submenu-open .table-submenu {
+⋮----
+#editor td.table-preview-cell,
+⋮----
+#editor tr.table-preview-row > td,
+⋮----
+#editor td.table-preview-col,
+⋮----
+#editor tr.table-preview-row-add > td,
+⋮----
+#editor tr.table-preview-row-del > td,
+⋮----
+#editor table.table-preview-resize-plus {
+⋮----
+#editor table.table-preview-resize-minus {
+⋮----
+#editor td.table-preview-merge,
+⋮----
+#editor td.table-preview-merge-anchor,
+⋮----
+#editor td.table-preview-merge-removed,
+⋮----
+#editor td.table-preview-split,
+````
+
+## File: styles/components/_table-tools.css
+````css
+.table-tool-btn {
+⋮----
+.table-tool-btn:hover {
+⋮----
+.table-tool-parent {
+⋮----
+.table-submenu {
+⋮----
+.dark .table-submenu {
+````
+
+## File: styles/components/_voice-note.css
+````css
+#editor .voice-note {
+⋮----
+#editor .voice-note:hover {
+⋮----
+#editor .voice-note-content {
+⋮----
+#editor .voice-note-header {
+⋮----
+#editor .voice-note-badge,
+⋮----
+#editor .voice-note-badge {
+⋮----
+#editor .voice-note-badge::before {
+⋮----
+#editor .voice-note-status {
+⋮----
+#editor .voice-note-title {
+⋮----
+#editor .voice-note-title:focus {
+⋮----
+#editor .voice-note-meta {
+⋮----
+#editor .voice-note.voice-note-playing {
+⋮----
+.dark #editor .voice-note {
+⋮----
+.dark #editor .voice-note.voice-note-playing {
+⋮----
+.dark #editor .voice-note-meta {
+⋮----
+.dark #editor .voice-note-title {
+⋮----
+.dark #editor .voice-note-badge {
+⋮----
+.dark #editor .voice-note-status {
+⋮----
+#editor .voice-note-native-audio {
+⋮----
+#editor .voice-note-native-audio::-webkit-media-controls-panel {
+⋮----
+.dark #editor .voice-note-native-audio {
+⋮----
+.dark #editor .voice-note-native-audio::-webkit-media-controls-panel {
+````
+
+## File: styles/layout/_sidebar.css
+````css
+#sidebar.collapsed {
+⋮----
+#sidebar.collapsed .sidebar-text {
+⋮----
+#sidebar.collapsed .mb-8.px-2 {
+⋮----
+#sidebar.collapsed .nav-item,
+⋮----
+#sidebar.collapsed .nav-item i,
+⋮----
+#sidebar.collapsed h4 {
+⋮----
+#sidebar.collapsed #media-player {
+⋮----
+#sidebar.collapsed #media-player .bg-slate-800 {
+⋮----
+#sidebar.collapsed #media-player .flex.items-center.justify-between.mb-2 {
+⋮----
+#sidebar.collapsed .mt-auto.pt-4.border-t {
+⋮----
+#sidebar.collapsed .notebook-item {
+#sidebar.collapsed #notebook-list {
+#sidebar.collapsed #notebook-list { margin: 0; padding: 0; }
+#sidebar.collapsed #notebook-list a { justify-content: center; padding: 12px 0; }
+#sidebar.collapsed #notebook-list a div.shrink-0 { margin: 0 !important; }
+⋮----
+#sidebar.collapsed #notebook-list a.is-favorite { background-color: rgba(251, 191, 36, 0.08) !important; position: relative; box-shadow: inset 0 0 10px rgba(251, 191, 36, 0.1); }
+#sidebar.collapsed #notebook-list a.is-favorite::after { content: ''; position: absolute; left: 4px; top: 50%; transform: translateY(-50%); width: 3px; height: 16px; background-color: #fbbf24; border-radius: 0 4px 4px 0; box-shadow: 0 0 8px rgba(251, 191, 36, 0.6); }
+.dark #sidebar.collapsed #notebook-list a.is-favorite { background-color: rgba(251, 191, 36, 0.12) !important; box-shadow: inset 0 0 15px rgba(251, 191, 36, 0.15); }
+#sidebar.collapsed .notebook-fav-icon { display: none !important; }
+⋮----
+#notes-panel.collapsed {
+⋮----
+#sidebar:not(.collapsed) #main-nav-links,
+#sidebar:not(.collapsed) #main-nav-links > * + *,
+#sidebar:not(.collapsed) #main-nav-links .nav-item,
+#sidebar:not(.collapsed) #main-nav-links .sidebar-text,
+````
+
+## File: styles/main.css
+````css
+
+````
+
+## File: styles/utilities/_animations.css
+````css
+.gold-letter {
+⋮----
+#notebook-view {
+⋮----
+#dashboard {
+````
+
+## File: styles/utilities/_contenteditable.css
+````css
+[contenteditable]:empty:before {
+````
+
+## File: styles/utilities/_helpers.css
+````css
+.flash-highlight {
+````
+
+## File: styles/utilities/_scrollbars.css
+````css
+.custom-scrollbar {
+⋮----
+.dark .custom-scrollbar {
+⋮----
+.custom-scrollbar::-webkit-scrollbar {
+⋮----
+.custom-scrollbar:hover::-webkit-scrollbar {
+⋮----
+.custom-scrollbar::-webkit-scrollbar-track {
+⋮----
+.custom-scrollbar::-webkit-scrollbar-thumb {
+⋮----
+.custom-scrollbar::-webkit-scrollbar-thumb:hover {
+⋮----
+.dark .custom-scrollbar::-webkit-scrollbar-thumb {
+⋮----
+.dark .custom-scrollbar::-webkit-scrollbar-thumb:hover {
+````
 
 ## File: .github/workflows/main.yml
 ````yaml
@@ -2072,530 +2666,5 @@ reader.onload = (ev)
 
 ## File: styles.css
 ````css
-body {
-⋮----
-.logo-font {
-⋮----
-.dots-loader {
-⋮----
-.dots-loader div {
-⋮----
-.dots-loader div:nth-child(1) {
-⋮----
-.dots-loader div:nth-child(2) {
-⋮----
-.gold-letter {
-⋮----
-#notebook-view {
-⋮----
-#dashboard {
-⋮----
-[data-lucide] {
-⋮----
-#editor {
-⋮----
-#editor h2 {
-⋮----
-#editor h3 {
-⋮----
-#editor ul,
-⋮----
-#editor ul {
-⋮----
-#editor ol {
-⋮----
-#editor li {
-⋮----
-#editor ul.editor-check-list {
-⋮----
-#editor ul.editor-check-list li {
-⋮----
-#editor blockquote {
-⋮----
-#editor pre {
-⋮----
-#editor pre code,
-⋮----
-#editor :not(pre) > code {
-⋮----
-#editor table {
-⋮----
-#editor thead {
-⋮----
-#editor th,
-⋮----
-#editor th {
-⋮----
-#editor .insert-callout-placeholder {
-⋮----
-#editor .insert-callout-label {
-⋮----
-#editor .insert-callout-icon-wrap {
-⋮----
-#editor .insert-callout-icon {
-⋮----
-#editor tbody tr:nth-child(even) {
-⋮----
-#editor s,
-⋮----
-.dark #editor,
-⋮----
-.dark #editor table {
-⋮----
-.dark #editor thead {
-⋮----
-.dark #editor th,
-⋮----
-.dark #editor th {
-⋮----
-.dark #editor h2,
-⋮----
-.dark #editor blockquote {
-⋮----
-.dark #editor pre {
-⋮----
-.dark #editor .insert-block-card,
-⋮----
-.dark #editor .insert-block-desc,
-⋮----
-.dark #editor .insert-chip {
-⋮----
-#editor .insert-columns-2,
-⋮----
-.dark #editor tbody tr:nth-child(even) {
-⋮----
-.table-tool-btn {
-⋮----
-.table-tool-btn:hover {
-⋮----
-.table-tool-parent {
-⋮----
-.table-submenu {
-⋮----
-.dark .table-submenu {
-⋮----
-.insert-tab-btn {
-⋮----
-.insert-tab-btn:hover {
-⋮----
-.insert-card {
-⋮----
-.insert-card:hover {
-⋮----
-#editor .insert-block-card {
-⋮----
-#editor .insert-block-title {
-⋮----
-#editor .insert-block-desc,
-⋮----
-#editor .insert-chip {
-⋮----
-#editor .insert-columns {
-⋮----
-#editor .insert-columns-2 {
-⋮----
-#editor .insert-columns-3 {
-⋮----
-#editor .insert-aside {
-⋮----
-#editor .insert-cover {
-⋮----
-#editor .insert-progress {
-⋮----
-#editor .insert-progress > div {
-⋮----
-#editor .insert-block audio {
-⋮----
-#editor .insert-block audio::-webkit-media-controls-panel {
-⋮----
-#editor .insert-block audio::-webkit-media-controls-play-button,
-⋮----
-.dark #editor .insert-block audio {
-⋮----
-.dark #editor .insert-block audio::-webkit-media-controls-panel {
-⋮----
-#editor .voice-note {
-⋮----
-#editor .voice-note:hover {
-⋮----
-#editor .voice-note-content {
-⋮----
-#editor .voice-note-header {
-⋮----
-#editor .voice-note-badge,
-⋮----
-#editor .voice-note-badge {
-⋮----
-#editor .voice-note-badge::before {
-⋮----
-#editor .voice-note-status {
-⋮----
-#editor .voice-note-title {
-⋮----
-#editor .voice-note-title:focus {
-⋮----
-#editor .voice-note-meta {
-⋮----
-#editor .voice-note.voice-note-playing {
-⋮----
-.dark #editor .voice-note {
-⋮----
-.dark #editor .voice-note.voice-note-playing {
-⋮----
-.dark #editor .voice-note-meta {
-⋮----
-.dark #editor .voice-note-title {
-⋮----
-.dark #editor .voice-note-badge {
-⋮----
-.dark #editor .voice-note-status {
-⋮----
-#editor .voice-note-native-audio {
-⋮----
-#editor .voice-note-native-audio::-webkit-media-controls-panel {
-⋮----
-.dark #editor .voice-note-native-audio {
-⋮----
-.dark #editor .voice-note-native-audio::-webkit-media-controls-panel {
-⋮----
-.group\/sub.submenu-open .table-submenu {
-⋮----
-#editor td.table-preview-cell,
-⋮----
-#editor tr.table-preview-row > td,
-⋮----
-#editor td.table-preview-col,
-⋮----
-#editor tr.table-preview-row-add > td,
-⋮----
-#editor tr.table-preview-row-del > td,
-⋮----
-#editor table.table-preview-resize-plus {
-⋮----
-#editor table.table-preview-resize-minus {
-⋮----
-#editor td.table-preview-merge,
-⋮----
-#editor td.table-preview-merge-anchor,
-⋮----
-#editor td.table-preview-merge-removed,
-⋮----
-#editor td.table-preview-split,
-⋮----
-[contenteditable]:empty:before {
-⋮----
-/* Fix background for active note/notebook selection */
-.nav-item.active {
-⋮----
-.dark .nav-item.active {
-⋮----
-/* Custom Scrollbar Minimalist - High Quality with Hover Expansion */
-.custom-scrollbar {
-⋮----
-.dark .custom-scrollbar {
-⋮----
-.custom-scrollbar::-webkit-scrollbar {
-⋮----
-.custom-scrollbar:hover::-webkit-scrollbar {
-⋮----
-.custom-scrollbar::-webkit-scrollbar-track {
-⋮----
-.custom-scrollbar::-webkit-scrollbar-thumb {
-⋮----
-.custom-scrollbar::-webkit-scrollbar-thumb:hover {
-⋮----
-.dark .custom-scrollbar::-webkit-scrollbar-thumb {
-⋮----
-.dark .custom-scrollbar::-webkit-scrollbar-thumb:hover {
-⋮----
-/* Hide input color default picker UI */
-input[type="color"]::-webkit-color-swatch-wrapper {
-⋮----
-input[type="color"]::-webkit-color-swatch {
-⋮----
-.notebook-spine {
-⋮----
-.notebook-spine::after {
-⋮----
-.notebook-ring {
-⋮----
-.dark .notebook-ring {
-⋮----
-/* Dark Mode Graphite */
-:root {
-⋮----
-.dark {
-⋮----
-.dark .bg-surface {
-⋮----
-.dark .text-on-surface {
-⋮----
-.dark .bg-surface-container-low {
-⋮----
-.dark .bg-surface-container {
-⋮----
-.dark .bg-surface-container-high {
-⋮----
-.dark .bg-surface-container-highest {
-⋮----
-.dark .bg-surface-container-lowest {
-⋮----
-.dark .bg-surface-bright {
-⋮----
-.dark .text-on-surface-variant {
-⋮----
-.dark .bg-surface-variant {
-⋮----
-.dark .hover\:bg-surface:hover {
-⋮----
-.dark .hover\:bg-surface-container-low:hover {
-⋮----
-.dark .hover\:bg-surface-container:hover {
-⋮----
-.dark .hover\:bg-surface-container-high:hover {
-⋮----
-.dark .hover\:bg-surface-container-highest:hover {
-⋮----
-.dark .hover\:bg-surface-container-lowest:hover {
-⋮----
-.dark .hover\:bg-surface-bright:hover {
-⋮----
-.dark .hover\:bg-surface-variant:hover {
-⋮----
-.dark .border-outline-variant\/5 {
-⋮----
-.dark .border-outline-variant\/10 {
-⋮----
-.dark .border-outline-variant\/20 {
-⋮----
-.dark .border-outline-variant\/30 {
-⋮----
-.dark .text-on-surface-variant\/30 {
-⋮----
-.dark .text-on-surface-variant\/50 {
-⋮----
-.dark .text-on-surface-variant\/60 {
-⋮----
-.dark .bg-surface-container\/80 {
-⋮----
-.dark .hover\:bg-surface-container\/80:hover {
-⋮----
-.dark .hover\:bg-surface-container\/50:hover {
-⋮----
-.dark .hover\:bg-surface\/50:hover {
-⋮----
-.dark .bg-surface-container\/50 {
-⋮----
-.dark .bg-surface\/50 {
-⋮----
-.dark input, .dark select, .dark textarea {
-⋮----
-.dark select option {
-⋮----
-.dark ::placeholder {
-⋮----
-.dark .text-primary {
-⋮----
-.dark .bg-primary {
-⋮----
-.dark .text-on-primary {
-⋮----
-.dark .border-primary {
-⋮----
-.dark .accent-primary {
-⋮----
-.dark .group-focus-within\:text-primary:focus-within {
-⋮----
-.dark .group-hover\:text-primary:hover {
-⋮----
-.dark .hover\:text-primary:hover {
-⋮----
-.dark .focus\:ring-primary\/20:focus {
-⋮----
-.dark .bg-primary\/5 {
-⋮----
-.dark .bg-primary\/10 {
-⋮----
-.dark .bg-primary\/20 {
-⋮----
-.dark .border-primary\/10 {
-⋮----
-.dark .border-primary\/20 {
-⋮----
-.dark .shadow-primary\/20 {
-⋮----
-/* execCommand genera font tags con colores oscuros en dark mode */
-.dark #editor font[color="#37352f"],
-⋮----
-/* ===== Tamaños de fuente (Mapeo de execCommand 1-7) ===== */
-#editor font[size="1"] {
-⋮----
-#editor font[size="2"] {
-⋮----
-#editor font[size="3"] {
-⋮----
-#editor font[size="4"] {
-⋮----
-#editor font[size="5"] {
-⋮----
-#editor font[size="6"] {
-⋮----
-#editor font[size="7"] {
-⋮----
-/* ===== Resaltados: Efecto marcador (Background) ===== */
-/* Soporta tanto mis clases como el estilo generado por execCommand('backColor') */
-.highlight-yellow,
-⋮----
-.highlight-blue,
-⋮----
-.highlight-green,
-⋮----
-.highlight-red,
-⋮----
-.highlight-orange,
-⋮----
-.highlight-pink,
-⋮----
-.highlight-purple,
-⋮----
-.highlight-indigo,
-⋮----
-.highlight-teal,
-⋮----
-.highlight-cyan,
-⋮----
-.highlight-lime,
-⋮----
-.highlight-amber,
-⋮----
-.highlight-rose,
-⋮----
-.highlight-gray,
-⋮----
-.highlight-brown,
-⋮----
-.highlight-mint,
-⋮----
-.dark .highlight-yellow,
-⋮----
-.dark .highlight-blue,
-⋮----
-.dark .highlight-green,
-⋮----
-.dark .highlight-red,
-⋮----
-.dark .highlight-orange,
-⋮----
-.dark .highlight-pink,
-⋮----
-.dark .highlight-purple,
-⋮----
-.dark .highlight-indigo,
-⋮----
-.dark .highlight-teal,
-⋮----
-.dark .highlight-cyan,
-⋮----
-.dark .highlight-lime,
-⋮----
-.dark .highlight-amber,
-⋮----
-.dark .highlight-rose,
-⋮----
-.dark .highlight-gray,
-⋮----
-.dark .highlight-brown,
-⋮----
-.dark .highlight-mint,
-⋮----
-.dark #custom-context-menu,
-⋮----
-.dark #custom-context-menu .menu-item:hover,
-⋮----
-.dark #custom-context-menu .h-px {
-⋮----
-.flash-highlight {
-⋮----
-#sidebar.collapsed {
-⋮----
-#sidebar.collapsed .sidebar-text {
-⋮----
-#sidebar.collapsed .mb-8.px-2 {
-⋮----
-#sidebar.collapsed .nav-item,
-⋮----
-#sidebar.collapsed .nav-item i,
-⋮----
-#sidebar.collapsed h4 {
-⋮----
-#sidebar.collapsed #media-player {
-⋮----
-#sidebar.collapsed #media-player .bg-slate-800 {
-⋮----
-#sidebar.collapsed #media-player .flex.items-center.justify-between.mb-2 {
-⋮----
-#sidebar.collapsed .mt-auto.pt-4.border-t {
-⋮----
-#sidebar.collapsed .notebook-item {
-#sidebar.collapsed #notebook-list {
-#sidebar.collapsed #notebook-list { margin: 0; padding: 0; }
-#sidebar.collapsed #notebook-list a { justify-content: center; padding: 12px 0; }
-#sidebar.collapsed #notebook-list a div.shrink-0 { margin: 0 !important; }
-⋮----
-#sidebar.collapsed #notebook-list a.is-favorite { background-color: rgba(251, 191, 36, 0.08) !important; position: relative; box-shadow: inset 0 0 10px rgba(251, 191, 36, 0.1); }
-#sidebar.collapsed #notebook-list a.is-favorite::after { content: ''; position: absolute; left: 4px; top: 50%; transform: translateY(-50%); width: 3px; height: 16px; background-color: #fbbf24; border-radius: 0 4px 4px 0; box-shadow: 0 0 8px rgba(251, 191, 36, 0.6); }
-.dark #sidebar.collapsed #notebook-list a.is-favorite { background-color: rgba(251, 191, 36, 0.12) !important; box-shadow: inset 0 0 15px rgba(251, 191, 36, 0.15); }
-#sidebar.collapsed .notebook-fav-icon { display: none !important; }
-⋮----
-/* ===== Notes Panel Collapse ===== */
-#notes-panel.collapsed {
-⋮----
-/* ===== Responsive Sidebar Menu for Short Screens ===== */
-⋮----
-#sidebar:not(.collapsed) #main-nav-links,
-#sidebar:not(.collapsed) #main-nav-links > * + *,
-⋮----
-margin-top: 0 !important; /* override space-y-1 */
-⋮----
-#sidebar:not(.collapsed) #main-nav-links .nav-item,
-#sidebar:not(.collapsed) #main-nav-links .sidebar-text,
-⋮----
-/* ===== Premium Media Player Styles ===== */
-.glass-player-card {
-⋮----
-background: rgba(245, 247, 255, 0.98) !important; /* Más opaco y con tinte azul */
-⋮----
-border: 1px solid rgba(99, 102, 241, 0.3) !important; /* Borde más saturado */
-⋮----
-.dark .glass-player-card {
-⋮----
-.glass-player-card:hover {
-⋮----
-.player-btn-secondary {
-⋮----
-color: #6366f1; /* Indigo 500 (más vivo que slate) */
-⋮----
-.dark .player-btn-secondary {
-⋮----
-color: #94a3b8; /* Slate 400 */
-⋮----
-.player-btn-secondary:hover {
-⋮----
-color: #4f46e5; /* Indigo 600 */
-⋮----
-.dark .player-btn-secondary:hover {
-⋮----
-.player-btn-secondary:active {
-⋮----
-.player-play-btn {
-⋮----
-.player-play-btn:hover {
-⋮----
-transform: scale(1.08) rotate(3deg); /* Slightly less scale and rotation to avoid clipping */
-⋮----
-.player-play-btn:active {
-⋮----
-.player-play-btn::after {
-⋮----
-.player-play-btn:hover::after {
+
 ````

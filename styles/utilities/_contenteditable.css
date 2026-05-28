@@ -1,0 +1,7 @@
+[contenteditable]:empty:before {
+    content: attr(placeholder);
+    color: #a1a1aa;
+    pointer-events: none;
+    display: block;
+}
+

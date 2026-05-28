@@ -1,0 +1,115 @@
+/* ===== Sidebar Collapse ===== */
+#sidebar.collapsed {
+    width: 72px;
+    padding-left: 10px;
+    padding-right: 10px;
+}
+
+#sidebar.collapsed .sidebar-text {
+    opacity: 0;
+    pointer-events: none;
+    width: 0;
+    display: none !important;
+}
+
+/* Centrar Logo */
+#sidebar.collapsed .mb-8.px-2 {
+    padding-left: 0;
+    padding-right: 0;
+    justify-content: center;
+    gap: 0;
+}
+
+#sidebar.collapsed .nav-item, 
+#sidebar.collapsed #add-notebook {
+    justify-content: center;
+    padding-left: 0;
+    padding-right: 0;
+    width: 48px;
+    height: 48px;
+    margin: 0 auto;
+}
+
+#sidebar.collapsed .nav-item i,
+#sidebar.collapsed #add-notebook i {
+    width: 20px;
+    height: 20px;
+}
+
+#sidebar.collapsed h4 {
+    justify-content: center;
+    padding: 0;
+}
+
+#sidebar.collapsed #media-player {
+    padding: 0;
+}
+
+#sidebar.collapsed #media-player .bg-slate-800 {
+    padding: 12px 4px;
+}
+
+#sidebar.collapsed #media-player .flex.items-center.justify-between.mb-2 {
+    justify-content: center;
+}
+
+#sidebar.collapsed .mt-auto.pt-4.border-t {
+    padding-left: 0;
+    padding-right: 0;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+}
+
+#sidebar.collapsed .notebook-item {
+    justify-content: center;
+}
+#sidebar.collapsed #notebook-list {
+    justify-content: center;
+}
+#sidebar.collapsed #notebook-list { margin: 0; padding: 0; }
+#sidebar.collapsed #notebook-list a { justify-content: center; padding: 12px 0; }
+#sidebar.collapsed #notebook-list a div.shrink-0 { margin: 0 !important; }
+
+#sidebar.collapsed #notebook-list a.is-favorite { background-color: rgba(251, 191, 36, 0.08) !important; position: relative; box-shadow: inset 0 0 10px rgba(251, 191, 36, 0.1); }
+#sidebar.collapsed #notebook-list a.is-favorite::after { content: ''; position: absolute; left: 4px; top: 50%; transform: translateY(-50%); width: 3px; height: 16px; background-color: #fbbf24; border-radius: 0 4px 4px 0; box-shadow: 0 0 8px rgba(251, 191, 36, 0.6); }
+.dark #sidebar.collapsed #notebook-list a.is-favorite { background-color: rgba(251, 191, 36, 0.12) !important; box-shadow: inset 0 0 15px rgba(251, 191, 36, 0.15); }
+#sidebar.collapsed .notebook-fav-icon { display: none !important; }
+
+/* ===== Notes Panel Collapse ===== */
+#notes-panel.collapsed {
+    width: 0 !important;
+    min-width: 0 !important;
+    border: none;
+    opacity: 0;
+}
+
+/* ===== Responsive Sidebar Menu for Short Screens ===== */
+@media (max-height: 700px) {
+    #sidebar:not(.collapsed) #main-nav-links,
+    #sidebar:not(.collapsed) #bottom-nav-links {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 0.5rem;
+    }
+    #sidebar:not(.collapsed) #main-nav-links > * + *,
+    #sidebar:not(.collapsed) #bottom-nav-links > * + * {
+        margin-top: 0 !important; /* override space-y-1 */
+    }
+    #sidebar:not(.collapsed) #main-nav-links .nav-item,
+    #sidebar:not(.collapsed) #bottom-nav-links .nav-item {
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+        text-align: center;
+        padding: 0.5rem !important;
+        gap: 0.25rem !important;
+    }
+    #sidebar:not(.collapsed) #main-nav-links .sidebar-text,
+    #sidebar:not(.collapsed) #bottom-nav-links .sidebar-text {
+        font-size: 0.7rem;
+        white-space: normal;
+        line-height: 1.1;
+    }
+}

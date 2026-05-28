@@ -1,0 +1,12 @@
+/* Fix background for active note/notebook selection */
+.nav-item.active {
+    background-color: #eef2ff !important;
+    color: #4338ca !important;
+    font-weight: 600;
+}
+
+.dark .nav-item.active {
+    background-color: rgba(49, 46, 129, 0.3) !important;
+    color: #a5b4fc !important;
+}
+
