@@ -2,7 +2,7 @@ import { state, saveAll } from './state.js';
 import { refreshIcons, showModal, cleanHTML, escapeHTML, stripHTML, createId } from './utils.js';
 import { renderSidebar } from './notebooks.js';
 import { updateWordCount, updateAttachmentsIfNeeded } from './editor.js';
-import { initVoiceNotePlayers, destroyVoiceNotePlayers } from './insert-blocks.js';
+import { initRichBlocks, initVoiceNotePlayers, destroyVoiceNotePlayers } from './insert-blocks.js';
 
 export function renderNotesList() {
     const list = document.getElementById('notes-list');
@@ -159,6 +159,7 @@ export async function selectNote(id) {
 
     if (editorEl) {
         currentNoteImagesOnOpen = Array.from(editorEl.querySelectorAll('img')).map(img => img.src);
+        initRichBlocks(editorEl);
         initVoiceNotePlayers(editorEl);
     }
 

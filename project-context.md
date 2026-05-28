@@ -46,8 +46,17 @@ js/calendar.js
 js/editor.js
 js/events.js
 js/insert-blocks.js
+js/insert-blocks/block-editors.js
+js/insert-blocks/block-renderer.js
+js/insert-blocks/blocks/checklist.js
+js/insert-blocks/blocks/date-time.js
+js/insert-blocks/blocks/image.js
+js/insert-blocks/blocks/link.js
+js/insert-blocks/blocks/reminder.js
+js/insert-blocks/blocks/table.js
 js/insert-blocks/catalog.js
 js/insert-blocks/editor-dom.js
+js/insert-blocks/modal.js
 js/insert-blocks/shared.js
 js/insert-blocks/voice-note.js
 js/insert-blocks/voice-recorder.js
@@ -89,6 +98,7 @@ styles.css
 styles/base/_reset.css
 styles/base/_typography.css
 styles/base/_variables.css
+styles/components/_blocks.css
 styles/components/_context-menu.css
 styles/components/_editor-formatting.css
 styles/components/_editor.css
@@ -112,6 +122,698 @@ styles/utilities/_scrollbars.css
 ```
 
 # Files
+
+## File: js/insert-blocks/block-editors.js
+````javascript
+export function registerBlockEditor(type, handler)
+⋮----
+export function getBlockEditor(type)
+````
+
+## File: js/insert-blocks/block-renderer.js
+````javascript
+function buildDataAttrs(data =
+⋮----
+const toKebab = (value) => String(value).replace(/[A-Z]/g, (match) => `-$
+⋮----
+export function blockShell(
+⋮----
+export function insertRichBlock(html)
+⋮----
+export function updateBlockElement(block)
+⋮----
+function updateChecklistProgress(block)
+⋮----
+function ensureActionIcons(block)
+⋮----
+function closestElement(target, selector)
+⋮----
+function getOwnedBlockContext(target)
+⋮----
+function getActiveRichBlockFromSelection()
+⋮----
+function syncActiveCaretBlock()
+⋮----
+function finishDrag()
+⋮----
+function normalizeRichBlockWrappers(root = document)
+⋮----
+function focusEditableBody(block)
+⋮----
+async function runBlockEditor(block)
+⋮----
+export function initRichBlocks(root = document)
+````
+
+## File: js/insert-blocks/blocks/checklist.js
+````javascript
+function buildChecklistBody(items)
+⋮----
+async insert()
+````
+
+## File: js/insert-blocks/blocks/date-time.js
+````javascript
+function insertChip(type, icon, label)
+⋮----
+insert()
+````
+
+## File: js/insert-blocks/blocks/image.js
+````javascript
+async insert()
+````
+
+## File: js/insert-blocks/blocks/link.js
+````javascript
+function getFavicon(url)
+⋮----
+async insert()
+````
+
+## File: js/insert-blocks/blocks/reminder.js
+````javascript
+async insert()
+````
+
+## File: js/insert-blocks/blocks/table.js
+````javascript
+function clampNumber(value, min, max, fallback)
+⋮----
+function buildTable(rows, columns, includeHeaders)
+⋮----
+async insert()
+````
+
+## File: js/insert-blocks/modal.js
+````javascript
+function createField(field, form)
+⋮----
+function collectFormData(form)
+⋮----
+export function openBlockModal(
+⋮----
+const finish = (value) =>
+⋮----
+export function closeBlockModal()
+````
+
+## File: styles/components/_blocks.css
+````css
+.block-config-modal {
+⋮----
+.block-config-dialog {
+⋮----
+.dark .block-config-dialog {
+⋮----
+.block-config-header,
+⋮----
+.block-config-title {
+⋮----
+.block-config-title span,
+⋮----
+.block-config-close,
+⋮----
+.block-config-close:hover,
+⋮----
+.block-config-form {
+⋮----
+.block-config-fields {
+⋮----
+.block-modal-field {
+⋮----
+.block-modal-field input,
+⋮----
+.dark .block-modal-field input,
+⋮----
+.block-modal-field input:focus,
+⋮----
+.block-modal-items-list {
+⋮----
+.block-modal-item-row {
+⋮----
+.block-modal-item-row button {
+⋮----
+.block-config-actions {
+⋮----
+.block-modal-primary,
+⋮----
+.block-modal-primary {
+⋮----
+.block-modal-secondary {
+⋮----
+#editor .rich-insert-block-wrap {
+⋮----
+#editor .rich-insert-block-wrap > p {
+⋮----
+#editor .rich-insert-block {
+⋮----
+.dark #editor .rich-insert-block {
+⋮----
+#editor .rich-insert-block:hover .rich-block-actions {
+⋮----
+#editor .rich-insert-block.is-editing {
+⋮----
+#editor .rich-insert-block.is-active-caret:not(.is-editing) {
+⋮----
+.dark #editor .rich-insert-block.is-active-caret:not(.is-editing) {
+⋮----
+#editor .rich-insert-block.is-dragging {
+⋮----
+#editor .rich-block-accent {
+⋮----
+#editor .rich-block-main {
+⋮----
+#editor .rich-block-header,
+⋮----
+#editor .rich-block-header {
+⋮----
+#editor .rich-block-heading strong {
+⋮----
+#editor .rich-block-heading small {
+⋮----
+.dark #editor .rich-block-heading small {
+⋮----
+#editor .rich-block-actions {
+⋮----
+#editor [data-rich-block-drag] {
+⋮----
+#editor [data-rich-block-drag]:active {
+⋮----
+body.rich-block-dragging {
+⋮----
+#editor .rich-block-body {
+⋮----
+#editor .rich-insert-block.is-editing .rich-block-body {
+⋮----
+#editor .rich-inline-chip {
+⋮----
+.dark #editor .rich-inline-chip {
+⋮----
+#editor .rich-reminder-date,
+⋮----
+#editor .rich-link-preview {
+⋮----
+#editor .rich-link-preview img {
+⋮----
+#editor .rich-link-preview span {
+⋮----
+#editor .rich-link-preview small,
+⋮----
+#editor .rich-image-block {
+⋮----
+#editor .rich-image-block img {
+⋮----
+#editor .rich-image-small {
+⋮----
+#editor .rich-image-medium {
+⋮----
+#editor .rich-image-full {
+⋮----
+#editor .rich-image-fallback {
+⋮----
+#editor .rich-image-block.is-broken img {
+⋮----
+#editor .rich-image-block.is-broken .rich-image-fallback {
+⋮----
+#editor .rich-image-block figcaption {
+⋮----
+#editor .rich-table {
+⋮----
+#editor .rich-checklist-progress {
+⋮----
+#editor .rich-checklist-progress-track {
+⋮----
+#editor .rich-checklist-progress-bar {
+⋮----
+#editor .rich-checklist-count {
+⋮----
+#editor .rich-checklist-items {
+⋮----
+#editor .rich-checklist-item {
+⋮----
+#editor .rich-checklist-item span {
+⋮----
+#editor .rich-checklist-item.is-checked span {
+````
+
+## File: .github/workflows/main.yml
+````yaml
+name: 'Dependency review'
+on:
+  pull_request:
+    branches: [ "master" ]
+permissions:
+  contents: read
+  pull-requests: write
+jobs:
+  dependency-review:
+    runs-on: ubuntu-latest
+    steps:
+      - name: 'Checkout repository'
+        uses: actions/checkout@v4
+      - name: 'Dependency Review'
+        uses: actions/dependency-review-action@v4
+        with:
+          comment-summary-in-pr: always
+````
+
+## File: js/insert-blocks/catalog.js
+````javascript
+template: ()
+⋮----
+⋮----
+template: () => makeListBlock("Pendientes por fecha", [`$
+⋮----
+insert: async () =>
+⋮----
+export function renderInsertBlocks()
+⋮----
+export async function insertBlockById(id)
+⋮----
+export function hasInsertBlock(id)
+⋮----
+export function getInsertBlockSummary()
+````
+
+## File: js/insert-blocks/editor-dom.js
+````javascript
+export function getEditor()
+⋮----
+export function ensureSelectionInEditor(editor)
+⋮----
+export function insertHtmlAtCursor(html)
+````
+
+## File: js/insert-blocks/shared.js
+````javascript
+export const vlog = (...args) =>
+export const verr = (...args) =>
+⋮----
+export const isValidHttpUrl = (value)
+⋮----
+export const wrapBlock = (kind, inner)
+⋮----
+export const makeListBlock = (title, items)
+⋮----
+export const baseTemplate = (title, desc)
+⋮----
+export function ensureWrappedBlock(id, html)
+⋮----
+export function formatClock(sec)
+⋮----
+export function sanitizeDurationSec(value)
+⋮----
+export function getSafeDuration(audioEl, fallbackSeconds = 0)
+⋮----
+export function formatBytes(bytes)
+⋮----
+export function sanitizeAttachmentFileName(value)
+⋮----
+export function extractAttachmentFileName(src)
+⋮----
+export function getVoiceNoteFallbackDuration(note)
+⋮----
+export function getAudioStatusLabel(status)
+⋮----
+export function parseAudioFileLabel(src)
+⋮----
+export function parseAudioFormat(src)
+⋮----
+export function buildVoiceMetaText(note)
+````
+
+## File: js/insert-blocks/voice-note.js
+````javascript
+export function buildVoiceNoteHtml(meta =
+⋮----
+function cleanupVoiceNotePlayer(note)
+⋮----
+function upgradeNativeAudioPlayers(root = document)
+⋮----
+function normalizeVoiceNoteMarkup(root = document)
+⋮----
+function initVoiceNotePlayer(voiceNote)
+⋮----
+const markStatus = (status) =>
+⋮----
+const resolveAudioSrc = async () =>
+⋮----
+const onPlay = () =>
+⋮----
+const onPause = () =>
+⋮----
+const onLoadedMetadata = () =>
+⋮----
+const onAudioError = () =>
+⋮----
+export function initVoiceNotePlayers(root = document)
+⋮----
+export function destroyVoiceNotePlayers(root = document)
+````
+
+## File: js/insert-blocks/voice-recorder.js
+````javascript
+async function appendVoiceNoteHtmlToNote(noteId, html)
+⋮----
+export async function checkRecoverableRecordings()
+⋮----
+function pickRecorderMimeType()
+⋮----
+function createRecorderPanel()
+⋮----
+export async function recordAudioFromMic()
+⋮----
+const cleanup = () =>
+⋮----
+const resolveOnce = (resolve, value) =>
+⋮----
+recorder.ondataavailable = (event) =>
+⋮----
+startBtn.onclick = async () =>
+⋮----
+stopBtn.onclick = () =>
+⋮----
+closeBtn.onclick = () =>
+⋮----
+recorder.onstop = async () =>
+````
+
+## File: js/tailwind-config.js
+````javascript
+
+````
+
+## File: lib/lucide.min.js
+````javascript
+(function(a,n)
+````
+
+## File: lib/tailwind.min.js
+````javascript
+(()=>
+⋮----
+`)}toString()
+⋮----
+`,colon:": ",commentLeft:" ",commentRight:" ",emptyBody:"",indent:"    ",semicolon:!1};function vx(r)
+`))
+`)&&(t=t.replace(/[^\n]+$/,"")),!1}),t&&(t=t.replace(/\S/g,"")),t}rawBeforeComment(e,t)
+⋮----
+`)&&(i=i.replace(/[^\n]+$/,"")),!1}),typeof i=="undefined"?i=this.raw(t,null,"beforeDecl"):i&&(i=i.replace(/\S/g,"")),i}rawBeforeDecl(e,t)
+⋮----
+`)&&(i=i.replace(/[^\n]+$/,"")),!1}),typeof i=="undefined"?i=this.raw(t,null,"beforeRule"):i&&(i=i.replace(/\S/g,"")),i}rawBeforeOpen(e)
+`)&&(t=t.replace(/[^\n]+$/,"")),!1}),t&&(t=t.replace(/\S/g,"")),t}rawColon(e)
+`);return t=s[s.length-1],t=t.replace(/\S/g,""),!1}}),t}rawSemicolon(e)
+`?(t=1,i+=1):t+=1}return n}var un=class
+⋮----
+https://www.w3ctech.com/topic/2226`));let o=t(...a);return o.postcssPlugin=e,o.postcssVersion=new Ta().version,o}let s;return Object.defineProperty(n,"postcss",
+⋮----
+`),v=y.length-1,v>0?(k=a+v,S=w-y[v].length):(k=a,S=s),T=D.comment,a=k,p=k,d=w-S):c===D.slash?(w=o,T=c,p=a,d=o-s,l=w+1):(w=OA(t,o),T=D.word,p=a,d=w-s),l=w+1;break}e.push([T,a,o-s,p,d,o,l]),S&&(s=S,S=null),o=l}return e}});var kd=x((ki,xd)=>
+⋮----
+`,CHAR_NO_BREAK_SPACE:"\xA0",CHAR_PERCENT:"%",CHAR_PLUS:"+",CHAR_QUESTION_MARK:"?",CHAR_RIGHT_ANGLE_BRACKET:">",CHAR_RIGHT_CURLY_BRACE:"}",CHAR_RIGHT_SQUARE_BRACKET:"]",CHAR_SEMICOLON:";",CHAR_SINGLE_QUOTE:"'",CHAR_SPACE:" ",CHAR_TAB:"	",CHAR_UNDERSCORE:"_",CHAR_VERTICAL_LINE:"|",CHAR_ZERO_WIDTH_NOBREAK_SPACE:"\uFEFF"}});var Nm=x((s6,Mm)=>
+`))if(n=n.trim(),!i.has(n))if(i.add(n),Li.get(e).has(n))for(let s of Li.get(e).get(n))t.add(s);else
+`))});c.push([p,d,h])}}for(let[l,[c,f]]of o)
+⋮----
+`),t}].filter(Boolean)}};Ql.exports.postcss=!0});var _y=x((Gq,Cy)=>
+⋮----
+`;function V5(r)
+⋮----
+`))}gv.exports=Dr;function Dr(...r)
+````
+
+## File: LICENSE.txt
+````
+TERMINOS Y CONDICIONES DE USO - NOTEVAULT
+
+Bienvenido a NoteVault: Tu boveda personal de conocimiento academico.
+
+Al instalar y utilizar esta aplicacion, aceptas los siguientes terminos:
+
+1. USO DE LA APLICACION
+NoteVault es una herramienta de gestion universitaria, construida sobre Electron, disenada para organizar libretas personalizadas, escribir mediante un editor de texto enriquecido y gestionar contenido multimedia. El uso de esta herramienta para la organizacion academica o personal es responsabilidad exclusiva del usuario.
+
+2. PRIVACIDAD Y ALMACENAMIENTO DE DATOS
+Todos los datos, notas, imagenes y configuraciones generados en NoteVault se almacenan de forma estrictamente LOCAL en el sistema de archivos de tu dispositivo. No recopilamos, transmitimos, ni almacenamos tu informacion personal en servidores externos. Eres el unico propietario y responsable de mantener copias de seguridad (backups) de tu propia informacion.
+
+3. ESTADO DEL SOFTWARE
+La aplicacion se proporciona en version Estable (1.3.0). Aunque NoteVault incorpora funciones como autoguardado y papelera de reciclaje temporal, el desarrollador no se hace responsable de la perdida accidental de datos.
+
+4. LICENCIA DE USO PERSONAL Y RESTRICCIONES
+Copyright (c) 2025 vC3sar (vazquezsg.ovh)
+
+Se concede permiso para descargar, instalar, modificar y utilizar este software EXCLUSIVAMENTE con fines personales y no comerciales. 
+
+Queda estrictamente prohibido:
+- El uso del software con fines comerciales, empresariales o lucrativos.
+- Vender, revender, alquilar, sublicenciar o distribuir el software (modificado o no) a cambio de una compensacion economica.
+- Eliminar, ocultar o alterar los avisos de derechos de autor y creditos originales del desarrollador (vC3sar).
+
+Cualquier copia o modificacion del software para uso personal debe mantener intacto este aviso de derechos de autor y las restricciones de uso.
+
+EL SOFTWARE SE PROPORCIONA "TAL CUAL", SIN GARANTIA DE NINGUN TIPO. EN NINGUN CASO EL AUTOR (vC3sar) SERA RESPONSABLE DE NINGUNA RECLAMACION O DANO DERIVADO DEL USO DE ESTE SOFTWARE.
+
+---------------------------------------------
+Desarrollado por vC3sar - vazquezsg.ovh
+````
+
+## File: partials/modal-profile.html
+````html
+<div id="profile-modal"
+    class="fixed inset-0 bg-black/60 backdrop-blur-md hidden items-center justify-center z-50 transition-opacity">
+    <div
+        class="bg-surface-container-lowest rounded-[2rem] w-[480px] shadow-[0_32px_80px_-16px_rgba(0,0,0,0.3)] animate-[fadeIn_0.3s_ease-out] overflow-hidden border border-white/10">
+        <div class="p-10">
+            <div class="flex items-center gap-6 mb-10">
+                <div
+                    class="w-16 h-16 bg-indigo-500/10 rounded-2xl flex items-center justify-center border border-indigo-500/20 shadow-inner">
+                    <i data-lucide="user" class="w-8 h-8 text-indigo-600 dark:text-indigo-400"></i>
+                </div>
+                <div>
+                    <h4 class="text-2xl font-black text-on-surface tracking-tight leading-tight">Configuración del
+                        Perfil</h4>
+                    <p class="text-xs font-bold text-on-surface-variant/50 uppercase tracking-widest mt-1">
+                        Personalización</p>
+                </div>
+            </div>
+            <div class="space-y-8">
+                <div class="relative group">
+                    <div
+                        class="absolute -top-2.5 left-4 px-1.5 bg-surface-container-lowest text-[10px] font-black text-indigo-600 dark:text-indigo-400 uppercase tracking-widest transition-all group-focus-within:text-primary z-10">
+                        Nombre Completo
+                    </div>
+                    <input type="text" id="profile-name-input" placeholder="¿Cómo te llamas?"
+                        class="w-full bg-transparent border-2 border-outline-variant/20 dark:border-white/10 rounded-2xl px-5 py-4 text-on-surface font-bold outline-none focus:border-indigo-500/50 focus:ring-4 focus:ring-indigo-500/5 transition-all placeholder:font-normal placeholder:opacity-30">
+                </div>
+                <div class="relative group">
+                    <div
+                        class="absolute -top-2.5 left-4 px-1.5 bg-surface-container-lowest text-[10px] font-black text-indigo-600 dark:text-indigo-400 uppercase tracking-widest transition-all group-focus-within:text-primary z-10">
+                        Correo Electrónico
+                    </div>
+                    <input type="email" id="profile-email-input" placeholder="tu@email.com"
+                        class="w-full bg-transparent border-2 border-outline-variant/20 dark:border-white/10 rounded-2xl px-5 py-4 text-on-surface font-bold outline-none focus:border-indigo-500/50 focus:ring-4 focus:ring-indigo-500/5 transition-all placeholder:font-normal placeholder:opacity-30">
+                </div>
+                <div class="relative group">
+                    <div
+                        class="absolute -top-2.5 left-4 px-1.5 bg-surface-container-lowest text-[10px] font-black text-indigo-600 dark:text-indigo-400 uppercase tracking-widest transition-all group-focus-within:text-primary z-10">
+                        Idioma de Preferencia
+                    </div>
+                    <select id="profile-lang-input"
+                        class="w-full bg-transparent border-2 border-outline-variant/20 dark:border-white/10 rounded-2xl px-5 py-4 text-on-surface font-bold outline-none focus:border-indigo-500/50 focus:ring-4 focus:ring-indigo-500/5 appearance-none transition-all cursor-pointer">
+                        <option value="es">Español</option>
+                        <option value="en">English</option>
+                        <option value="fr">Français</option>
+                    </select>
+                    <div
+                        class="absolute right-5 top-1/2 -translate-y-1/2 pointer-events-none text-on-surface-variant/40">
+                        <i data-lucide="chevron-down" class="w-5 h-5"></i>
+                    </div>
+                </div>
+            </div>
+            <div class="flex items-center justify-end gap-3 mt-12">
+                <button id="profile-cancel"
+                    class="px-6 py-3.5 rounded-xl font-bold text-on-surface-variant hover:bg-surface-container-high transition-all active:scale-95 text-sm">Cancelar</button>
+                <button id="profile-confirm"
+                    class="px-8 py-3.5 rounded-xl font-black bg-indigo-600 text-white shadow-xl shadow-indigo-600/20 hover:bg-indigo-500 hover:scale-[1.02] active:scale-95 transition-all text-sm">Guardar
+                    Cambios</button>
+            </div>
+        </div>
+    </div>
+</div>
+````
+
+## File: partials/modal-settings.html
+````html
+<div id="settings-modal"
+    class="fixed inset-0 bg-black/40 backdrop-blur-sm hidden items-center justify-center z-50 transition-opacity">
+    <div class="bg-surface-container-lowest p-6 rounded-2xl w-[400px] shadow-2xl animate-[fadeIn_0.2s_ease-out]">
+        <h4 class="text-xl font-bold mb-6 text-on-surface flex items-center gap-2"><i data-lucide="settings"></i>
+            Ajustes</h4>
+        <div class="mb-4">
+            <label class="block text-sm font-semibold text-on-surface-variant mb-2">Tema de la aplicación:</label>
+            <select id="theme-input"
+                class="w-full bg-indigo-100/80 dark:bg-black/20 border border-indigo-200 dark:border-white/10 rounded-xl px-4 py-3 text-on-surface outline-none focus:ring-2 focus:ring-primary/20 shadow-sm transition-all">
+                <option value="system">Tema del Sistema</option>
+                <option value="light">Claro</option>
+                <option value="dark">Oscuro</option>
+            </select>
+        </div>
+        <div class="mb-4">
+            <label class="block text-sm font-semibold text-on-surface-variant mb-2">Días para borrar notas de
+                papelera:</label>
+            <input type="number" id="trash-retention-input" min="1" max="365" value="30"
+                class="w-full bg-indigo-100/80 dark:bg-black/20 border border-indigo-200 dark:border-white/10 rounded-xl px-4 py-3 text-on-surface outline-none focus:ring-2 focus:ring-primary/20 shadow-sm transition-all">
+        </div>
+        <div class="mb-4">
+            <label class="block text-sm font-semibold text-on-surface-variant mb-2">Autoguardar cada
+                (minutos):</label>
+            <input type="number" id="autosave-interval-input" min="1" max="60" value="5"
+                class="w-full bg-indigo-100/80 dark:bg-black/20 border border-indigo-200 dark:border-white/10 rounded-xl px-4 py-3 text-on-surface outline-none focus:ring-2 focus:ring-primary/20 shadow-sm transition-all">
+        </div>
+        <div class="mb-8">
+            <div
+                class="flex items-center justify-between bg-indigo-100/80 dark:bg-black/20 border border-indigo-200 dark:border-white/10 rounded-xl p-3.5 shadow-sm">
+                <div>
+                    <div class="text-sm font-semibold text-on-surface">Reproductor multimedia</div>
+                    <div class="text-xs text-on-surface-variant mt-0.5 opacity-80">Muestra Spotify y otros
+                        reproductores en la barra lateral</div>
+                </div>
+                <label class="relative inline-flex items-center cursor-pointer ml-4 shrink-0">
+                    <input type="checkbox" id="media-player-toggle" class="sr-only peer">
+                    <div
+                        class="w-11 h-6 bg-outline-variant/50 dark:bg-outline-variant/80 rounded-full peer peer-checked:bg-primary transition-colors duration-300 after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:rounded-full after:h-5 after:w-5 after:transition-all after:duration-300 peer-checked:after:translate-x-5">
+                    </div>
+                </label>
+            </div>
+        </div>
+        <div class="flex justify-end gap-3">
+            <button id="settings-cancel"
+                class="px-5 py-2.5 rounded-lg font-medium text-on-surface-variant hover:bg-surface-container-high transition-colors">Cancelar</button>
+            <button id="settings-confirm"
+                class="px-5 py-2.5 rounded-lg font-bold bg-primary text-on-primary shadow-md hover:bg-indigo-700 transition-colors">Guardar</button>
+        </div>
+    </div>
+</div>
+````
+
+## File: partials/view-calendar.html
+````html
+<div id="calendar-view" class="hidden flex-1 overflow-hidden">
+    <div class="flex-1 flex overflow-hidden">
+        <div class="flex-1 overflow-y-auto custom-scrollbar p-6 md:p-10 flex flex-col">
+            <div class="flex items-center justify-between mb-8">
+                <h2 id="calendar-month-year" class="text-3xl font-extrabold tracking-tight text-on-surface">Mayo
+                    2026</h2>
+                <div class="flex items-center gap-2">
+                    <button onclick="window.calendarEngine.navigateMonth(-1)"
+                        class="p-2 text-on-surface-variant hover:text-primary transition-colors hover:bg-surface-container-high rounded-lg active:scale-95"><i
+                            data-lucide="chevron-left" class="w-5 h-5"></i></button>
+                    <button onclick="window.calendarEngine.goToToday()"
+                        class="px-4 py-2 text-sm font-bold text-on-surface-variant hover:text-primary transition-colors hover:bg-surface-container-high rounded-lg active:scale-95">Hoy</button>
+                    <button onclick="window.calendarEngine.navigateMonth(1)"
+                        class="p-2 text-on-surface-variant hover:text-primary transition-colors hover:bg-surface-container-high rounded-lg active:scale-95"><i
+                            data-lucide="chevron-right" class="w-5 h-5"></i></button>
+                </div>
+            </div>
+            <div
+                class="grid grid-cols-7 gap-px bg-outline-variant/20 rounded-2xl overflow-hidden border border-outline-variant/20 flex-1 min-h-[500px]">
+                <div
+                    class="bg-surface-container-lowest py-3 text-center text-xs font-black uppercase tracking-widest text-on-surface-variant/70">
+                    Lun</div>
+                <div
+                    class="bg-surface-container-lowest py-3 text-center text-xs font-black uppercase tracking-widest text-on-surface-variant/70">
+                    Mar</div>
+                <div
+                    class="bg-surface-container-lowest py-3 text-center text-xs font-black uppercase tracking-widest text-on-surface-variant/70">
+                    Mié</div>
+                <div
+                    class="bg-surface-container-lowest py-3 text-center text-xs font-black uppercase tracking-widest text-on-surface-variant/70">
+                    Jue</div>
+                <div
+                    class="bg-surface-container-lowest py-3 text-center text-xs font-black uppercase tracking-widest text-on-surface-variant/70">
+                    Vie</div>
+                <div
+                    class="bg-surface-container-lowest py-3 text-center text-xs font-black uppercase tracking-widest text-on-surface-variant/70">
+                    Sáb</div>
+                <div
+                    class="bg-surface-container-lowest py-3 text-center text-xs font-black uppercase tracking-widest text-on-surface-variant/70">
+                    Dom</div>
+                <div id="calendar-grid-content" class="contents"></div>
+            </div>
+        </div>
+        <aside
+            class="w-80 md:w-96 border-l border-outline-variant/10 bg-surface-container-lowest flex flex-col shrink-0 overflow-hidden">
+            <div class="p-6 border-b border-outline-variant/10">
+                <div class="flex items-center justify-between mb-4">
+                    <h3 class="font-bold text-xl text-on-surface">Horario Escolar</h3>
+                    <button onclick="window.calendarEngine.showScheduleModal()"
+                        title="Gestionar Clases y Horario"
+                        class="flex items-center gap-1.5 px-3 py-1.5 bg-primary/10 text-primary hover:bg-primary/20 rounded-lg transition-colors active:scale-95 text-xs font-bold">
+                        <i data-lucide="plus-circle" class="w-4 h-4"></i>
+                        Gestionar Clases
+                    </button>
+                </div>
+                <div class="bg-surface-container-low rounded-xl p-1 flex">
+                    <button id="tab-schedule-l-v" onclick="window.calendarEngine.setScheduleMode('lv')"
+                        class="flex-1 py-1.5 text-xs font-bold rounded-lg text-on-surface bg-surface-container-lowest shadow-sm transition-all">Lunes
+                        a Viernes</button>
+                    <button id="tab-schedule-s" onclick="window.calendarEngine.setScheduleMode('s')"
+                        class="flex-1 py-1.5 text-xs font-bold rounded-lg text-on-surface-variant hover:text-on-surface transition-all">Solo
+                        Sábados</button>
+                </div>
+            </div>
+            <div class="flex-1 overflow-y-auto custom-scrollbar p-6 space-y-6">
+                <div>
+                    <div class="flex items-center justify-between mb-3">
+                        <h4 id="selected-day-title"
+                            class="text-xs font-black uppercase tracking-widest text-on-surface-variant">Día
+                            Seleccionado</h4>
+                        <button onclick="window.calendarEngine.showEventModal()"
+                            class="text-primary hover:text-primary/80 transition-colors"><i
+                                data-lucide="plus-circle" class="w-4 h-4"></i></button>
+                    </div>
+                    <div id="selected-day-events" class="space-y-2">
+                        <div class="text-sm text-on-surface-variant opacity-60 text-center py-4">Selecciona un
+                            día</div>
+                    </div>
+                </div>
+                <div>
+                    <h4 class="text-xs font-black uppercase tracking-widest text-on-surface-variant mb-3">
+                        Horario Recurrente</h4>
+                    <div id="schedule-list"
+                        class="space-y-2 relative pl-3 border-l-2 border-outline-variant/20">
+                    </div>
+                </div>
+            </div>
+        </aside>
+    </div>
+</div>
+````
+
+## File: partials/view-trash.html
+````html
+<div id="trash-view" class="flex-1 overflow-y-auto p-8 custom-scrollbar relative hidden">
+    <div class="mb-12 flex items-end justify-between max-w-7xl mx-auto w-full">
+        <div class="pr-8">
+            <h2 class="text-4xl font-extrabold tracking-tighter text-on-surface mb-2">Papelera</h2>
+            <p class="text-on-surface-variant text-lg font-medium opacity-70">Notas eliminadas (se borrarán en
+                30 días por defecto - Puedes cambiarlo en la configuración)</p>
+        </div>
+        <button id="empty-trash"
+            class="flex items-center gap-2 px-4 py-2 text-sm font-bold text-error border border-error/20 dark:border-error/40 hover:bg-error-container rounded-xl transition-colors">
+            <i data-lucide="trash-2" style="width:16px;"></i> Vaciar papelera
+        </button>
+    </div>
+    <div id="trash-list"
+        class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6 max-w-7xl mx-auto w-full">
+    </div>
+    <div id="trash-empty-state"
+        class="hidden flex-col items-center justify-center p-20 text-center text-on-surface-variant">
+        <i data-lucide="trash" class="w-16 h-16 mb-4 opacity-40"></i>
+        <h3 class="text-xl font-bold text-on-surface">La papelera está vacía</h3>
+        <p class="text-sm mt-2 opacity-80">Las notas que elimines aparecerán aquí.</p>
+    </div>
+</div>
+````
 
 ## File: styles/base/_reset.css
 ````css
@@ -591,11 +1293,17 @@ input[type="color"]::-webkit-color-swatch {
 ⋮----
 #editor .voice-note-native-audio {
 ⋮----
-#editor .voice-note-native-audio::-webkit-media-controls-panel {
+#editor .voice-note-native-audio::-webkit-media-controls-enclosure,
+⋮----
+#editor .voice-note-native-audio::-webkit-media-controls-current-time-display,
+⋮----
+#editor .voice-note-native-audio::-webkit-media-controls-timeline {
 ⋮----
 .dark #editor .voice-note-native-audio {
 ⋮----
-.dark #editor .voice-note-native-audio::-webkit-media-controls-panel {
+.dark #editor .voice-note-native-audio::-webkit-media-controls-enclosure,
+⋮----
+.dark #editor .voice-note-native-audio::-webkit-media-controls-current-time-display,
 ````
 
 ## File: styles/layout/_sidebar.css
@@ -682,464 +1390,6 @@ input[type="color"]::-webkit-color-swatch {
 .dark .custom-scrollbar::-webkit-scrollbar-thumb {
 ⋮----
 .dark .custom-scrollbar::-webkit-scrollbar-thumb:hover {
-````
-
-## File: .github/workflows/main.yml
-````yaml
-name: 'Dependency review'
-on:
-  pull_request:
-    branches: [ "master" ]
-permissions:
-  contents: read
-  pull-requests: write
-jobs:
-  dependency-review:
-    runs-on: ubuntu-latest
-    steps:
-      - name: 'Checkout repository'
-        uses: actions/checkout@v4
-      - name: 'Dependency Review'
-        uses: actions/dependency-review-action@v4
-        with:
-          comment-summary-in-pr: always
-````
-
-## File: js/insert-blocks/catalog.js
-````javascript
-template: ()
-⋮----
-insert: async () =>
-⋮----
-⋮----
-template: () => makeListBlock("Pendientes por fecha", [`$
-⋮----
-export function renderInsertBlocks()
-⋮----
-export async function insertBlockById(id)
-⋮----
-export function hasInsertBlock(id)
-⋮----
-export function getInsertBlockSummary()
-````
-
-## File: js/insert-blocks/editor-dom.js
-````javascript
-export function getEditor()
-⋮----
-export function ensureSelectionInEditor(editor)
-⋮----
-export function insertHtmlAtCursor(html)
-````
-
-## File: js/insert-blocks/shared.js
-````javascript
-export const vlog = (...args) =>
-export const verr = (...args) =>
-⋮----
-export const isValidHttpUrl = (value)
-⋮----
-export const wrapBlock = (kind, inner)
-⋮----
-export const makeListBlock = (title, items)
-⋮----
-export const baseTemplate = (title, desc)
-⋮----
-export function ensureWrappedBlock(id, html)
-⋮----
-export function formatClock(sec)
-⋮----
-export function sanitizeDurationSec(value)
-⋮----
-export function getSafeDuration(audioEl, fallbackSeconds = 0)
-⋮----
-export function formatBytes(bytes)
-⋮----
-export function sanitizeAttachmentFileName(value)
-⋮----
-export function extractAttachmentFileName(src)
-⋮----
-export function getVoiceNoteFallbackDuration(note)
-⋮----
-export function getAudioStatusLabel(status)
-⋮----
-export function parseAudioFileLabel(src)
-⋮----
-export function parseAudioFormat(src)
-⋮----
-export function buildVoiceMetaText(note)
-````
-
-## File: js/insert-blocks/voice-note.js
-````javascript
-export function buildVoiceNoteHtml(meta =
-⋮----
-function cleanupVoiceNotePlayer(note)
-⋮----
-function upgradeNativeAudioPlayers(root = document)
-⋮----
-function normalizeVoiceNoteMarkup(root = document)
-⋮----
-function initVoiceNotePlayer(voiceNote)
-⋮----
-const markStatus = (status) =>
-⋮----
-const resolveAudioSrc = async () =>
-⋮----
-const onPlay = () =>
-⋮----
-const onPause = () =>
-⋮----
-const onLoadedMetadata = () =>
-⋮----
-const onAudioError = () =>
-⋮----
-export function initVoiceNotePlayers(root = document)
-⋮----
-export function destroyVoiceNotePlayers(root = document)
-````
-
-## File: js/insert-blocks/voice-recorder.js
-````javascript
-async function appendVoiceNoteHtmlToNote(noteId, html)
-⋮----
-export async function checkRecoverableRecordings()
-⋮----
-function pickRecorderMimeType()
-⋮----
-function createRecorderPanel()
-⋮----
-export async function recordAudioFromMic()
-⋮----
-const cleanup = () =>
-⋮----
-const resolveOnce = (resolve, value) =>
-⋮----
-recorder.ondataavailable = (event) =>
-⋮----
-startBtn.onclick = async () =>
-⋮----
-stopBtn.onclick = () =>
-⋮----
-closeBtn.onclick = () =>
-⋮----
-recorder.onstop = async () =>
-````
-
-## File: js/tailwind-config.js
-````javascript
-
-````
-
-## File: lib/lucide.min.js
-````javascript
-(function(a,n)
-````
-
-## File: lib/tailwind.min.js
-````javascript
-(()=>
-⋮----
-`)}toString()
-⋮----
-`,colon:": ",commentLeft:" ",commentRight:" ",emptyBody:"",indent:"    ",semicolon:!1};function vx(r)
-`))
-`)&&(t=t.replace(/[^\n]+$/,"")),!1}),t&&(t=t.replace(/\S/g,"")),t}rawBeforeComment(e,t)
-⋮----
-`)&&(i=i.replace(/[^\n]+$/,"")),!1}),typeof i=="undefined"?i=this.raw(t,null,"beforeDecl"):i&&(i=i.replace(/\S/g,"")),i}rawBeforeDecl(e,t)
-⋮----
-`)&&(i=i.replace(/[^\n]+$/,"")),!1}),typeof i=="undefined"?i=this.raw(t,null,"beforeRule"):i&&(i=i.replace(/\S/g,"")),i}rawBeforeOpen(e)
-`)&&(t=t.replace(/[^\n]+$/,"")),!1}),t&&(t=t.replace(/\S/g,"")),t}rawColon(e)
-`);return t=s[s.length-1],t=t.replace(/\S/g,""),!1}}),t}rawSemicolon(e)
-`?(t=1,i+=1):t+=1}return n}var un=class
-⋮----
-https://www.w3ctech.com/topic/2226`));let o=t(...a);return o.postcssPlugin=e,o.postcssVersion=new Ta().version,o}let s;return Object.defineProperty(n,"postcss",
-⋮----
-`),v=y.length-1,v>0?(k=a+v,S=w-y[v].length):(k=a,S=s),T=D.comment,a=k,p=k,d=w-S):c===D.slash?(w=o,T=c,p=a,d=o-s,l=w+1):(w=OA(t,o),T=D.word,p=a,d=w-s),l=w+1;break}e.push([T,a,o-s,p,d,o,l]),S&&(s=S,S=null),o=l}return e}});var kd=x((ki,xd)=>
-⋮----
-`,CHAR_NO_BREAK_SPACE:"\xA0",CHAR_PERCENT:"%",CHAR_PLUS:"+",CHAR_QUESTION_MARK:"?",CHAR_RIGHT_ANGLE_BRACKET:">",CHAR_RIGHT_CURLY_BRACE:"}",CHAR_RIGHT_SQUARE_BRACKET:"]",CHAR_SEMICOLON:";",CHAR_SINGLE_QUOTE:"'",CHAR_SPACE:" ",CHAR_TAB:"	",CHAR_UNDERSCORE:"_",CHAR_VERTICAL_LINE:"|",CHAR_ZERO_WIDTH_NOBREAK_SPACE:"\uFEFF"}});var Nm=x((s6,Mm)=>
-`))if(n=n.trim(),!i.has(n))if(i.add(n),Li.get(e).has(n))for(let s of Li.get(e).get(n))t.add(s);else
-`))});c.push([p,d,h])}}for(let[l,[c,f]]of o)
-⋮----
-`),t}].filter(Boolean)}};Ql.exports.postcss=!0});var _y=x((Gq,Cy)=>
-⋮----
-`;function V5(r)
-⋮----
-`))}gv.exports=Dr;function Dr(...r)
-````
-
-## File: LICENSE.txt
-````
-TERMINOS Y CONDICIONES DE USO - NOTEVAULT
-
-Bienvenido a NoteVault: Tu boveda personal de conocimiento academico.
-
-Al instalar y utilizar esta aplicacion, aceptas los siguientes terminos:
-
-1. USO DE LA APLICACION
-NoteVault es una herramienta de gestion universitaria, construida sobre Electron, disenada para organizar libretas personalizadas, escribir mediante un editor de texto enriquecido y gestionar contenido multimedia. El uso de esta herramienta para la organizacion academica o personal es responsabilidad exclusiva del usuario.
-
-2. PRIVACIDAD Y ALMACENAMIENTO DE DATOS
-Todos los datos, notas, imagenes y configuraciones generados en NoteVault se almacenan de forma estrictamente LOCAL en el sistema de archivos de tu dispositivo. No recopilamos, transmitimos, ni almacenamos tu informacion personal en servidores externos. Eres el unico propietario y responsable de mantener copias de seguridad (backups) de tu propia informacion.
-
-3. ESTADO DEL SOFTWARE
-La aplicacion se proporciona en version Estable (1.3.0). Aunque NoteVault incorpora funciones como autoguardado y papelera de reciclaje temporal, el desarrollador no se hace responsable de la perdida accidental de datos.
-
-4. LICENCIA DE USO PERSONAL Y RESTRICCIONES
-Copyright (c) 2025 vC3sar (vazquezsg.ovh)
-
-Se concede permiso para descargar, instalar, modificar y utilizar este software EXCLUSIVAMENTE con fines personales y no comerciales. 
-
-Queda estrictamente prohibido:
-- El uso del software con fines comerciales, empresariales o lucrativos.
-- Vender, revender, alquilar, sublicenciar o distribuir el software (modificado o no) a cambio de una compensacion economica.
-- Eliminar, ocultar o alterar los avisos de derechos de autor y creditos originales del desarrollador (vC3sar).
-
-Cualquier copia o modificacion del software para uso personal debe mantener intacto este aviso de derechos de autor y las restricciones de uso.
-
-EL SOFTWARE SE PROPORCIONA "TAL CUAL", SIN GARANTIA DE NINGUN TIPO. EN NINGUN CASO EL AUTOR (vC3sar) SERA RESPONSABLE DE NINGUNA RECLAMACION O DANO DERIVADO DEL USO DE ESTE SOFTWARE.
-
----------------------------------------------
-Desarrollado por vC3sar - vazquezsg.ovh
-````
-
-## File: partials/modal-profile.html
-````html
-<div id="profile-modal"
-    class="fixed inset-0 bg-black/60 backdrop-blur-md hidden items-center justify-center z-50 transition-opacity">
-    <div
-        class="bg-surface-container-lowest rounded-[2rem] w-[480px] shadow-[0_32px_80px_-16px_rgba(0,0,0,0.3)] animate-[fadeIn_0.3s_ease-out] overflow-hidden border border-white/10">
-        <div class="p-10">
-            <div class="flex items-center gap-6 mb-10">
-                <div
-                    class="w-16 h-16 bg-indigo-500/10 rounded-2xl flex items-center justify-center border border-indigo-500/20 shadow-inner">
-                    <i data-lucide="user" class="w-8 h-8 text-indigo-600 dark:text-indigo-400"></i>
-                </div>
-                <div>
-                    <h4 class="text-2xl font-black text-on-surface tracking-tight leading-tight">Configuración del
-                        Perfil</h4>
-                    <p class="text-xs font-bold text-on-surface-variant/50 uppercase tracking-widest mt-1">
-                        Personalización</p>
-                </div>
-            </div>
-            <div class="space-y-8">
-                <div class="relative group">
-                    <div
-                        class="absolute -top-2.5 left-4 px-1.5 bg-surface-container-lowest text-[10px] font-black text-indigo-600 dark:text-indigo-400 uppercase tracking-widest transition-all group-focus-within:text-primary z-10">
-                        Nombre Completo
-                    </div>
-                    <input type="text" id="profile-name-input" placeholder="¿Cómo te llamas?"
-                        class="w-full bg-transparent border-2 border-outline-variant/20 dark:border-white/10 rounded-2xl px-5 py-4 text-on-surface font-bold outline-none focus:border-indigo-500/50 focus:ring-4 focus:ring-indigo-500/5 transition-all placeholder:font-normal placeholder:opacity-30">
-                </div>
-                <div class="relative group">
-                    <div
-                        class="absolute -top-2.5 left-4 px-1.5 bg-surface-container-lowest text-[10px] font-black text-indigo-600 dark:text-indigo-400 uppercase tracking-widest transition-all group-focus-within:text-primary z-10">
-                        Correo Electrónico
-                    </div>
-                    <input type="email" id="profile-email-input" placeholder="tu@email.com"
-                        class="w-full bg-transparent border-2 border-outline-variant/20 dark:border-white/10 rounded-2xl px-5 py-4 text-on-surface font-bold outline-none focus:border-indigo-500/50 focus:ring-4 focus:ring-indigo-500/5 transition-all placeholder:font-normal placeholder:opacity-30">
-                </div>
-                <div class="relative group">
-                    <div
-                        class="absolute -top-2.5 left-4 px-1.5 bg-surface-container-lowest text-[10px] font-black text-indigo-600 dark:text-indigo-400 uppercase tracking-widest transition-all group-focus-within:text-primary z-10">
-                        Idioma de Preferencia
-                    </div>
-                    <select id="profile-lang-input"
-                        class="w-full bg-transparent border-2 border-outline-variant/20 dark:border-white/10 rounded-2xl px-5 py-4 text-on-surface font-bold outline-none focus:border-indigo-500/50 focus:ring-4 focus:ring-indigo-500/5 appearance-none transition-all cursor-pointer">
-                        <option value="es">Español</option>
-                        <option value="en">English</option>
-                        <option value="fr">Français</option>
-                    </select>
-                    <div
-                        class="absolute right-5 top-1/2 -translate-y-1/2 pointer-events-none text-on-surface-variant/40">
-                        <i data-lucide="chevron-down" class="w-5 h-5"></i>
-                    </div>
-                </div>
-            </div>
-            <div class="flex items-center justify-end gap-3 mt-12">
-                <button id="profile-cancel"
-                    class="px-6 py-3.5 rounded-xl font-bold text-on-surface-variant hover:bg-surface-container-high transition-all active:scale-95 text-sm">Cancelar</button>
-                <button id="profile-confirm"
-                    class="px-8 py-3.5 rounded-xl font-black bg-indigo-600 text-white shadow-xl shadow-indigo-600/20 hover:bg-indigo-500 hover:scale-[1.02] active:scale-95 transition-all text-sm">Guardar
-                    Cambios</button>
-            </div>
-        </div>
-    </div>
-</div>
-````
-
-## File: partials/modal-settings.html
-````html
-<div id="settings-modal"
-    class="fixed inset-0 bg-black/40 backdrop-blur-sm hidden items-center justify-center z-50 transition-opacity">
-    <div class="bg-surface-container-lowest p-6 rounded-2xl w-[400px] shadow-2xl animate-[fadeIn_0.2s_ease-out]">
-        <h4 class="text-xl font-bold mb-6 text-on-surface flex items-center gap-2"><i data-lucide="settings"></i>
-            Ajustes</h4>
-        <div class="mb-4">
-            <label class="block text-sm font-semibold text-on-surface-variant mb-2">Tema de la aplicación:</label>
-            <select id="theme-input"
-                class="w-full bg-indigo-100/80 dark:bg-black/20 border border-indigo-200 dark:border-white/10 rounded-xl px-4 py-3 text-on-surface outline-none focus:ring-2 focus:ring-primary/20 shadow-sm transition-all">
-                <option value="system">Tema del Sistema</option>
-                <option value="light">Claro</option>
-                <option value="dark">Oscuro</option>
-            </select>
-        </div>
-        <div class="mb-4">
-            <label class="block text-sm font-semibold text-on-surface-variant mb-2">Días para borrar notas de
-                papelera:</label>
-            <input type="number" id="trash-retention-input" min="1" max="365" value="30"
-                class="w-full bg-indigo-100/80 dark:bg-black/20 border border-indigo-200 dark:border-white/10 rounded-xl px-4 py-3 text-on-surface outline-none focus:ring-2 focus:ring-primary/20 shadow-sm transition-all">
-        </div>
-        <div class="mb-4">
-            <label class="block text-sm font-semibold text-on-surface-variant mb-2">Autoguardar cada
-                (minutos):</label>
-            <input type="number" id="autosave-interval-input" min="1" max="60" value="5"
-                class="w-full bg-indigo-100/80 dark:bg-black/20 border border-indigo-200 dark:border-white/10 rounded-xl px-4 py-3 text-on-surface outline-none focus:ring-2 focus:ring-primary/20 shadow-sm transition-all">
-        </div>
-        <div class="mb-8">
-            <div
-                class="flex items-center justify-between bg-indigo-100/80 dark:bg-black/20 border border-indigo-200 dark:border-white/10 rounded-xl p-3.5 shadow-sm">
-                <div>
-                    <div class="text-sm font-semibold text-on-surface">Reproductor multimedia</div>
-                    <div class="text-xs text-on-surface-variant mt-0.5 opacity-80">Muestra Spotify y otros
-                        reproductores en la barra lateral</div>
-                </div>
-                <label class="relative inline-flex items-center cursor-pointer ml-4 shrink-0">
-                    <input type="checkbox" id="media-player-toggle" class="sr-only peer">
-                    <div
-                        class="w-11 h-6 bg-outline-variant/50 dark:bg-outline-variant/80 rounded-full peer peer-checked:bg-primary transition-colors duration-300 after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:rounded-full after:h-5 after:w-5 after:transition-all after:duration-300 peer-checked:after:translate-x-5">
-                    </div>
-                </label>
-            </div>
-        </div>
-        <div class="flex justify-end gap-3">
-            <button id="settings-cancel"
-                class="px-5 py-2.5 rounded-lg font-medium text-on-surface-variant hover:bg-surface-container-high transition-colors">Cancelar</button>
-            <button id="settings-confirm"
-                class="px-5 py-2.5 rounded-lg font-bold bg-primary text-on-primary shadow-md hover:bg-indigo-700 transition-colors">Guardar</button>
-        </div>
-    </div>
-</div>
-````
-
-## File: partials/view-calendar.html
-````html
-<div id="calendar-view" class="hidden flex-1 overflow-hidden">
-    <div class="flex-1 flex overflow-hidden">
-        <div class="flex-1 overflow-y-auto custom-scrollbar p-6 md:p-10 flex flex-col">
-            <div class="flex items-center justify-between mb-8">
-                <h2 id="calendar-month-year" class="text-3xl font-extrabold tracking-tight text-on-surface">Mayo
-                    2026</h2>
-                <div class="flex items-center gap-2">
-                    <button onclick="window.calendarEngine.navigateMonth(-1)"
-                        class="p-2 text-on-surface-variant hover:text-primary transition-colors hover:bg-surface-container-high rounded-lg active:scale-95"><i
-                            data-lucide="chevron-left" class="w-5 h-5"></i></button>
-                    <button onclick="window.calendarEngine.goToToday()"
-                        class="px-4 py-2 text-sm font-bold text-on-surface-variant hover:text-primary transition-colors hover:bg-surface-container-high rounded-lg active:scale-95">Hoy</button>
-                    <button onclick="window.calendarEngine.navigateMonth(1)"
-                        class="p-2 text-on-surface-variant hover:text-primary transition-colors hover:bg-surface-container-high rounded-lg active:scale-95"><i
-                            data-lucide="chevron-right" class="w-5 h-5"></i></button>
-                </div>
-            </div>
-            <div
-                class="grid grid-cols-7 gap-px bg-outline-variant/20 rounded-2xl overflow-hidden border border-outline-variant/20 flex-1 min-h-[500px]">
-                <div
-                    class="bg-surface-container-lowest py-3 text-center text-xs font-black uppercase tracking-widest text-on-surface-variant/70">
-                    Lun</div>
-                <div
-                    class="bg-surface-container-lowest py-3 text-center text-xs font-black uppercase tracking-widest text-on-surface-variant/70">
-                    Mar</div>
-                <div
-                    class="bg-surface-container-lowest py-3 text-center text-xs font-black uppercase tracking-widest text-on-surface-variant/70">
-                    Mié</div>
-                <div
-                    class="bg-surface-container-lowest py-3 text-center text-xs font-black uppercase tracking-widest text-on-surface-variant/70">
-                    Jue</div>
-                <div
-                    class="bg-surface-container-lowest py-3 text-center text-xs font-black uppercase tracking-widest text-on-surface-variant/70">
-                    Vie</div>
-                <div
-                    class="bg-surface-container-lowest py-3 text-center text-xs font-black uppercase tracking-widest text-on-surface-variant/70">
-                    Sáb</div>
-                <div
-                    class="bg-surface-container-lowest py-3 text-center text-xs font-black uppercase tracking-widest text-on-surface-variant/70">
-                    Dom</div>
-                <div id="calendar-grid-content" class="contents"></div>
-            </div>
-        </div>
-        <aside
-            class="w-80 md:w-96 border-l border-outline-variant/10 bg-surface-container-lowest flex flex-col shrink-0 overflow-hidden">
-            <div class="p-6 border-b border-outline-variant/10">
-                <div class="flex items-center justify-between mb-4">
-                    <h3 class="font-bold text-xl text-on-surface">Horario Escolar</h3>
-                    <button onclick="window.calendarEngine.showScheduleModal()"
-                        title="Gestionar Clases y Horario"
-                        class="flex items-center gap-1.5 px-3 py-1.5 bg-primary/10 text-primary hover:bg-primary/20 rounded-lg transition-colors active:scale-95 text-xs font-bold">
-                        <i data-lucide="plus-circle" class="w-4 h-4"></i>
-                        Gestionar Clases
-                    </button>
-                </div>
-                <div class="bg-surface-container-low rounded-xl p-1 flex">
-                    <button id="tab-schedule-l-v" onclick="window.calendarEngine.setScheduleMode('lv')"
-                        class="flex-1 py-1.5 text-xs font-bold rounded-lg text-on-surface bg-surface-container-lowest shadow-sm transition-all">Lunes
-                        a Viernes</button>
-                    <button id="tab-schedule-s" onclick="window.calendarEngine.setScheduleMode('s')"
-                        class="flex-1 py-1.5 text-xs font-bold rounded-lg text-on-surface-variant hover:text-on-surface transition-all">Solo
-                        Sábados</button>
-                </div>
-            </div>
-            <div class="flex-1 overflow-y-auto custom-scrollbar p-6 space-y-6">
-                <div>
-                    <div class="flex items-center justify-between mb-3">
-                        <h4 id="selected-day-title"
-                            class="text-xs font-black uppercase tracking-widest text-on-surface-variant">Día
-                            Seleccionado</h4>
-                        <button onclick="window.calendarEngine.showEventModal()"
-                            class="text-primary hover:text-primary/80 transition-colors"><i
-                                data-lucide="plus-circle" class="w-4 h-4"></i></button>
-                    </div>
-                    <div id="selected-day-events" class="space-y-2">
-                        <div class="text-sm text-on-surface-variant opacity-60 text-center py-4">Selecciona un
-                            día</div>
-                    </div>
-                </div>
-                <div>
-                    <h4 class="text-xs font-black uppercase tracking-widest text-on-surface-variant mb-3">
-                        Horario Recurrente</h4>
-                    <div id="schedule-list"
-                        class="space-y-2 relative pl-3 border-l-2 border-outline-variant/20">
-                    </div>
-                </div>
-            </div>
-        </aside>
-    </div>
-</div>
-````
-
-## File: partials/view-trash.html
-````html
-<div id="trash-view" class="flex-1 overflow-y-auto p-8 custom-scrollbar relative hidden">
-    <div class="mb-12 flex items-end justify-between max-w-7xl mx-auto w-full">
-        <div class="pr-8">
-            <h2 class="text-4xl font-extrabold tracking-tighter text-on-surface mb-2">Papelera</h2>
-            <p class="text-on-surface-variant text-lg font-medium opacity-70">Notas eliminadas (se borrarán en
-                30 días por defecto - Puedes cambiarlo en la configuración)</p>
-        </div>
-        <button id="empty-trash"
-            class="flex items-center gap-2 px-4 py-2 text-sm font-bold text-error border border-error/20 dark:border-error/40 hover:bg-error-container rounded-xl transition-colors">
-            <i data-lucide="trash-2" style="width:16px;"></i> Vaciar papelera
-        </button>
-    </div>
-    <div id="trash-list"
-        class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6 max-w-7xl mx-auto w-full">
-    </div>
-    <div id="trash-empty-state"
-        class="hidden flex-col items-center justify-center p-20 text-center text-on-surface-variant">
-        <i data-lucide="trash" class="w-16 h-16 mb-4 opacity-40"></i>
-        <h3 class="text-xl font-bold text-on-surface">La papelera está vacía</h3>
-        <p class="text-sm mt-2 opacity-80">Las notas que elimines aparecerán aquí.</p>
-    </div>
-</div>
 ````
 
 ## File: js/partials-loader.js
@@ -2393,6 +2643,16 @@ function sanitizeUrlAttribute(value, allowData = false)
 ⋮----
 function unwrapElement(el)
 ⋮----
+function normalizeInlineChips(root)
+⋮----
+function svgClassToPlaceholder(className, fallback = '')
+⋮----
+function replaceLucideSvg(svg, fallbackClass = '')
+⋮----
+function normalizeLucidePlaceholders(root)
+⋮----
+function normalizeRichBlocks(root)
+⋮----
 export function sanitizeHTML(html)
 ⋮----
 export function showModal(title, placeholder, initialValue = '')
@@ -2547,7 +2807,7 @@ export function toggleNotesPanel()
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta http-equiv="Content-Security-Policy"
-        content="default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com; img-src 'self' data: file: blob:; media-src 'self' data: file: blob: https:;">
+        content="default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com; img-src 'self' data: file: blob: https:; media-src 'self' data: file: blob: https:;">
     <title>NoteVault - University Manager</title>
     <script src="lib/tailwind.min.js"></script>
     <link

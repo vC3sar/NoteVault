@@ -221,7 +221,8 @@ export async function forceSaveNote() {
         editor.innerHTML = sanitizedContent;
         // Rehidratar listeners de bloques dinámicos que se pierden al reasignar innerHTML.
         try {
-            const { initVoiceNotePlayers } = await import('./insert-blocks.js');
+            const { initRichBlocks, initVoiceNotePlayers } = await import('./insert-blocks.js');
+            initRichBlocks(editor);
             initVoiceNotePlayers(editor);
             const dbg = (localStorage.getItem('NOTEVAULT_DEBUG') === '1') || location.search.includes('debug=1');
             if (dbg) console.log('[EDITOR] Rehydrated voice players after sanitize rewrite');

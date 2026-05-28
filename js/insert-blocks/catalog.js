@@ -1,101 +1,32 @@
-import { escapeHTML, refreshIcons, showModal, showToast } from "../utils.js";
+import { escapeHTML, refreshIcons, showToast } from "../utils.js";
 import { getEditor, insertHtmlAtCursor } from "./editor-dom.js";
 import { initVoiceNotePlayers, buildVoiceNoteHtml } from "./voice-note.js";
 import { recordAudioFromMic } from "./voice-recorder.js";
+import { initRichBlocks } from "./block-renderer.js";
+import { reminderBlock } from "./blocks/reminder.js";
+import { currentDateBlock, currentTimeBlock } from "./blocks/date-time.js";
+import { linkBlock } from "./blocks/link.js";
+import { imageBlock } from "./blocks/image.js";
+import { tableBlock } from "./blocks/table.js";
+import { checklistBlock } from "./blocks/checklist.js";
 import {
   CATEGORY_MAP,
   RECOMMENDED_IDS,
   baseTemplate,
   ensureWrappedBlock,
-  isValidHttpUrl,
   makeListBlock,
   sanitizeDurationSec,
   wrapBlock,
 } from "./shared.js";
 
 const BLOCKS = [
-  {
-    id: "reminder",
-    name: "Recordatorio",
-    category: "recommended",
-    description: "Recordatorio con fecha.",
-    icon: "alarm-clock",
-    template: () =>
-      wrapBlock(
-        "reminder",
-        `<div class="insert-block-meta"><strong>Recordatorio:</strong> ${new Date().toLocaleDateString("es-MX")}</div><p>Tarea pendiente...</p>`,
-      ),
-  },
-  {
-    id: "current-date",
-    name: "Fecha actual",
-    category: "recommended",
-    description: "Inserta la fecha de hoy.",
-    icon: "calendar-days",
-    template: () =>
-      wrapBlock(
-        "current-date",
-        `<div class="insert-block-meta">${new Date().toLocaleDateString("es-MX", { dateStyle: "full" })}</div>`,
-      ),
-  },
-  {
-    id: "current-time",
-    name: "Hora actual",
-    category: "recommended",
-    description: "Inserta la hora actual.",
-    icon: "clock-3",
-    template: () =>
-      wrapBlock(
-        "current-time",
-        `<div class="insert-block-meta">${new Date().toLocaleTimeString("es-MX")}</div>`,
-      ),
-  },
-  {
-    id: "link",
-    name: "Enlace",
-    category: "recommended",
-    description: "Enlace con validación.",
-    icon: "link",
-    insert: async () => {
-      const url = await showModal("URL del enlace", "https://ejemplo.com", "https://");
-      if (!url) return false;
-      if (!isValidHttpUrl(url)) return showToast("Enlace inválido. Usa http(s).", "error");
-      const label = await showModal("Texto del enlace", "Texto visible", url);
-      return insertHtmlAtCursor(
-        wrapBlock(
-          "link",
-          `<a href="${escapeHTML(url)}" target="_blank">${escapeHTML((label || url).trim())}</a>`,
-        ),
-      );
-    },
-  },
-  {
-    id: "image",
-    name: "Imagen",
-    category: "recommended",
-    description: "Inserta imagen por URL.",
-    icon: "image",
-    template: () =>
-      `<img src="https://picsum.photos/900/500" alt="Imagen insertada" class="max-w-full h-auto rounded-2xl shadow-lg my-4 border border-outline-variant/20"><p><br></p>`,
-  },
-  {
-    id: "table-3x3",
-    name: "Tabla",
-    category: "recommended",
-    description: "Comparación rápida.",
-    icon: "table-2",
-    template: () =>
-      `<table><thead><tr><th style="text-align: center;">Encabezado 1</th><th style="text-align: center;">Encabezado 2</th><th style="text-align: center;">Encabezado 3</th></tr></thead><tbody><tr><td>Dato 1</td><td>Dato 2</td><td>Dato 3</td></tr><tr><td>Dato 4</td><td>Dato 5</td><td>Dato 6</td></tr></tbody></table><p><br></p>`,
-  },
-  {
-    id: "check-list",
-    name: "Checklist",
-    category: "recommended",
-    description: "Tareas pendientes.",
-    icon: "list-checks",
-    template: () =>
-      `<ul class="editor-check-list"><li><input type="checkbox"> Tarea 1</li><li><input type="checkbox"> Tarea 2</li></ul><p><br></p>`,
-  },
+  reminderBlock,
+  currentDateBlock,
+  currentTimeBlock,
+  linkBlock,
+  imageBlock,
+  tableBlock,
+  checklistBlock,
   {
     id: "callout",
     name: "Tip / Callout",
@@ -140,19 +71,7 @@ const BLOCKS = [
         `<div class="insert-block-meta">Creado: ${new Date().toLocaleString("es-MX")} | Autor: Usuario</div>`,
       ),
   },
-  { id: "bullet-list", name: "Lista con viñetas", category: "lists", description: "Puntos rápidos.", icon: "list", template: () => `<ul><li>Punto 1</li><li>Punto 2</li><li>Punto 3</li></ul><p><br></p>` },
-  { id: "number-list", name: "Lista numerada", category: "lists", description: "Pasos o ranking.", icon: "list-ordered", template: () => `<ol><li>Paso 1</li><li>Paso 2</li><li>Paso 3</li></ol><p><br></p>` },
-  { id: "priority-list", name: "Lista de prioridades", category: "lists", description: "Orden de prioridad.", icon: "arrow-up-wide-narrow", template: () => makeListBlock("Prioridades", ["Alta", "Media", "Baja"]) },
-  { id: "shopping-list", name: "Lista de compras", category: "lists", description: "Compras pendientes.", icon: "shopping-cart", template: () => makeListBlock("Compras", ["Producto 1", "Producto 2"]) },
-  { id: "reading-list", name: "Lista de lectura", category: "lists", description: "Lecturas pendientes.", icon: "book-open", template: () => makeListBlock("Lecturas", ["Artículo 1", "Libro 1"]) },
-  {
-    id: "due-list",
-    name: "Pendientes por fecha",
-    category: "lists",
-    description: "Tareas por fecha.",
-    icon: "calendar-range",
-    template: () => makeListBlock("Pendientes por fecha", [`${new Date().toLocaleDateString("es-MX")} - Tarea`]),
-  },
+
   { id: "blockquote", name: "Cita", category: "blocks", description: "Bloque destacado.", icon: "quote", template: () => `<blockquote>Cita o referencia importante...</blockquote><p><br></p>` },
   { id: "code-block", name: "Bloque de código", category: "blocks", description: "Código con fondo.", icon: "code-2", template: () => `<pre><code>// Escribe tu código aquí</code></pre><p><br></p>` },
   {
@@ -210,7 +129,6 @@ export function renderInsertBlocks() {
   const panels = {
     recommended: document.querySelector('[data-insert-panel="recommended"]'),
     structure: document.querySelector('[data-insert-panel="structure"]'),
-    lists: document.querySelector('[data-insert-panel="lists"]'),
     blocks: document.querySelector('[data-insert-panel="blocks"]'),
   };
   Object.values(panels).forEach((panel) => {
@@ -235,6 +153,7 @@ export function renderInsertBlocks() {
     panel.appendChild(btn);
   });
   refreshIcons();
+  initRichBlocks(document);
 }
 
 export async function insertBlockById(id) {

@@ -6,6 +6,10 @@ export {
 } from "./insert-blocks/catalog.js";
 
 export {
+  initRichBlocks,
+} from "./insert-blocks/block-renderer.js";
+
+export {
   initVoiceNotePlayers,
   destroyVoiceNotePlayers,
 } from "./insert-blocks/voice-note.js";

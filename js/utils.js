@@ -84,6 +84,103 @@ function unwrapElement(el) {
     parent.removeChild(el);
 }
 
+function normalizeInlineChips(root) {
+    root.querySelectorAll('.rich-inline-chip').forEach((chip) => {
+        const type = chip.getAttribute('data-block-type') || '';
+        const icon = chip.getAttribute('data-chip-icon') || '';
+        const text = (chip.textContent || '').replace(/\u00a0/g, ' ').replace(/\s+/g, ' ').trim();
+        chip.innerHTML = '';
+        chip.textContent = text;
+        chip.setAttribute('contenteditable', 'false');
+        if (type) chip.setAttribute('data-block-type', type);
+        if (icon) chip.setAttribute('data-chip-icon', icon);
+    });
+
+    root.querySelectorAll('p').forEach((paragraph) => {
+        if (!paragraph.querySelector('.rich-inline-chip')) return;
+        paragraph.querySelectorAll('br').forEach((br) => br.remove());
+        Array.from(paragraph.childNodes).forEach((node) => {
+            if (node.nodeType !== Node.TEXT_NODE) return;
+            const cleaned = node.textContent.replace(/\u00a0/g, ' ').replace(/\s+/g, ' ');
+            if (!cleaned.trim()) node.remove();
+            else node.textContent = cleaned;
+        });
+    });
+}
+
+function svgClassToPlaceholder(className, fallback = '') {
+    const classes = String(className || '')
+        .split(/\s+/)
+        .filter(Boolean)
+        .filter((token) => token !== 'lucide' && !token.startsWith('lucide-'));
+    if (fallback && !classes.includes(fallback)) classes.unshift(fallback);
+    return classes.join(' ').trim();
+}
+
+function replaceLucideSvg(svg, fallbackClass = '') {
+    const name = svg.getAttribute('data-lucide');
+    if (!name) return;
+    const icon = svg.ownerDocument.createElement('i');
+    icon.setAttribute('data-lucide', name);
+    const className = svgClassToPlaceholder(svg.getAttribute('class'), fallbackClass);
+    if (className) icon.setAttribute('class', className);
+    icon.setAttribute('aria-hidden', 'true');
+    svg.replaceWith(icon);
+}
+
+function normalizeLucidePlaceholders(root) {
+    root.querySelectorAll('svg[data-lucide]').forEach((svg) => {
+        let fallbackClass = '';
+        if (svg.closest('.insert-callout-icon-wrap')) fallbackClass = 'insert-callout-icon';
+        replaceLucideSvg(svg, fallbackClass);
+    });
+
+    root.querySelectorAll('.rich-block-icon').forEach((wrap) => {
+        if (wrap.querySelector('[data-lucide]')) return;
+        const block = wrap.closest('.rich-insert-block');
+        const name = block?.getAttribute('data-block-icon');
+        if (!name) return;
+        wrap.innerHTML = `<i data-lucide="${name}" class="w-4 h-4" aria-hidden="true"></i>`;
+    });
+
+    root.querySelectorAll('[data-rich-block-edit]').forEach((button) => {
+        if (button.querySelector('[data-lucide]')) return;
+        button.innerHTML = '<i data-lucide="pencil" class="w-4 h-4" aria-hidden="true"></i>';
+    });
+
+    root.querySelectorAll('[data-rich-block-delete]').forEach((button) => {
+        if (button.querySelector('[data-lucide]')) return;
+        button.innerHTML = '<i data-lucide="trash-2" class="w-4 h-4" aria-hidden="true"></i>';
+    });
+
+    root.querySelectorAll('[data-rich-block-drag]').forEach((handle) => {
+        if (handle.querySelector('[data-lucide]')) return;
+        handle.innerHTML = '<i data-lucide="grip-vertical" class="w-4 h-4" aria-hidden="true"></i>';
+    });
+
+    root.querySelectorAll('.rich-reminder-date').forEach((dateEl) => {
+        if (dateEl.querySelector('[data-lucide]')) return;
+        dateEl.insertAdjacentHTML('afterbegin', '<i data-lucide="calendar-clock" class="w-4 h-4" aria-hidden="true"></i>');
+    });
+}
+
+function normalizeRichBlocks(root) {
+    root.querySelectorAll('.rich-insert-block').forEach((block) => {
+        const legacyType = block.getAttribute('data-blocktype');
+        const legacyIcon = block.getAttribute('data-blockicon');
+        if (!block.getAttribute('data-block-type') && legacyType) block.setAttribute('data-block-type', legacyType);
+        if (!block.getAttribute('data-block-icon') && legacyIcon) block.setAttribute('data-block-icon', legacyIcon);
+
+        block.classList.remove('is-editing', 'is-dragging');
+        block.querySelectorAll('.rich-block-accent, .rich-block-header, .rich-block-actions, .rich-block-icon, .rich-reminder-date, .rich-checklist-progress').forEach((el) => {
+            el.setAttribute('contenteditable', 'false');
+        });
+        block.querySelectorAll('[data-rich-block-edit], [data-rich-block-delete], [data-rich-block-drag]').forEach((el) => {
+            el.setAttribute('contenteditable', 'false');
+        });
+    });
+}
+
 const ALLOWED_TAGS = new Set([
     'A', 'ABBR', 'B', 'BLOCKQUOTE', 'BR', 'CAPTION', 'CITE', 'CODE', 'COL',
     'COLGROUP', 'DD', 'DEL', 'DETAILS', 'DIV', 'DL', 'DT', 'EM', 'FIGCAPTION',
@@ -97,7 +194,7 @@ const SAFE_ATTRS = new Set([
     'href', 'src', 'alt', 'title', 'class', 'style', 'colspan', 'rowspan',
     'scope', 'loading', 'target', 'rel', 'type', 'checked', 'disabled',
     'contenteditable', 'data-lucide', 'color', 'size', 'face', 'dir', 'align',
-    'controls', 'preload', 'playsinline'
+    'controls', 'preload', 'playsinline', 'draggable'
 ]);
 
 export function sanitizeHTML(html) {
@@ -304,9 +401,15 @@ export function cleanHTML(html) {
         wrap.setAttribute('contenteditable', 'false');
         wrap.innerHTML = '<i data-lucide="lightbulb" class="insert-callout-icon" aria-hidden="true"></i>';
     });
+    normalizeInlineChips(preDoc.body);
+    normalizeRichBlocks(preDoc.body);
+    normalizeLucidePlaceholders(preDoc.body);
 
     const sanitized = sanitizeHTML(preDoc.body.innerHTML);
     const doc = parser.parseFromString(sanitized, 'text/html');
+    normalizeInlineChips(doc.body);
+    normalizeRichBlocks(doc.body);
+    normalizeLucidePlaceholders(doc.body);
     doc.body.querySelectorAll('*').forEach(el => {
         if (el.classList) {
             el.classList.remove('Apple-interchange-newline', 'processed');
