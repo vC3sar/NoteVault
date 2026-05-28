@@ -786,14 +786,40 @@ allowBuilds:
                 placeholder="Buscar en la libreta activa...">
         </div>
         <div id="note-text-actions" class="hidden items-center gap-2">
-            <button data-editor-action="bold"
-                class="px-3 py-2 rounded-lg text-sm bg-surface-container-high hover:bg-surface-container-highest text-on-surface transition-colors"><span class="font-bold">B</span> <span class="text-[10px] opacity-60 ml-1">Ctrl+B</span></button>
-            <button data-editor-action="italic"
-                class="px-3 py-2 rounded-lg text-sm bg-surface-container-high hover:bg-surface-container-highest text-on-surface transition-colors"><span class="italic font-semibold">I</span> <span class="text-[10px] opacity-60 ml-1">Ctrl+I</span></button>
-            <button data-editor-action="underline"
-                class="px-3 py-2 rounded-lg text-sm bg-surface-container-high hover:bg-surface-container-highest text-on-surface transition-colors"><span class="underline font-semibold">U</span> <span class="text-[10px] opacity-60 ml-1">Ctrl+U</span></button>
-            <button data-editor-action="strikethrough"
-                class="px-3 py-2 rounded-lg text-sm bg-surface-container-high hover:bg-surface-container-highest text-on-surface transition-colors"><span class="line-through font-semibold">S</span> <span class="text-[10px] opacity-60 ml-1">Ctrl+O</span></button>
+            <details class="relative group">
+                <summary
+                    class="list-none cursor-pointer px-3 py-2 rounded-xl text-sm bg-surface-container-high hover:bg-surface-container-highest text-on-surface border border-outline-variant/20 transition-colors flex items-center gap-1.5">
+                    <i data-lucide="type" class="w-4 h-4 text-primary"></i>
+                    <span class="font-semibold">Formato</span>
+                    <i data-lucide="chevron-down" class="w-4 h-4 opacity-70 transition-transform group-open:rotate-180"></i>
+                </summary>
+                <div
+                    class="absolute top-full left-0 mt-2 w-64 z-40 p-2.5 rounded-2xl border border-outline-variant/20 bg-surface-container-lowest shadow-xl flex flex-col gap-1.5">
+                    <div class="px-2 pb-1 border-b border-outline-variant/15">
+                        <p class="text-[11px] uppercase tracking-wider font-bold text-on-surface-variant/80">Formato de texto</p>
+                    </div>
+                    <button data-editor-action="bold"
+                        class="w-full text-left px-2.5 py-2 rounded-lg text-sm hover:bg-surface-container-high text-on-surface transition-colors flex items-center justify-between gap-3">
+                        <span class="flex items-center gap-2.5"><i data-lucide="bold" class="w-4 h-4 text-primary"></i> <span class="font-medium">Negrita</span></span>
+                        <span class="text-[10px] opacity-60">Ctrl+B</span>
+                    </button>
+                    <button data-editor-action="italic"
+                        class="w-full text-left px-2.5 py-2 rounded-lg text-sm hover:bg-surface-container-high text-on-surface transition-colors flex items-center justify-between gap-3">
+                        <span class="flex items-center gap-2.5"><i data-lucide="italic" class="w-4 h-4 text-primary"></i> <span class="font-medium">Cursiva</span></span>
+                        <span class="text-[10px] opacity-60">Ctrl+I</span>
+                    </button>
+                    <button data-editor-action="underline"
+                        class="w-full text-left px-2.5 py-2 rounded-lg text-sm hover:bg-surface-container-high text-on-surface transition-colors flex items-center justify-between gap-3">
+                        <span class="flex items-center gap-2.5"><i data-lucide="underline" class="w-4 h-4 text-primary"></i> <span class="font-medium">Subrayado</span></span>
+                        <span class="text-[10px] opacity-60">Ctrl+U</span>
+                    </button>
+                    <button data-editor-action="strikethrough"
+                        class="w-full text-left px-2.5 py-2 rounded-lg text-sm hover:bg-surface-container-high text-on-surface transition-colors flex items-center justify-between gap-3">
+                        <span class="flex items-center gap-2.5"><i data-lucide="strikethrough" class="w-4 h-4 text-primary"></i> <span class="font-medium">Tachado</span></span>
+                        <span class="text-[10px] opacity-60">Ctrl+O</span>
+                    </button>
+                </div>
+            </details>
             <button id="open-insert-modal"
                 class="px-3 py-2 rounded-lg text-sm bg-primary/10 hover:bg-primary/20 text-primary border border-primary/20 transition-colors flex items-center gap-1.5">
                 <i data-lucide="plus-square" class="w-4 h-4"></i> Insertar
@@ -833,6 +859,14 @@ loadNote: (id)
 uploadCover: (path)
 savePastedImage: (data)
 saveRecordedAudio: (data)
+beginRecordingSession: (data)
+appendRecordingChunk: (data)
+finishRecordingSession: (data)
+listRecoverableRecordings: ()
+recoverRecordingSession: (id)
+discardRecordingSession: (id)
+resolveAttachmentUrl: (fileName)
+getAttachmentMetadata: (fileName)
 deleteAttachment: (url)
 deleteCover: (path)
 deleteNoteFile: (id)
@@ -858,30 +892,6 @@ mediaPrev: ()
 checkMediaNow: ()
 ⋮----
 onMenuAction: (callback)
-````
-
-## File: modules/ipc-handlers.js
-````javascript
-function registerIpcHandlers(
-⋮----
-function normalizePath(input)
-⋮----
-function isInsideDir(baseDir, candidate)
-⋮----
-function sanitizeFileId(id)
-⋮----
-async function readJsonFile(filePath)
-⋮----
-async function pathExists(filePath)
-⋮----
-async function loadPersistedData()
-⋮----
-async function writeAtomicJson(filePath, data)
-⋮----
-async function safeDeleteInsideDir(baseDir, candidatePath)
-⋮----
-click: () =>
-⋮----
 ````
 
 ## File: modules/media.js
@@ -1296,6 +1306,54 @@ function serializeNoteForDisk(note)
 export async function saveAll()
 ````
 
+## File: modules/ipc-handlers.js
+````javascript
+function registerIpcHandlers(
+⋮----
+function normalizePath(input)
+⋮----
+function isInsideDir(baseDir, candidate)
+⋮----
+function sanitizeFileId(id)
+⋮----
+function sanitizeAttachmentFileName(fileName)
+⋮----
+function normalizeAudioMime(mimeType)
+⋮----
+function audioExtensionForMime(mimeType)
+⋮----
+function createAudioId()
+⋮----
+function getAudioIdFromFileName(fileName)
+⋮----
+function getAttachmentPath(fileName)
+⋮----
+function getAudioMetaPathFromId(id)
+⋮----
+function getRecordingSessionPath(id)
+⋮----
+async function writeJsonAtomicLocal(filePath, data)
+⋮----
+async function readAudioMeta(fileName)
+⋮----
+async function buildAttachmentInfo(fileName)
+⋮----
+async function readJsonFile(filePath)
+⋮----
+async function pathExists(filePath)
+⋮----
+async function loadPersistedData()
+⋮----
+async function writeAtomicJson(filePath, data)
+⋮----
+async function safeDeleteInsideDir(baseDir, candidatePath)
+⋮----
+async function finalizeRecordingSession(id, data =
+⋮----
+click: () =>
+⋮----
+````
+
 ## File: js/notes.js
 ````javascript
 export function renderNotesList()
@@ -1654,109 +1712,6 @@ export function buildPreview(htmlContent)
 </div>
 ````
 
-## File: js/insert-blocks.js
-````javascript
-const vlog = (...args) =>
-const verr = (...args) =>
-⋮----
-const isValidHttpUrl = (value)
-⋮----
-const wrapBlock = (kind, inner)
-⋮----
-const makeListBlock = (title, items)
-⋮----
-const baseTemplate = (title, desc)
-⋮----
-function ensureWrappedBlock(id, html)
-⋮----
-function getEditor()
-⋮----
-function ensureSelectionInEditor(editor)
-⋮----
-function insertHtmlAtCursor(html)
-⋮----
-function formatClock(sec)
-⋮----
-function parseClockToSec(value)
-⋮----
-function normalizeIdleTime(value)
-⋮----
-function cleanupWavePlayer(note)
-⋮----
-function buildVoiceNoteHtml(src, stamp, durationSec = 0)
-⋮----
-function upgradeNativeAudioPlayers(root = document)
-⋮----
-function normalizeVoiceNoteMarkup(root = document)
-⋮----
-export function initVoiceNotePlayers(root = document)
-⋮----
-const dbg = (label, extra =
-⋮----
-const setProcessing = (enabled) =>
-⋮----
-const updateTime = () =>
-⋮----
-const hasUsableAudio = () =>
-⋮----
-const clearRetryTimer = () =>
-⋮----
-const scheduleRetry = (reason) =>
-⋮----
-const onPlayPauseClick = async () =>
-const onPlay = () =>
-const onPause = () =>
-const onEnded = () =>
-const onTimeUpdate = ()
-const onLoadedMetadata = () =>
-const onSeekInput = () =>
-const onSeekCommit = () =>
-const onAudioError = () =>
-const onCanPlay = () =>
-const onLoadedData = ()
-const onStalled = ()
-const onWaiting = ()
-const onSuspend = ()
-const onDurationChange = ()
-⋮----
-export function destroyVoiceNotePlayers(root = document)
-⋮----
-async function recordAudioFromMic()
-⋮----
-const pickRecorderMimeType = () =>
-⋮----
-recorder.ondataavailable = (e) =>
-⋮----
-const getBlobDurationSec = (blob)
-⋮----
-el.onloadedmetadata = () =>
-el.onerror = () =>
-⋮----
-const cleanup = () =>
-⋮----
-startBtn.onclick = () =>
-⋮----
-stopBtn.onclick = () =>
-⋮----
-closeBtn.onclick = () =>
-⋮----
-recorder.onstop = async () =>
-⋮----
-reader.onload = (ev)
-⋮----
-template: ()
-⋮----
-insert: async () =>
-⋮----
-export function renderInsertBlocks()
-⋮----
-export async function insertBlockById(id)
-⋮----
-export function hasInsertBlock(id)
-⋮----
-export function getInsertBlockSummary()
-````
-
 ## File: js/ipc.js
 ````javascript
 function getFileLabel(value)
@@ -1805,6 +1760,152 @@ if (!newPreview) continue; // sigue vacía
 // Si no, esperar el evento.
 ⋮----
 export function startPeriodicAutosave()
+````
+
+## File: js/insert-blocks.js
+````javascript
+const vlog = (...args) =>
+const verr = (...args) =>
+⋮----
+const isValidHttpUrl = (value)
+⋮----
+const wrapBlock = (kind, inner)
+⋮----
+const makeListBlock = (title, items)
+⋮----
+const baseTemplate = (title, desc)
+⋮----
+function ensureWrappedBlock(id, html)
+⋮----
+function getEditor()
+⋮----
+function ensureSelectionInEditor(editor)
+⋮----
+function insertHtmlAtCursor(html)
+⋮----
+function formatClock(sec)
+⋮----
+function sanitizeDurationSec(value)
+⋮----
+function getSafeDuration(audioEl, fallbackSeconds = 0)
+⋮----
+function clamp(value, min, max)
+⋮----
+function safeSetCurrentTime(audioEl, seconds)
+⋮----
+function formatBytes(bytes)
+⋮----
+function sanitizeAttachmentFileName(value)
+⋮----
+function extractAttachmentFileName(src)
+⋮----
+function getVoiceNoteFallbackDuration(note)
+⋮----
+function getAudioStatusLabel(status)
+⋮----
+function buildVoiceMetaText(note)
+⋮----
+function parseClockToSec(value)
+⋮----
+function normalizeIdleTime(value)
+⋮----
+function parseAudioFileLabel(src)
+⋮----
+function parseAudioFormat(src)
+⋮----
+function waitForAudioMetadata(audioEl, timeoutMs = 1200)
+⋮----
+const finish = (ok) =>
+const onReady = ()
+⋮----
+async function collectAudioInfoForUi(audioEl)
+⋮----
+function cleanupWavePlayer(note)
+⋮----
+function buildVoiceNoteHtml(meta =
+⋮----
+function upgradeNativeAudioPlayers(root = document)
+⋮----
+function normalizeVoiceNoteMarkup(root = document)
+⋮----
+export function initVoiceNotePlayers(root = document)
+⋮----
+const setPlayIcon = (playing) =>
+const markStatus = (status) =>
+⋮----
+const resolveAudioSrc = async () =>
+⋮----
+const dbg = (label, extra =
+⋮----
+const setProcessing = (enabled) =>
+⋮----
+const updateTime = () =>
+⋮----
+const getSeekDuration = () =>
+⋮----
+const updateSeekPreview = () =>
+⋮----
+const hasUsableAudio = () =>
+⋮----
+const clearRetryTimer = () =>
+⋮----
+const scheduleRetry = (reason) =>
+⋮----
+const onPlayPauseClick = async () =>
+const onPlay = () =>
+const onPause = () =>
+const onEnded = () =>
+⋮----
+const queueTimeUpdate = () =>
+const onTimeUpdate = ()
+const onLoadedMetadata = () =>
+const beginSeek = () =>
+const onSeekInput = () =>
+const finishSeek = () =>
+const onSeekCommit = () =>
+const onSeeked = ()
+const onAudioError = () =>
+const onCanPlay = () =>
+const onLoadedData = ()
+const onStalled = ()
+const onWaiting = ()
+const onSuspend = ()
+const onDurationChange = ()
+const onDurationChangeDebug = () =>
+⋮----
+export function destroyVoiceNotePlayers(root = document)
+⋮----
+async function appendVoiceNoteHtmlToNote(noteId, html)
+⋮----
+export async function checkRecoverableRecordings()
+⋮----
+async function recordAudioFromMic()
+⋮----
+const pickRecorderMimeType = () =>
+⋮----
+recorder.ondataavailable = (e) =>
+⋮----
+const cleanup = () =>
+⋮----
+startBtn.onclick = async () =>
+⋮----
+stopBtn.onclick = () =>
+⋮----
+closeBtn.onclick = () =>
+⋮----
+recorder.onstop = async () =>
+⋮----
+template: ()
+⋮----
+insert: async () =>
+⋮----
+export function renderInsertBlocks()
+⋮----
+export async function insertBlockById(id)
+⋮----
+export function hasInsertBlock(id)
+⋮----
+export function getInsertBlockSummary()
 ````
 
 ## File: js/notebooks.js
@@ -2132,6 +2233,14 @@ body {
 ⋮----
 #editor .voice-note-content {
 ⋮----
+#editor .voice-note-header {
+⋮----
+#editor .voice-note-badge,
+⋮----
+#editor .voice-note-badge {
+⋮----
+#editor .voice-note-status {
+⋮----
 #editor .voice-note-title {
 ⋮----
 #editor .voice-note-title:focus {
@@ -2151,6 +2260,10 @@ body {
 .dark #editor .voice-note-title {
 ⋮----
 .dark #editor .voice-note-time {
+⋮----
+.dark #editor .voice-note-badge {
+⋮----
+.dark #editor .voice-note-status {
 ⋮----
 #editor .voice-note-player {
 ⋮----

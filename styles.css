@@ -503,166 +503,233 @@ body {
 }
 
 #editor .voice-note {
-    display: flex;
-    align-items: center;
-    gap: 0.8rem;
-    width: 680px;
+    display: block;
+    width: 720px;
     max-width: 100%;
-    min-height: 92px;
     box-sizing: border-box;
-    padding: 0.75rem 0.85rem;
-    border-radius: 1.05rem;
-    border: 1px solid #cbd5e1;
-    background: #f8fafc;
-    transition: border-color .2s ease, background-color .2s ease;
+    padding: 1.1rem;
+    border-radius: 1.35rem;
+    border: 1px solid rgba(167, 139, 250, 0.28);
+    background:
+        radial-gradient(circle at 12% 0%, rgba(124, 58, 237, 0.38), transparent 34%),
+        radial-gradient(circle at 88% 12%, rgba(14, 165, 233, 0.28), transparent 32%),
+        linear-gradient(145deg, rgba(15, 23, 42, 0.94), rgba(30, 41, 59, 0.88));
+    box-shadow:
+        0 24px 70px rgba(15, 23, 42, 0.34),
+        inset 0 1px 0 rgba(255, 255, 255, 0.08);
+    transition: transform .18s ease, border-color .18s ease, box-shadow .18s ease;
     resize: none;
     overflow: hidden;
+    position: relative;
+    color: #f8fafc;
+    backdrop-filter: blur(18px);
+}
+
+#editor .voice-note:hover {
+    transform: translateY(-2px);
+    border-color: rgba(125, 211, 252, 0.42);
+    box-shadow:
+        0 30px 90px rgba(15, 23, 42, 0.42),
+        0 0 0 1px rgba(125, 211, 252, 0.08),
+        inset 0 1px 0 rgba(255, 255, 255, 0.12);
 }
 
 #editor .voice-note-content {
-    flex: 1;
     min-width: 0;
+    position: relative;
+    z-index: 1;
+}
+
+#editor .voice-note-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 0.75rem;
+    margin-bottom: 0.75rem;
+}
+
+#editor .voice-note-badge,
+#editor .voice-note-status {
+    display: inline-flex;
+    align-items: center;
+    min-height: 1.35rem;
+    border-radius: 999px;
+    font-size: 0.64rem;
+    font-weight: 900;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+}
+
+#editor .voice-note-badge {
+    gap: 0.38rem;
+    padding: 0.38rem 0.62rem;
+    color: #dbeafe;
+    background: rgba(59, 130, 246, 0.16);
+    border: 1px solid rgba(147, 197, 253, 0.26);
+}
+
+#editor .voice-note-badge::before {
+    content: "";
+    width: 0.42rem;
+    height: 0.42rem;
+    border-radius: 999px;
+    background: #a78bfa;
+    box-shadow: 0 0 0 rgba(167, 139, 250, 0.7);
+    animation: voicePulse 1.8s ease-out infinite;
+}
+
+#editor .voice-note-status {
+    padding: 0.34rem 0.56rem;
+    color: #bbf7d0;
+    background: rgba(34, 197, 94, 0.14);
+    border: 1px solid rgba(74, 222, 128, 0.26);
+    box-shadow: 0 0 20px rgba(34, 197, 94, 0.12);
 }
 
 #editor .voice-note-title {
-    font-size: 0.9rem;
-    font-weight: 800;
-    letter-spacing: 0.01em;
-    color: #0f172a;
+    font-size: 1.08rem;
+    font-weight: 850;
+    letter-spacing: 0;
+    color: #ffffff;
     line-height: 1.2;
+    margin-bottom: 0.35rem;
 }
 
 #editor .voice-note-title:focus {
     outline: none;
-    border-radius: 0.35rem;
-    box-shadow: 0 0 0 2px rgba(14, 165, 233, 0.22);
+    border-radius: 0.6rem;
+    box-shadow: 0 0 0 3px rgba(125, 211, 252, 0.18);
 }
 
 #editor .voice-note-meta {
-    font-size: 0.72rem;
+    font-size: 0.68rem;
     font-weight: 700;
-    letter-spacing: 0.04em;
+    letter-spacing: 0.05em;
     text-transform: uppercase;
-    color: #334155;
-    margin-bottom: 0.35rem;
-}
-
-#editor .voice-note-time {
-    font-size: 0.7rem;
-    color: #475569;
-    font-weight: 700;
-    min-width: 92px;
-    text-align: right;
+    color: rgba(226, 232, 240, 0.58);
+    margin-bottom: 0.85rem;
+    overflow-wrap: anywhere;
 }
 
 #editor .voice-note.voice-note-playing {
-    border-color: #38bdf8;
-    background: #f0f9ff;
+    border-color: rgba(125, 211, 252, 0.56);
+    box-shadow:
+        0 30px 90px rgba(14, 165, 233, 0.2),
+        0 0 0 1px rgba(167, 139, 250, 0.12),
+        inset 0 1px 0 rgba(255, 255, 255, 0.12);
 }
 
 .dark #editor .voice-note {
-    background: #0f172a;
-    border-color: #334155;
+    border-color: rgba(167, 139, 250, 0.32);
+    background:
+        radial-gradient(circle at 12% 0%, rgba(124, 58, 237, 0.42), transparent 34%),
+        radial-gradient(circle at 88% 12%, rgba(14, 165, 233, 0.3), transparent 32%),
+        linear-gradient(145deg, rgba(2, 6, 23, 0.96), rgba(15, 23, 42, 0.9));
+    box-shadow:
+        0 24px 70px rgba(0, 0, 0, 0.38),
+        inset 0 1px 0 rgba(255, 255, 255, 0.08);
 }
 
 .dark #editor .voice-note.voice-note-playing {
-    border-color: #0284c7;
-    background: #082f49;
+    border-color: rgba(125, 211, 252, 0.56);
 }
 
 .dark #editor .voice-note-meta {
-    color: #cbd5e1;
+    color: rgba(226, 232, 240, 0.6);
 }
 
 .dark #editor .voice-note-title {
     color: #f1f5f9;
 }
 
-.dark #editor .voice-note-time {
-    color: #cbd5e1;
+.dark #editor .voice-note-badge {
+    color: #dbeafe;
+    background: rgba(59, 130, 246, 0.16);
+    border-color: rgba(147, 197, 253, 0.26);
 }
 
-#editor .voice-note-player {
-    display: flex;
-    align-items: center;
-    gap: 0.6rem;
-    margin-top: 0.1rem;
-    padding: 0.42rem 0.52rem;
-    border: 1px solid #cbd5e1;
-    border-radius: 0.78rem;
-    background: #ffffff;
+.dark #editor .voice-note-status {
+    color: #a7f3d0;
+    background: rgba(16, 185, 129, 0.14);
+    border-color: rgba(52, 211, 153, 0.22);
 }
 
-#editor .voice-note-btn {
-    width: 2.05rem;
-    height: 2.05rem;
-    border-radius: 999px;
-    border: 1px solid rgba(30, 64, 175, 0.28);
-    background: #2563eb;
-    color: #f8fafc;
-    font-size: 0.78rem;
-    font-weight: 700;
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    cursor: pointer;
-    transition: transform .15s ease, background-color .15s ease, filter .15s ease;
+#editor .voice-note-native-audio {
+    display: block;
+    width: 100%;
+    box-sizing: border-box;
+    margin-top: 0.85rem;
+    border-radius: 1rem;
+    border: 1px solid rgba(148, 163, 184, 0.22);
+    background:
+        linear-gradient(135deg, rgba(255, 255, 255, 0.12), rgba(255, 255, 255, 0.04)),
+        rgba(15, 23, 42, 0.5);
+    box-shadow:
+        inset 0 1px 0 rgba(255, 255, 255, 0.08),
+        0 12px 28px rgba(2, 6, 23, 0.22);
+    padding: 0.38rem;
 }
 
-#editor .voice-note-btn:hover {
-    transform: translateY(-1px);
-    background: #1d4ed8;
+#editor .voice-note-native-audio::-webkit-media-controls-panel {
+    background: linear-gradient(135deg, rgba(30, 41, 59, 0.98), rgba(49, 46, 129, 0.88));
 }
 
-#editor .voice-note-btn:active {
-    transform: translateY(0) scale(0.98);
-    filter: brightness(0.96);
+.dark #editor .voice-note-native-audio {
+    border-color: rgba(148, 163, 184, 0.22);
+    background:
+        linear-gradient(135deg, rgba(255, 255, 255, 0.12), rgba(255, 255, 255, 0.04)),
+        rgba(15, 23, 42, 0.5);
 }
 
-#editor .voice-note-btn:disabled {
-    opacity: 0.45;
-    cursor: not-allowed;
+.dark #editor .voice-note-native-audio::-webkit-media-controls-panel {
+    background: linear-gradient(135deg, rgba(30, 41, 59, 0.98), rgba(49, 46, 129, 0.88));
 }
 
-#editor .voice-note-seek {
-    flex: 1;
-    min-width: 120px;
-    accent-color: #0ea5e9;
-    height: 1rem;
+#editor .voice-note-content::after {
+    content: "";
+    display: block;
+    height: 2rem;
+    margin: 0.75rem 0 0.1rem;
+    border-radius: 0.75rem;
+    opacity: 0.75;
+    background:
+        linear-gradient(90deg,
+            rgba(125, 211, 252, 0.16) 0 0.38rem,
+            transparent 0.38rem 0.75rem,
+            rgba(167, 139, 250, 0.34) 0.75rem 1.06rem,
+            transparent 1.06rem 1.5rem,
+            rgba(96, 165, 250, 0.24) 1.5rem 1.88rem,
+            transparent 1.88rem 2.38rem);
+    background-size: 2.38rem 100%;
+    mask-image: linear-gradient(90deg, transparent, #000 10%, #000 90%, transparent);
+    animation: voiceWave 1.8s linear infinite;
 }
 
-.dark #editor .voice-note-player {
-    border-color: #334155;
-    background: #111827;
+#editor .voice-note.voice-note-playing .voice-note-content::after {
+    opacity: 1;
+    animation-duration: 0.9s;
 }
 
-.dark #editor .voice-note-btn {
-    border-color: #1e3a8a;
-    background: #1d4ed8;
-    color: #f8fafc;
+@keyframes voiceWave {
+    from { background-position-x: 0; }
+    to { background-position-x: 2.38rem; }
+}
+
+@keyframes voicePulse {
+    0% { box-shadow: 0 0 0 0 rgba(167, 139, 250, 0.7); }
+    70% { box-shadow: 0 0 0 0.42rem rgba(167, 139, 250, 0); }
+    100% { box-shadow: 0 0 0 0 rgba(167, 139, 250, 0); }
 }
 
 @media (max-width: 640px) {
     #editor .voice-note {
         width: calc(100% - 2rem);
-        min-height: 102px;
         max-width: 100%;
-        padding: 0.65rem 0.7rem;
+        padding: 0.85rem;
     }
 
-    #editor .voice-note-player {
-        flex-wrap: wrap;
-        gap: 0.45rem;
-    }
-
-    #editor .voice-note-seek {
-        min-width: 100%;
-        order: 3;
-    }
-
-    #editor .voice-note-time {
-        min-width: 0;
-        margin-left: auto;
+    #editor .voice-note-native-audio {
+        margin-top: 0.7rem;
     }
 }
 

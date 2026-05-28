@@ -42,6 +42,101 @@ function registerIpcHandlers({ DATA_PATH, NOTES_DIR, COVERS_DIR, ATTACHMENTS_DIR
     return safe && safe === path.basename(safe) && !safe.includes(path.sep) && !safe.includes('/') && !safe.includes('\\') ? safe : null;
   }
 
+  function sanitizeAttachmentFileName(fileName) {
+    const safe = String(fileName ?? '').trim();
+    if (!safe || safe !== path.basename(safe)) return null;
+    if (safe.includes('/') || safe.includes('\\') || safe.includes('..')) return null;
+    return /^[a-zA-Z0-9._-]+$/.test(safe) ? safe : null;
+  }
+
+  function normalizeAudioMime(mimeType) {
+    return String(mimeType || 'audio/webm')
+      .toLowerCase()
+      .split(';')[0]
+      .trim() || 'audio/webm';
+  }
+
+  function audioExtensionForMime(mimeType) {
+    const extMap = {
+      'audio/webm': '.webm',
+      'audio/ogg': '.ogg',
+      'audio/mp4': '.m4a',
+      'audio/mpeg': '.mp3',
+      'audio/wav': '.wav'
+    };
+    return extMap[normalizeAudioMime(mimeType)] || '.webm';
+  }
+
+  function createAudioId() {
+    return `aud_${Date.now()}_${Math.floor(Math.random() * 100000)}`;
+  }
+
+  function getAudioIdFromFileName(fileName) {
+    const safe = sanitizeAttachmentFileName(fileName);
+    if (!safe) return null;
+    return path.basename(safe, path.extname(safe));
+  }
+
+  function getAttachmentPath(fileName) {
+    const safe = sanitizeAttachmentFileName(fileName);
+    if (!safe) return null;
+    const filePath = path.join(ATTACHMENTS_DIR, safe);
+    return isInsideDir(ATTACHMENTS_DIR, filePath) ? filePath : null;
+  }
+
+  function getAudioMetaPathFromId(id) {
+    const rawId = String(id ?? '').trim();
+    if (!rawId || !/^[a-zA-Z0-9_-]+$/.test(rawId)) return null;
+    const safeId = sanitizeAttachmentFileName(`${rawId}.meta.json`);
+    if (!safeId) return null;
+    return path.join(ATTACHMENTS_DIR, safeId);
+  }
+
+  function getRecordingSessionPath(id) {
+    const rawId = String(id ?? '').trim();
+    if (!rawId || !/^[a-zA-Z0-9_-]+$/.test(rawId)) return null;
+    const safeId = sanitizeAttachmentFileName(`${rawId}.recording-session.json`);
+    if (!safeId) return null;
+    return path.join(ATTACHMENTS_DIR, safeId);
+  }
+
+  async function writeJsonAtomicLocal(filePath, data) {
+    const tempPath = `${filePath}.${process.pid}.${Date.now()}.tmp`;
+    await fsp.writeFile(tempPath, JSON.stringify(data, null, 2), 'utf-8');
+    try {
+      await fsp.rename(tempPath, filePath);
+    } catch (error) {
+      await fsp.copyFile(tempPath, filePath);
+      await fsp.unlink(tempPath).catch(() => {});
+    }
+  }
+
+  async function readAudioMeta(fileName) {
+    const id = getAudioIdFromFileName(fileName);
+    if (!id) return null;
+    const metaPath = getAudioMetaPathFromId(id);
+    if (!metaPath || !(await pathExists(metaPath))) return null;
+    return await readJsonFile(metaPath);
+  }
+
+  async function buildAttachmentInfo(fileName) {
+    const safe = sanitizeAttachmentFileName(fileName);
+    const filePath = safe ? getAttachmentPath(safe) : null;
+    if (!safe || !filePath) return { success: false, error: 'Invalid attachment file name' };
+
+    const exists = await pathExists(filePath);
+    const stat = exists ? await fsp.stat(filePath) : null;
+    const meta = await readAudioMeta(safe).catch(() => null);
+    return {
+      success: true,
+      exists,
+      url: exists ? pathToFileURL(filePath).href : '',
+      fileName: safe,
+      sizeBytes: stat ? stat.size : 0,
+      meta
+    };
+  }
+
   async function readJsonFile(filePath) {
     const content = await fsp.readFile(filePath, 'utf-8');
     return JSON.parse(content);
@@ -181,6 +276,15 @@ function registerIpcHandlers({ DATA_PATH, NOTES_DIR, COVERS_DIR, ATTACHMENTS_DIR
             await fsp.unlink(fullPath).catch(() => {});
           }
         }
+        const portableAttachmentRegex = /data-audio-file="([^"]+)"/g;
+        while ((match = portableAttachmentRegex.exec(content)) !== null) {
+          const audioPath = getAttachmentPath(match[1]);
+          if (audioPath && await pathExists(audioPath)) {
+            await fsp.unlink(audioPath).catch(() => {});
+            const metaPath = getAudioMetaPathFromId(getAudioIdFromFileName(match[1]));
+            if (metaPath) await fsp.unlink(metaPath).catch(() => {});
+          }
+        }
         await fsp.unlink(filePath);
       }
       return { success: true };
@@ -265,18 +369,210 @@ function registerIpcHandlers({ DATA_PATH, NOTES_DIR, COVERS_DIR, ATTACHMENTS_DIR
     }
   });
 
-  ipcMain.handle('save-recorded-audio', async (event, { base64, mimeType }) => {
+  ipcMain.handle('resolve-attachment-url', async (event, fileName) => {
     try {
-      const mime = String(mimeType || 'audio/webm').toLowerCase().split(';')[0].trim();
-      const extMap = {
-        'audio/webm': '.webm',
-        'audio/ogg': '.ogg',
-        'audio/mp4': '.m4a',
-        'audio/mpeg': '.mp3',
-        'audio/wav': '.wav'
+      return await buildAttachmentInfo(fileName);
+    } catch (error) {
+      return { success: false, error: error.message };
+    }
+  });
+
+  ipcMain.handle('get-attachment-metadata', async (event, fileName) => {
+    try {
+      return await buildAttachmentInfo(fileName);
+    } catch (error) {
+      return { success: false, error: error.message };
+    }
+  });
+
+  ipcMain.handle('begin-recording-session', async (event, data = {}) => {
+    try {
+      const id = createAudioId();
+      const mime = normalizeAudioMime(data.mimeType || 'audio/webm');
+      const ext = audioExtensionForMime(mime);
+      const fileName = `${id}${ext}`;
+      const tempFileName = `${fileName}.part`;
+      const tempPath = getAttachmentPath(tempFileName);
+      const sessionPath = getRecordingSessionPath(id);
+      const startedAt = Number(data.startedAt) || Date.now();
+      if (!tempPath || !sessionPath) return { success: false, error: 'Invalid recording session' };
+
+      await fsp.writeFile(tempPath, Buffer.alloc(0));
+      const session = {
+        schemaVersion: 1,
+        appVersion: app.getVersion(),
+        id,
+        fileName,
+        tempFileName,
+        originalName: data.originalName || 'Nota de voz',
+        mime,
+        codec: mime.includes('webm') ? 'opus' : '',
+        extension: ext,
+        startedAt,
+        endedAt: null,
+        sizeBytes: 0,
+        chunksCount: 0,
+        noteId: sanitizeFileId(data.noteId) || '',
+        status: 'recording'
       };
-      const ext = extMap[mime] || '.webm';
-      const fileName = `aud_${Date.now()}_${Math.floor(Math.random() * 1000)}${ext}`;
+      await writeJsonAtomicLocal(sessionPath, session);
+      return { success: true, ...session };
+    } catch (error) {
+      return { success: false, error: error.message };
+    }
+  });
+
+  ipcMain.handle('append-recording-chunk', async (event, { id, chunk }) => {
+    try {
+      const sessionPath = getRecordingSessionPath(id);
+      if (!sessionPath || !(await pathExists(sessionPath))) {
+        return { success: false, error: 'Recording session not found' };
+      }
+      const session = await readJsonFile(sessionPath);
+      const tempPath = getAttachmentPath(session.tempFileName);
+      if (!tempPath) return { success: false, error: 'Invalid temp path' };
+
+      const buffer = Buffer.from(chunk);
+      if (!buffer.length) return { success: true, sizeBytes: session.sizeBytes || 0, chunksCount: session.chunksCount || 0 };
+
+      await fsp.appendFile(tempPath, buffer);
+      const nextSession = {
+        ...session,
+        sizeBytes: Number(session.sizeBytes || 0) + buffer.length,
+        chunksCount: Number(session.chunksCount || 0) + 1,
+        lastChunkAt: Date.now()
+      };
+      await writeJsonAtomicLocal(sessionPath, nextSession);
+      return { success: true, sizeBytes: nextSession.sizeBytes, chunksCount: nextSession.chunksCount };
+    } catch (error) {
+      return { success: false, error: error.message };
+    }
+  });
+
+  async function finalizeRecordingSession(id, data = {}, recovered = false) {
+    const sessionPath = getRecordingSessionPath(id);
+    if (!sessionPath || !(await pathExists(sessionPath))) {
+      return { success: false, error: 'Recording session not found' };
+    }
+
+    const session = await readJsonFile(sessionPath);
+    const tempPath = getAttachmentPath(session.tempFileName);
+    const finalPath = getAttachmentPath(session.fileName);
+    if (!tempPath || !finalPath || !(await pathExists(tempPath))) {
+      return { success: false, error: 'Recording data not found' };
+    }
+
+    try {
+      await fsp.rename(tempPath, finalPath);
+    } catch (error) {
+      await fsp.copyFile(tempPath, finalPath);
+      await fsp.unlink(tempPath).catch(() => {});
+    }
+
+    const stat = await fsp.stat(finalPath);
+    const endedAt = Number(data.endedAt) || Date.now();
+    const durationMs = Math.max(0, Math.floor(Number(data.durationMs) || (endedAt - Number(session.startedAt || endedAt))));
+    const durationSec = Math.max(0, Math.floor(durationMs / 1000));
+    const meta = {
+      schemaVersion: 1,
+      appVersion: app.getVersion(),
+      id: session.id,
+      fileName: session.fileName,
+      originalName: session.originalName || 'Nota de voz',
+      mime: normalizeAudioMime(data.mimeType || session.mime),
+      codec: session.codec || '',
+      extension: session.extension || path.extname(session.fileName),
+      durationMs,
+      durationSec,
+      startedAt: Number(session.startedAt) || 0,
+      endedAt,
+      sizeBytes: stat.size,
+      chunksCount: Number(session.chunksCount || 0),
+      waveform: null,
+      peaks: null,
+      status: recovered ? 'recoverable' : 'ready',
+      checksum: '',
+      noteId: sanitizeFileId(data.noteId || session.noteId) || '',
+      audioDurationSec: Math.max(0, Math.floor(Number(data.audioDurationSec) || 0))
+    };
+
+    const metaPath = getAudioMetaPathFromId(session.id);
+    if (metaPath) await writeJsonAtomicLocal(metaPath, meta);
+    await fsp.unlink(sessionPath).catch(() => {});
+    return {
+      success: true,
+      id: meta.id,
+      fileName: meta.fileName,
+      path: pathToFileURL(finalPath).href,
+      url: pathToFileURL(finalPath).href,
+      meta
+    };
+  }
+
+  ipcMain.handle('finish-recording-session', async (event, { id, ...data } = {}) => {
+    try {
+      return await finalizeRecordingSession(id, data, false);
+    } catch (error) {
+      return { success: false, error: error.message };
+    }
+  });
+
+  ipcMain.handle('list-recoverable-recordings', async () => {
+    try {
+      const entries = await fsp.readdir(ATTACHMENTS_DIR);
+      const sessions = [];
+      for (const entry of entries) {
+        if (!entry.endsWith('.recording-session.json')) continue;
+        const sessionPath = path.join(ATTACHMENTS_DIR, entry);
+        if (!isInsideDir(ATTACHMENTS_DIR, sessionPath)) continue;
+        const session = await readJsonFile(sessionPath).catch(() => null);
+        if (!session || !session.id || !session.tempFileName) continue;
+        const tempPath = getAttachmentPath(session.tempFileName);
+        const tempExists = !!(tempPath && await pathExists(tempPath));
+        const stat = tempExists ? await fsp.stat(tempPath) : null;
+        sessions.push({
+          ...session,
+          tempExists,
+          sizeBytes: stat ? stat.size : Number(session.sizeBytes || 0),
+          durationMs: Math.max(0, Date.now() - Number(session.startedAt || Date.now()))
+        });
+      }
+      return { success: true, sessions };
+    } catch (error) {
+      return { success: false, error: error.message, sessions: [] };
+    }
+  });
+
+  ipcMain.handle('recover-recording-session', async (event, id) => {
+    try {
+      return await finalizeRecordingSession(id, { endedAt: Date.now() }, true);
+    } catch (error) {
+      return { success: false, error: error.message };
+    }
+  });
+
+  ipcMain.handle('discard-recording-session', async (event, id) => {
+    try {
+      const sessionPath = getRecordingSessionPath(id);
+      if (!sessionPath || !(await pathExists(sessionPath))) return { success: true };
+      const session = await readJsonFile(sessionPath).catch(() => null);
+      if (session?.tempFileName) {
+        const tempPath = getAttachmentPath(session.tempFileName);
+        if (tempPath) await fsp.unlink(tempPath).catch(() => {});
+      }
+      await fsp.unlink(sessionPath).catch(() => {});
+      return { success: true };
+    } catch (error) {
+      return { success: false, error: error.message };
+    }
+  });
+
+  ipcMain.handle('save-recorded-audio', async (event, { base64, mimeType, durationSec = 0, noteId = '' }) => {
+    try {
+      const mime = normalizeAudioMime(mimeType || 'audio/webm');
+      const ext = audioExtensionForMime(mime);
+      const id = createAudioId();
+      const fileName = `${id}${ext}`;
       const destPath = path.join(ATTACHMENTS_DIR, fileName);
 
       const parts = String(base64 || '').split(',');
@@ -285,7 +581,32 @@ function registerIpcHandlers({ DATA_PATH, NOTES_DIR, COVERS_DIR, ATTACHMENTS_DIR
 
       const buffer = Buffer.from(payload, 'base64');
       await fsp.writeFile(destPath, buffer);
-      return { success: true, path: pathToFileURL(destPath).href };
+      const stat = await fsp.stat(destPath);
+      const now = Date.now();
+      const meta = {
+        schemaVersion: 1,
+        appVersion: app.getVersion(),
+        id,
+        fileName,
+        originalName: 'Nota de voz',
+        mime,
+        codec: mime.includes('webm') ? 'opus' : '',
+        extension: ext,
+        durationMs: Math.max(0, Math.floor(Number(durationSec) || 0) * 1000),
+        durationSec: Math.max(0, Math.floor(Number(durationSec) || 0)),
+        startedAt: now - Math.max(0, Math.floor(Number(durationSec) || 0) * 1000),
+        endedAt: now,
+        sizeBytes: stat.size,
+        chunksCount: 1,
+        waveform: null,
+        peaks: null,
+        status: 'ready',
+        checksum: '',
+        noteId: sanitizeFileId(noteId) || ''
+      };
+      const metaPath = getAudioMetaPathFromId(id);
+      if (metaPath) await writeJsonAtomicLocal(metaPath, meta);
+      return { success: true, path: pathToFileURL(destPath).href, url: pathToFileURL(destPath).href, fileName, id, meta };
     } catch (error) {
       return { success: false, error: error.message };
     }
@@ -293,7 +614,8 @@ function registerIpcHandlers({ DATA_PATH, NOTES_DIR, COVERS_DIR, ATTACHMENTS_DIR
 
   ipcMain.handle('delete-attachment', async (event, fileUrl) => {
     try {
-      const filePath = normalizePath(fileUrl);
+      const portableName = sanitizeAttachmentFileName(fileUrl);
+      const filePath = portableName ? getAttachmentPath(portableName) : normalizePath(fileUrl);
       if (!isInsideDir(ATTACHMENTS_DIR, filePath) || !(await pathExists(filePath))) {
         return { success: false, error: 'Not an attachment or file not found' };
       }
@@ -313,6 +635,8 @@ function registerIpcHandlers({ DATA_PATH, NOTES_DIR, COVERS_DIR, ATTACHMENTS_DIR
 
       if (!isUsed) {
         await fsp.unlink(filePath);
+        const metaPath = getAudioMetaPathFromId(getAudioIdFromFileName(path.basename(filePath)));
+        if (metaPath) await fsp.unlink(metaPath).catch(() => {});
         return { success: true, deleted: true };
       }
 

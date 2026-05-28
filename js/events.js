@@ -4,10 +4,13 @@ import { addNotebook, renderNotebookGrid } from './notebooks.js';
 import { addNote, renderNotesList, selectNote, renderTrashList } from './notes.js';
 import { executeEditAction, setupEditor, handleInput } from './editor.js';
 import { refreshIcons, escapeHTML, stripHTML, showToast } from './utils.js';
-import { renderInsertBlocks, insertBlockById, hasInsertBlock } from './insert-blocks.js';
+import { renderInsertBlocks, insertBlockById, hasInsertBlock, checkRecoverableRecordings } from './insert-blocks.js';
 
 export function setupEventListeners() {
     setupEditor();
+    setTimeout(() => {
+        checkRecoverableRecordings().catch(err => console.warn('No se pudo revisar recovery de audio:', err));
+    }, 1200);
 
     const openInsertModal = () => {
         const modal = document.getElementById('insert-modal');

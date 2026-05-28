@@ -28,6 +28,14 @@ contextBridge.exposeInMainWorld('api', {
     uploadCover: (path) => ipcRenderer.invoke('upload-cover', path),
     savePastedImage: (data) => ipcRenderer.invoke('save-pasted-image', data),
     saveRecordedAudio: (data) => ipcRenderer.invoke('save-recorded-audio', data),
+    beginRecordingSession: (data) => ipcRenderer.invoke('begin-recording-session', data),
+    appendRecordingChunk: (data) => ipcRenderer.invoke('append-recording-chunk', data),
+    finishRecordingSession: (data) => ipcRenderer.invoke('finish-recording-session', data),
+    listRecoverableRecordings: () => ipcRenderer.invoke('list-recoverable-recordings'),
+    recoverRecordingSession: (id) => ipcRenderer.invoke('recover-recording-session', id),
+    discardRecordingSession: (id) => ipcRenderer.invoke('discard-recording-session', id),
+    resolveAttachmentUrl: (fileName) => ipcRenderer.invoke('resolve-attachment-url', fileName),
+    getAttachmentMetadata: (fileName) => ipcRenderer.invoke('get-attachment-metadata', fileName),
     deleteAttachment: (url) => ipcRenderer.invoke('delete-attachment', url),
     deleteCover: (path) => ipcRenderer.invoke('delete-cover', path),
     deleteNoteFile: (id) => ipcRenderer.invoke('delete-note-file', id),
@@ -60,4 +68,9 @@ contextBridge.exposeInMainWorld('api', {
 
     // Acciones disparadas desde el menú nativo (barra superior / atajos).
     onMenuAction: (callback) => ipcRenderer.on('menu-action', (_event, action) => callback(action))
+});
+
+contextBridge.exposeInMainWorld('noteVault', {
+    resolveAttachmentUrl: (fileName) => ipcRenderer.invoke('resolve-attachment-url', fileName),
+    getAttachmentMetadata: (fileName) => ipcRenderer.invoke('get-attachment-metadata', fileName)
 });

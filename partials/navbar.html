@@ -24,14 +24,40 @@
         </div>
 
         <div id="note-text-actions" class="hidden items-center gap-2">
-            <button data-editor-action="bold"
-                class="px-3 py-2 rounded-lg text-sm bg-surface-container-high hover:bg-surface-container-highest text-on-surface transition-colors"><span class="font-bold">B</span> <span class="text-[10px] opacity-60 ml-1">Ctrl+B</span></button>
-            <button data-editor-action="italic"
-                class="px-3 py-2 rounded-lg text-sm bg-surface-container-high hover:bg-surface-container-highest text-on-surface transition-colors"><span class="italic font-semibold">I</span> <span class="text-[10px] opacity-60 ml-1">Ctrl+I</span></button>
-            <button data-editor-action="underline"
-                class="px-3 py-2 rounded-lg text-sm bg-surface-container-high hover:bg-surface-container-highest text-on-surface transition-colors"><span class="underline font-semibold">U</span> <span class="text-[10px] opacity-60 ml-1">Ctrl+U</span></button>
-            <button data-editor-action="strikethrough"
-                class="px-3 py-2 rounded-lg text-sm bg-surface-container-high hover:bg-surface-container-highest text-on-surface transition-colors"><span class="line-through font-semibold">S</span> <span class="text-[10px] opacity-60 ml-1">Ctrl+O</span></button>
+            <details class="relative group">
+                <summary
+                    class="list-none cursor-pointer px-3 py-2 rounded-xl text-sm bg-surface-container-high hover:bg-surface-container-highest text-on-surface border border-outline-variant/20 transition-colors flex items-center gap-1.5">
+                    <i data-lucide="type" class="w-4 h-4 text-primary"></i>
+                    <span class="font-semibold">Formato</span>
+                    <i data-lucide="chevron-down" class="w-4 h-4 opacity-70 transition-transform group-open:rotate-180"></i>
+                </summary>
+                <div
+                    class="absolute top-full left-0 mt-2 w-64 z-40 p-2.5 rounded-2xl border border-outline-variant/20 bg-surface-container-lowest shadow-xl flex flex-col gap-1.5">
+                    <div class="px-2 pb-1 border-b border-outline-variant/15">
+                        <p class="text-[11px] uppercase tracking-wider font-bold text-on-surface-variant/80">Formato de texto</p>
+                    </div>
+                    <button data-editor-action="bold"
+                        class="w-full text-left px-2.5 py-2 rounded-lg text-sm hover:bg-surface-container-high text-on-surface transition-colors flex items-center justify-between gap-3">
+                        <span class="flex items-center gap-2.5"><i data-lucide="bold" class="w-4 h-4 text-primary"></i> <span class="font-medium">Negrita</span></span>
+                        <span class="text-[10px] opacity-60">Ctrl+B</span>
+                    </button>
+                    <button data-editor-action="italic"
+                        class="w-full text-left px-2.5 py-2 rounded-lg text-sm hover:bg-surface-container-high text-on-surface transition-colors flex items-center justify-between gap-3">
+                        <span class="flex items-center gap-2.5"><i data-lucide="italic" class="w-4 h-4 text-primary"></i> <span class="font-medium">Cursiva</span></span>
+                        <span class="text-[10px] opacity-60">Ctrl+I</span>
+                    </button>
+                    <button data-editor-action="underline"
+                        class="w-full text-left px-2.5 py-2 rounded-lg text-sm hover:bg-surface-container-high text-on-surface transition-colors flex items-center justify-between gap-3">
+                        <span class="flex items-center gap-2.5"><i data-lucide="underline" class="w-4 h-4 text-primary"></i> <span class="font-medium">Subrayado</span></span>
+                        <span class="text-[10px] opacity-60">Ctrl+U</span>
+                    </button>
+                    <button data-editor-action="strikethrough"
+                        class="w-full text-left px-2.5 py-2 rounded-lg text-sm hover:bg-surface-container-high text-on-surface transition-colors flex items-center justify-between gap-3">
+                        <span class="flex items-center gap-2.5"><i data-lucide="strikethrough" class="w-4 h-4 text-primary"></i> <span class="font-medium">Tachado</span></span>
+                        <span class="text-[10px] opacity-60">Ctrl+O</span>
+                    </button>
+                </div>
+            </details>
             <button id="open-insert-modal"
                 class="px-3 py-2 rounded-lg text-sm bg-primary/10 hover:bg-primary/20 text-primary border border-primary/20 transition-colors flex items-center gap-1.5">
                 <i data-lucide="plus-square" class="w-4 h-4"></i> Insertar

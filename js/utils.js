@@ -97,7 +97,7 @@ const SAFE_ATTRS = new Set([
     'href', 'src', 'alt', 'title', 'class', 'style', 'colspan', 'rowspan',
     'scope', 'loading', 'target', 'rel', 'type', 'checked', 'disabled',
     'contenteditable', 'data-lucide', 'color', 'size', 'face', 'dir', 'align',
-    'controls', 'preload'
+    'controls', 'preload', 'playsinline'
 ]);
 
 export function sanitizeHTML(html) {
@@ -277,6 +277,29 @@ export function cleanHTML(html) {
     if (!html) return '';
     const parser = new DOMParser();
     const preDoc = parser.parseFromString(String(html), 'text/html');
+    preDoc.body.querySelectorAll('.voice-note').forEach((note) => {
+        note.removeAttribute('data-player-ready');
+        note.querySelectorAll('.voice-note-player').forEach(player => {
+            const content = note.querySelector('.voice-note-content') || note;
+            player.querySelectorAll('audio').forEach(audio => content.appendChild(audio));
+            player.remove();
+        });
+        if (note.dataset && note.dataset.audioFile) {
+            note.removeAttribute('data-audio-src');
+            note.querySelectorAll('audio').forEach(audio => {
+                audio.removeAttribute('src');
+                audio.removeAttribute('data-player-ready');
+                audio.removeAttribute('data-voice-upgraded');
+                audio.classList.add('voice-note-native-audio');
+                audio.setAttribute('controls', '');
+                audio.setAttribute('preload', 'metadata');
+                audio.setAttribute('playsinline', '');
+            });
+        }
+        note.querySelectorAll('.voice-note-meta, .voice-note-header, audio').forEach(el => {
+            el.setAttribute('contenteditable', 'false');
+        });
+    });
     preDoc.body.querySelectorAll('.insert-callout-icon-wrap').forEach((wrap) => {
         wrap.setAttribute('contenteditable', 'false');
         wrap.innerHTML = '<i data-lucide="lightbulb" class="insert-callout-icon" aria-hidden="true"></i>';
