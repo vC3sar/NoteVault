@@ -507,31 +507,27 @@ body {
     width: 720px;
     max-width: 100%;
     box-sizing: border-box;
-    padding: 1.1rem;
-    border-radius: 1.35rem;
-    border: 1px solid rgba(167, 139, 250, 0.28);
-    background:
-        radial-gradient(circle at 12% 0%, rgba(124, 58, 237, 0.38), transparent 34%),
-        radial-gradient(circle at 88% 12%, rgba(14, 165, 233, 0.28), transparent 32%),
-        linear-gradient(145deg, rgba(15, 23, 42, 0.94), rgba(30, 41, 59, 0.88));
+    padding: 1.15rem;
+    border-radius: 1.55rem;
+    border: 1px solid rgba(147, 197, 253, 0.18);
+    background: #172554;
     box-shadow:
-        0 24px 70px rgba(15, 23, 42, 0.34),
-        inset 0 1px 0 rgba(255, 255, 255, 0.08);
+        0 18px 42px rgba(15, 23, 42, 0.28),
+        inset 0 1px 0 rgba(255, 255, 255, 0.07);
     transition: transform .18s ease, border-color .18s ease, box-shadow .18s ease;
     resize: none;
     overflow: hidden;
     position: relative;
     color: #f8fafc;
-    backdrop-filter: blur(18px);
 }
 
 #editor .voice-note:hover {
     transform: translateY(-2px);
-    border-color: rgba(125, 211, 252, 0.42);
+    border-color: rgba(147, 197, 253, 0.36);
     box-shadow:
-        0 30px 90px rgba(15, 23, 42, 0.42),
-        0 0 0 1px rgba(125, 211, 252, 0.08),
-        inset 0 1px 0 rgba(255, 255, 255, 0.12);
+        0 24px 58px rgba(15, 23, 42, 0.38),
+        0 0 0 1px rgba(96, 165, 250, 0.08),
+        inset 0 1px 0 rgba(255, 255, 255, 0.1);
 }
 
 #editor .voice-note-content {
@@ -563,9 +559,10 @@ body {
 #editor .voice-note-badge {
     gap: 0.38rem;
     padding: 0.38rem 0.62rem;
-    color: #dbeafe;
-    background: rgba(59, 130, 246, 0.16);
-    border: 1px solid rgba(147, 197, 253, 0.26);
+    color: #eff6ff;
+    background: #2563eb;
+    border: 1px solid rgba(191, 219, 254, 0.24);
+    box-shadow: 0 8px 18px rgba(37, 99, 235, 0.28);
 }
 
 #editor .voice-note-badge::before {
@@ -580,10 +577,10 @@ body {
 
 #editor .voice-note-status {
     padding: 0.34rem 0.56rem;
-    color: #bbf7d0;
-    background: rgba(34, 197, 94, 0.14);
-    border: 1px solid rgba(74, 222, 128, 0.26);
-    box-shadow: 0 0 20px rgba(34, 197, 94, 0.12);
+    color: #052e16;
+    background: #86efac;
+    border: 1px solid rgba(220, 252, 231, 0.42);
+    box-shadow: 0 8px 18px rgba(34, 197, 94, 0.2);
 }
 
 #editor .voice-note-title {
@@ -606,7 +603,7 @@ body {
     font-weight: 700;
     letter-spacing: 0.05em;
     text-transform: uppercase;
-    color: rgba(226, 232, 240, 0.58);
+    color: rgba(219, 234, 254, 0.66);
     margin-bottom: 0.85rem;
     overflow-wrap: anywhere;
 }
@@ -620,14 +617,11 @@ body {
 }
 
 .dark #editor .voice-note {
-    border-color: rgba(167, 139, 250, 0.32);
-    background:
-        radial-gradient(circle at 12% 0%, rgba(124, 58, 237, 0.42), transparent 34%),
-        radial-gradient(circle at 88% 12%, rgba(14, 165, 233, 0.3), transparent 32%),
-        linear-gradient(145deg, rgba(2, 6, 23, 0.96), rgba(15, 23, 42, 0.9));
+    border-color: rgba(147, 197, 253, 0.2);
+    background: #172554;
     box-shadow:
-        0 24px 70px rgba(0, 0, 0, 0.38),
-        inset 0 1px 0 rgba(255, 255, 255, 0.08);
+        0 18px 42px rgba(0, 0, 0, 0.36),
+        inset 0 1px 0 rgba(255, 255, 255, 0.07);
 }
 
 .dark #editor .voice-note.voice-note-playing {
@@ -635,7 +629,7 @@ body {
 }
 
 .dark #editor .voice-note-meta {
-    color: rgba(226, 232, 240, 0.6);
+    color: rgba(219, 234, 254, 0.66);
 }
 
 .dark #editor .voice-note-title {
@@ -643,15 +637,15 @@ body {
 }
 
 .dark #editor .voice-note-badge {
-    color: #dbeafe;
-    background: rgba(59, 130, 246, 0.16);
-    border-color: rgba(147, 197, 253, 0.26);
+    color: #eff6ff;
+    background: #2563eb;
+    border-color: rgba(191, 219, 254, 0.24);
 }
 
 .dark #editor .voice-note-status {
-    color: #a7f3d0;
-    background: rgba(16, 185, 129, 0.14);
-    border-color: rgba(52, 211, 153, 0.22);
+    color: #052e16;
+    background: #86efac;
+    border-color: rgba(220, 252, 231, 0.42);
 }
 
 #editor .voice-note-native-audio {
@@ -659,60 +653,28 @@ body {
     width: 100%;
     box-sizing: border-box;
     margin-top: 0.85rem;
-    border-radius: 1rem;
-    border: 1px solid rgba(148, 163, 184, 0.22);
-    background:
-        linear-gradient(135deg, rgba(255, 255, 255, 0.12), rgba(255, 255, 255, 0.04)),
-        rgba(15, 23, 42, 0.5);
+    border-radius: 2rem;
+    border: 1px solid rgba(226, 232, 240, 0.9);
+    background: #ffffff;
     box-shadow:
-        inset 0 1px 0 rgba(255, 255, 255, 0.08),
-        0 12px 28px rgba(2, 6, 23, 0.22);
-    padding: 0.38rem;
+        inset 0 1px 0 rgba(255, 255, 255, 0.9),
+        0 14px 28px rgba(2, 6, 23, 0.24);
+    color-scheme: light;
+    padding: 0.34rem;
 }
 
 #editor .voice-note-native-audio::-webkit-media-controls-panel {
-    background: linear-gradient(135deg, rgba(30, 41, 59, 0.98), rgba(49, 46, 129, 0.88));
+    border-radius: 2rem;
+    background: #ffffff;
 }
 
 .dark #editor .voice-note-native-audio {
-    border-color: rgba(148, 163, 184, 0.22);
-    background:
-        linear-gradient(135deg, rgba(255, 255, 255, 0.12), rgba(255, 255, 255, 0.04)),
-        rgba(15, 23, 42, 0.5);
+    border-color: rgba(226, 232, 240, 0.9);
+    background: #ffffff;
 }
 
 .dark #editor .voice-note-native-audio::-webkit-media-controls-panel {
-    background: linear-gradient(135deg, rgba(30, 41, 59, 0.98), rgba(49, 46, 129, 0.88));
-}
-
-#editor .voice-note-content::after {
-    content: "";
-    display: block;
-    height: 2rem;
-    margin: 0.75rem 0 0.1rem;
-    border-radius: 0.75rem;
-    opacity: 0.75;
-    background:
-        linear-gradient(90deg,
-            rgba(125, 211, 252, 0.16) 0 0.38rem,
-            transparent 0.38rem 0.75rem,
-            rgba(167, 139, 250, 0.34) 0.75rem 1.06rem,
-            transparent 1.06rem 1.5rem,
-            rgba(96, 165, 250, 0.24) 1.5rem 1.88rem,
-            transparent 1.88rem 2.38rem);
-    background-size: 2.38rem 100%;
-    mask-image: linear-gradient(90deg, transparent, #000 10%, #000 90%, transparent);
-    animation: voiceWave 1.8s linear infinite;
-}
-
-#editor .voice-note.voice-note-playing .voice-note-content::after {
-    opacity: 1;
-    animation-duration: 0.9s;
-}
-
-@keyframes voiceWave {
-    from { background-position-x: 0; }
-    to { background-position-x: 2.38rem; }
+    background: #ffffff;
 }
 
 @keyframes voicePulse {
