@@ -46,6 +46,11 @@ js/calendar.js
 js/editor.js
 js/events.js
 js/insert-blocks.js
+js/insert-blocks/catalog.js
+js/insert-blocks/editor-dom.js
+js/insert-blocks/shared.js
+js/insert-blocks/voice-note.js
+js/insert-blocks/voice-recorder.js
 js/ipc.js
 js/notebooks.js
 js/notes.js
@@ -104,6 +109,127 @@ jobs:
         uses: actions/dependency-review-action@v4
         with:
           comment-summary-in-pr: always
+````
+
+## File: js/insert-blocks/catalog.js
+````javascript
+template: ()
+⋮----
+insert: async () =>
+⋮----
+⋮----
+template: () => makeListBlock("Pendientes por fecha", [`$
+⋮----
+export function renderInsertBlocks()
+⋮----
+export async function insertBlockById(id)
+⋮----
+export function hasInsertBlock(id)
+⋮----
+export function getInsertBlockSummary()
+````
+
+## File: js/insert-blocks/editor-dom.js
+````javascript
+export function getEditor()
+⋮----
+export function ensureSelectionInEditor(editor)
+⋮----
+export function insertHtmlAtCursor(html)
+````
+
+## File: js/insert-blocks/shared.js
+````javascript
+export const vlog = (...args) =>
+export const verr = (...args) =>
+⋮----
+export const isValidHttpUrl = (value)
+⋮----
+export const wrapBlock = (kind, inner)
+⋮----
+export const makeListBlock = (title, items)
+⋮----
+export const baseTemplate = (title, desc)
+⋮----
+export function ensureWrappedBlock(id, html)
+⋮----
+export function formatClock(sec)
+⋮----
+export function sanitizeDurationSec(value)
+⋮----
+export function getSafeDuration(audioEl, fallbackSeconds = 0)
+⋮----
+export function formatBytes(bytes)
+⋮----
+export function sanitizeAttachmentFileName(value)
+⋮----
+export function extractAttachmentFileName(src)
+⋮----
+export function getVoiceNoteFallbackDuration(note)
+⋮----
+export function getAudioStatusLabel(status)
+⋮----
+export function parseAudioFileLabel(src)
+⋮----
+export function parseAudioFormat(src)
+⋮----
+export function buildVoiceMetaText(note)
+````
+
+## File: js/insert-blocks/voice-note.js
+````javascript
+export function buildVoiceNoteHtml(meta =
+⋮----
+function cleanupVoiceNotePlayer(note)
+⋮----
+function upgradeNativeAudioPlayers(root = document)
+⋮----
+function normalizeVoiceNoteMarkup(root = document)
+⋮----
+function initVoiceNotePlayer(voiceNote)
+⋮----
+const markStatus = (status) =>
+⋮----
+const resolveAudioSrc = async () =>
+⋮----
+const onPlay = () =>
+⋮----
+const onPause = () =>
+⋮----
+const onLoadedMetadata = () =>
+⋮----
+const onAudioError = () =>
+⋮----
+export function initVoiceNotePlayers(root = document)
+⋮----
+export function destroyVoiceNotePlayers(root = document)
+````
+
+## File: js/insert-blocks/voice-recorder.js
+````javascript
+async function appendVoiceNoteHtmlToNote(noteId, html)
+⋮----
+export async function checkRecoverableRecordings()
+⋮----
+function pickRecorderMimeType()
+⋮----
+function createRecorderPanel()
+⋮----
+export async function recordAudioFromMic()
+⋮----
+const cleanup = () =>
+⋮----
+const resolveOnce = (resolve, value) =>
+⋮----
+recorder.ondataavailable = (event) =>
+⋮----
+startBtn.onclick = async () =>
+⋮----
+stopBtn.onclick = () =>
+⋮----
+closeBtn.onclick = () =>
+⋮----
+recorder.onstop = async () =>
 ````
 
 ## File: js/tailwind-config.js
@@ -848,52 +974,6 @@ allowBuilds:
 </header>
 ````
 
-## File: preload.js
-````javascript
-saveData: (data)
-loadData: ()
-⋮----
-saveNoteContent: (id, content) => ipcRenderer.invoke('save-note-content',
-loadNote: (id)
-⋮----
-uploadCover: (path)
-savePastedImage: (data)
-saveRecordedAudio: (data)
-beginRecordingSession: (data)
-appendRecordingChunk: (data)
-finishRecordingSession: (data)
-listRecoverableRecordings: ()
-recoverRecordingSession: (id)
-discardRecordingSession: (id)
-resolveAttachmentUrl: (fileName)
-getAttachmentMetadata: (fileName)
-deleteAttachment: (url)
-deleteCover: (path)
-deleteNoteFile: (id)
-⋮----
-showNotebookMenu: (data)
-onNotebookAction: (callback)
-showNoteMenu: (data)
-onNoteAction: (callback)
-⋮----
-showEditMenu: ()
-onEditAction: (callback)
-showImageMenu: ()
-onImageAction: (callback)
-⋮----
-onAppClosing: (callback)
-onForceSave: (callback)
-sendSafeCloseReady: ()
-⋮----
-onMediaUpdate: (callback)
-mediaToggle: ()
-mediaNext: ()
-mediaPrev: ()
-checkMediaNow: ()
-⋮----
-onMenuAction: (callback)
-````
-
 ## File: modules/media.js
 ````javascript
 function initMedia(getWindow)
@@ -1029,6 +1109,52 @@ click: () =>
         </div>
     </section>
 </div>
+````
+
+## File: preload.js
+````javascript
+saveData: (data)
+loadData: ()
+⋮----
+saveNoteContent: (id, content) => ipcRenderer.invoke('save-note-content',
+loadNote: (id)
+⋮----
+uploadCover: (path)
+savePastedImage: (data)
+saveRecordedAudio: (data)
+beginRecordingSession: (data)
+appendRecordingChunk: (data)
+finishRecordingSession: (data)
+listRecoverableRecordings: ()
+recoverRecordingSession: (id)
+discardRecordingSession: (id)
+resolveAttachmentUrl: (fileName)
+getAttachmentMetadata: (fileName)
+deleteAttachment: (url)
+deleteCover: (path)
+deleteNoteFile: (id)
+⋮----
+showNotebookMenu: (data)
+onNotebookAction: (callback)
+showNoteMenu: (data)
+onNoteAction: (callback)
+⋮----
+showEditMenu: ()
+onEditAction: (callback)
+showImageMenu: ()
+onImageAction: (callback)
+⋮----
+onAppClosing: (callback)
+onForceSave: (callback)
+sendSafeCloseReady: ()
+⋮----
+onMediaUpdate: (callback)
+mediaToggle: ()
+mediaNext: ()
+mediaPrev: ()
+checkMediaNow: ()
+⋮----
+onMenuAction: (callback)
 ````
 
 ## File: README.md
@@ -1306,6 +1432,34 @@ function serializeNoteForDisk(note)
 export async function saveAll()
 ````
 
+## File: js/notes.js
+````javascript
+export function renderNotesList()
+⋮----
+item.onclick = (e) =>
+⋮----
+item.querySelector('.item-options').onclick = (e) =>
+⋮----
+item.oncontextmenu = (e) =>
+⋮----
+export function cleanupOrphans()
+⋮----
+export async function selectNote(id)
+⋮----
+export async function addNote()
+⋮----
+export function renderTrashList()
+⋮----
+card.querySelector('.restore-btn').onclick = ()
+card.querySelector('.delete-forever-btn').onclick = ()
+⋮----
+export async function restoreNote(id)
+⋮----
+export async function permanentlyDeleteNote(id)
+⋮----
+export async function cleanupTrash()
+````
+
 ## File: modules/ipc-handlers.js
 ````javascript
 function registerIpcHandlers(
@@ -1354,34 +1508,6 @@ click: () =>
 ⋮----
 ````
 
-## File: js/notes.js
-````javascript
-export function renderNotesList()
-⋮----
-item.onclick = (e) =>
-⋮----
-item.querySelector('.item-options').onclick = (e) =>
-⋮----
-item.oncontextmenu = (e) =>
-⋮----
-export function cleanupOrphans()
-⋮----
-export async function selectNote(id)
-⋮----
-export async function addNote()
-⋮----
-export function renderTrashList()
-⋮----
-card.querySelector('.restore-btn').onclick = ()
-card.querySelector('.delete-forever-btn').onclick = ()
-⋮----
-export async function restoreNote(id)
-⋮----
-export async function permanentlyDeleteNote(id)
-⋮----
-export async function cleanupTrash()
-````
-
 ## File: modules/window.js
 ````javascript
 function createWindow(debug, checkMedia)
@@ -1390,66 +1516,6 @@ const wlog = (...args) =>
 const werr = (...args) =>
 ⋮----
 click: ()
-````
-
-## File: js/utils.js
-````javascript
-export function refreshIcons()
-⋮----
-export function showToast(message, tone = 'neutral')
-⋮----
-export function escapeHTML(value)
-⋮----
-export function stripHTML(html)
-⋮----
-function sanitizeStyleValue(styleValue)
-⋮----
-function sanitizeUrlAttribute(value, allowData = false)
-⋮----
-function unwrapElement(el)
-⋮----
-export function sanitizeHTML(html)
-⋮----
-export function showModal(title, placeholder, initialValue = '')
-⋮----
-const closeModal = (value) =>
-⋮----
-const tryConfirm = () =>
-⋮----
-newCancelBtn.onclick = ()
-⋮----
-const onKeydown = (e) =>
-⋮----
-input.oninput = () =>
-⋮----
-export function cleanHTML(html)
-⋮----
-export function createId()
-⋮----
-export function safeHexColor(value, fallback = '#2b2d2e')
-⋮----
-export function hexToRgba(value, alpha = 1, fallback = 'rgba(43,45,46,1)')
-⋮----
-/**
- * Hash djb2 sobre un string.
- *
- * Uso:
- * - Fingerprints rápidos para detectar cambios (no criptográfico).
- * - Salida en base-36 para almacenamiento compacto (ej: "3q4r7a").
- *
- * Nota: no usar para seguridad, firmas o autenticación.
- */
-export function hashString(str)
-⋮----
-h = h >>> 0; // keep unsigned 32-bit
-⋮----
-/**
- * Genera un preview en texto plano (máx. 150 chars) a partir de HTML.
- *
- * Convención:
- * - Devuelve string vacío para notas en blanco (facilita filtros y evita ruido en UI).
- */
-export function buildPreview(htmlContent)
 ````
 
 ## File: package.json
@@ -1717,19 +1783,64 @@ export function buildPreview(htmlContent)
 function getFileLabel(value)
 ````
 
-## File: js/events.js
+## File: js/utils.js
 ````javascript
-export function setupEventListeners()
+export function refreshIcons()
 ⋮----
-const openInsertModal = () =>
+export function showToast(message, tone = 'neutral')
 ⋮----
-const closeInsertModal = () =>
+export function escapeHTML(value)
 ⋮----
-const setInsertTab = (tab) =>
+export function stripHTML(html)
 ⋮----
-item.onclick = ()
+function sanitizeStyleValue(styleValue)
 ⋮----
-// Preferencia del SO: reaccionar sólo cuando el tema está configurado como `system`.
+function sanitizeUrlAttribute(value, allowData = false)
+⋮----
+function unwrapElement(el)
+⋮----
+export function sanitizeHTML(html)
+⋮----
+export function showModal(title, placeholder, initialValue = '')
+⋮----
+const closeModal = (value) =>
+⋮----
+const tryConfirm = () =>
+⋮----
+newCancelBtn.onclick = ()
+⋮----
+const onKeydown = (e) =>
+⋮----
+input.oninput = () =>
+⋮----
+export function cleanHTML(html)
+⋮----
+export function createId()
+⋮----
+export function safeHexColor(value, fallback = '#2b2d2e')
+⋮----
+export function hexToRgba(value, alpha = 1, fallback = 'rgba(43,45,46,1)')
+⋮----
+/**
+ * Hash djb2 sobre un string.
+ *
+ * Uso:
+ * - Fingerprints rápidos para detectar cambios (no criptográfico).
+ * - Salida en base-36 para almacenamiento compacto (ej: "3q4r7a").
+ *
+ * Nota: no usar para seguridad, firmas o autenticación.
+ */
+export function hashString(str)
+⋮----
+h = h >>> 0; // keep unsigned 32-bit
+⋮----
+/**
+ * Genera un preview en texto plano (máx. 150 chars) a partir de HTML.
+ *
+ * Convención:
+ * - Devuelve string vacío para notas en blanco (facilita filtros y evita ruido en UI).
+ */
+export function buildPreview(htmlContent)
 ````
 
 ## File: main.js
@@ -1762,150 +1873,19 @@ if (!newPreview) continue; // sigue vacía
 export function startPeriodicAutosave()
 ````
 
-## File: js/insert-blocks.js
+## File: js/events.js
 ````javascript
-const vlog = (...args) =>
-const verr = (...args) =>
+export function setupEventListeners()
 ⋮----
-const isValidHttpUrl = (value)
+const openInsertModal = () =>
 ⋮----
-const wrapBlock = (kind, inner)
+const closeInsertModal = () =>
 ⋮----
-const makeListBlock = (title, items)
+const setInsertTab = (tab) =>
 ⋮----
-const baseTemplate = (title, desc)
+item.onclick = ()
 ⋮----
-function ensureWrappedBlock(id, html)
-⋮----
-function getEditor()
-⋮----
-function ensureSelectionInEditor(editor)
-⋮----
-function insertHtmlAtCursor(html)
-⋮----
-function formatClock(sec)
-⋮----
-function sanitizeDurationSec(value)
-⋮----
-function getSafeDuration(audioEl, fallbackSeconds = 0)
-⋮----
-function clamp(value, min, max)
-⋮----
-function safeSetCurrentTime(audioEl, seconds)
-⋮----
-function formatBytes(bytes)
-⋮----
-function sanitizeAttachmentFileName(value)
-⋮----
-function extractAttachmentFileName(src)
-⋮----
-function getVoiceNoteFallbackDuration(note)
-⋮----
-function getAudioStatusLabel(status)
-⋮----
-function buildVoiceMetaText(note)
-⋮----
-function parseClockToSec(value)
-⋮----
-function normalizeIdleTime(value)
-⋮----
-function parseAudioFileLabel(src)
-⋮----
-function parseAudioFormat(src)
-⋮----
-function waitForAudioMetadata(audioEl, timeoutMs = 1200)
-⋮----
-const finish = (ok) =>
-const onReady = ()
-⋮----
-async function collectAudioInfoForUi(audioEl)
-⋮----
-function cleanupWavePlayer(note)
-⋮----
-function buildVoiceNoteHtml(meta =
-⋮----
-function upgradeNativeAudioPlayers(root = document)
-⋮----
-function normalizeVoiceNoteMarkup(root = document)
-⋮----
-export function initVoiceNotePlayers(root = document)
-⋮----
-const setPlayIcon = (playing) =>
-const markStatus = (status) =>
-⋮----
-const resolveAudioSrc = async () =>
-⋮----
-const dbg = (label, extra =
-⋮----
-const setProcessing = (enabled) =>
-⋮----
-const updateTime = () =>
-⋮----
-const getSeekDuration = () =>
-⋮----
-const updateSeekPreview = () =>
-⋮----
-const hasUsableAudio = () =>
-⋮----
-const clearRetryTimer = () =>
-⋮----
-const scheduleRetry = (reason) =>
-⋮----
-const onPlayPauseClick = async () =>
-const onPlay = () =>
-const onPause = () =>
-const onEnded = () =>
-⋮----
-const queueTimeUpdate = () =>
-const onTimeUpdate = ()
-const onLoadedMetadata = () =>
-const beginSeek = () =>
-const onSeekInput = () =>
-const finishSeek = () =>
-const onSeekCommit = () =>
-const onSeeked = ()
-const onAudioError = () =>
-const onCanPlay = () =>
-const onLoadedData = ()
-const onStalled = ()
-const onWaiting = ()
-const onSuspend = ()
-const onDurationChange = ()
-const onDurationChangeDebug = () =>
-⋮----
-export function destroyVoiceNotePlayers(root = document)
-⋮----
-async function appendVoiceNoteHtmlToNote(noteId, html)
-⋮----
-export async function checkRecoverableRecordings()
-⋮----
-async function recordAudioFromMic()
-⋮----
-const pickRecorderMimeType = () =>
-⋮----
-recorder.ondataavailable = (e) =>
-⋮----
-const cleanup = () =>
-⋮----
-startBtn.onclick = async () =>
-⋮----
-stopBtn.onclick = () =>
-⋮----
-closeBtn.onclick = () =>
-⋮----
-recorder.onstop = async () =>
-⋮----
-template: ()
-⋮----
-insert: async () =>
-⋮----
-export function renderInsertBlocks()
-⋮----
-export async function insertBlockById(id)
-⋮----
-export function hasInsertBlock(id)
-⋮----
-export function getInsertBlockSummary()
+// Preferencia del SO: reaccionar sólo cuando el tema está configurado como `system`.
 ````
 
 ## File: js/notebooks.js
@@ -1958,6 +1938,11 @@ export function updateGreeting()
 const render = () =>
 ⋮----
 export function toggleNotesPanel()
+````
+
+## File: js/insert-blocks.js
+````javascript
+
 ````
 
 ## File: index.html
@@ -2231,6 +2216,8 @@ body {
 ⋮----
 #editor .voice-note {
 ⋮----
+#editor .voice-note:hover {
+⋮----
 #editor .voice-note-content {
 ⋮----
 #editor .voice-note-header {
@@ -2239,6 +2226,8 @@ body {
 ⋮----
 #editor .voice-note-badge {
 ⋮----
+#editor .voice-note-badge::before {
+⋮----
 #editor .voice-note-status {
 ⋮----
 #editor .voice-note-title {
@@ -2246,8 +2235,6 @@ body {
 #editor .voice-note-title:focus {
 ⋮----
 #editor .voice-note-meta {
-⋮----
-#editor .voice-note-time {
 ⋮----
 #editor .voice-note.voice-note-playing {
 ⋮----
@@ -2259,27 +2246,17 @@ body {
 ⋮----
 .dark #editor .voice-note-title {
 ⋮----
-.dark #editor .voice-note-time {
-⋮----
 .dark #editor .voice-note-badge {
 ⋮----
 .dark #editor .voice-note-status {
 ⋮----
-#editor .voice-note-player {
+#editor .voice-note-native-audio {
 ⋮----
-#editor .voice-note-btn {
+#editor .voice-note-native-audio::-webkit-media-controls-panel {
 ⋮----
-#editor .voice-note-btn:hover {
+.dark #editor .voice-note-native-audio {
 ⋮----
-#editor .voice-note-btn:active {
-⋮----
-#editor .voice-note-btn:disabled {
-⋮----
-#editor .voice-note-seek {
-⋮----
-.dark #editor .voice-note-player {
-⋮----
-.dark #editor .voice-note-btn {
+.dark #editor .voice-note-native-audio::-webkit-media-controls-panel {
 ⋮----
 .group\/sub.submenu-open .table-submenu {
 ⋮----
@@ -2307,10 +2284,12 @@ body {
 ⋮----
 [contenteditable]:empty:before {
 ⋮----
+/* Fix background for active note/notebook selection */
 .nav-item.active {
 ⋮----
 .dark .nav-item.active {
 ⋮----
+/* Custom Scrollbar Minimalist - High Quality with Hover Expansion */
 .custom-scrollbar {
 ⋮----
 .dark .custom-scrollbar {
@@ -2329,6 +2308,7 @@ body {
 ⋮----
 .dark .custom-scrollbar::-webkit-scrollbar-thumb:hover {
 ⋮----
+/* Hide input color default picker UI */
 input[type="color"]::-webkit-color-swatch-wrapper {
 ⋮----
 input[type="color"]::-webkit-color-swatch {
