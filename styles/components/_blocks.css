@@ -872,17 +872,17 @@ body.rich-block-dragging {
     cursor: zoom-in;
     transition: all 0.24s cubic-bezier(0.4, 0, 0.2, 1);
 }
-.rich-gallery-fit-cover-adaptable .rich-gallery-item {
+.rich-gallery-item-fit-cover-adaptable {
     aspect-ratio: 4 / 3;
 }
-.rich-gallery-fit-cover-adaptable .rich-gallery-img {
+.rich-gallery-img-fit-cover-adaptable {
     max-height: none;
     object-fit: cover;
 }
-.rich-gallery-fit-contain .rich-gallery-item {
+.rich-gallery-item-fit-contain {
     aspect-ratio: auto;
 }
-.rich-gallery-fit-contain .rich-gallery-img {
+.rich-gallery-img-fit-contain {
     height: auto;
     object-fit: contain;
     max-height: 320px;

@@ -744,21 +744,25 @@ function registerIpcHandlers({ DATA_PATH, NOTES_DIR, COVERS_DIR, ATTACHMENTS_DIR
     menu.popup(BrowserWindow.fromWebContents(event.sender));
   });
 
-  ipcMain.on('show-image-menu', (event) => {
-    const template = [
-      { label: 'Imagen Pequeña (25%)', click: () => event.sender.send('image-action', '25%') },
-      { label: 'Imagen Mediana (50%)', click: () => event.sender.send('image-action', '50%') },
-      { label: 'Imagen Grande (75%)', click: () => event.sender.send('image-action', '75%') },
-      { label: 'Tamaño Original (100%)', click: () => event.sender.send('image-action', '100%') },
-      { type: 'separator' },
-      { label: 'Centrar Imagen', click: () => event.sender.send('image-action', 'center') },
-      { label: 'Alinear a la izquierda', click: () => event.sender.send('image-action', 'left') },
-      { type: 'separator' },
-      { label: 'Galería: Cubrir espacio adaptable', click: () => event.sender.send('image-action', 'gallery-fit-cover-adaptable') },
-      { label: 'Galería: Mostrar completa (sin recorte)', click: () => event.sender.send('image-action', 'gallery-fit-contain') },
-      { type: 'separator' },
-      { label: 'Eliminar Imagen', click: () => event.sender.send('image-action', 'delete') }
-    ];
+  ipcMain.on('show-image-menu', (event, context = {}) => {
+    const isGalleryImage = !!context?.isGalleryImage;
+    const template = isGalleryImage
+      ? [
+        { label: 'Editar imágenes', click: () => event.sender.send('image-action', 'edit-gallery-images') },
+        { type: 'separator' },
+        { label: 'Eliminar foto', click: () => event.sender.send('image-action', 'delete-gallery-image') }
+      ]
+      : [
+        { label: 'Imagen Pequeña (25%)', click: () => event.sender.send('image-action', '25%') },
+        { label: 'Imagen Mediana (50%)', click: () => event.sender.send('image-action', '50%') },
+        { label: 'Imagen Grande (75%)', click: () => event.sender.send('image-action', '75%') },
+        { label: 'Tamaño Original (100%)', click: () => event.sender.send('image-action', '100%') },
+        { type: 'separator' },
+        { label: 'Centrar Imagen', click: () => event.sender.send('image-action', 'center') },
+        { label: 'Alinear a la izquierda', click: () => event.sender.send('image-action', 'left') },
+        { type: 'separator' },
+        { label: 'Eliminar Imagen', click: () => event.sender.send('image-action', 'delete') }
+      ];
     const menu = Menu.buildFromTemplate(template);
     menu.popup(BrowserWindow.fromWebContents(event.sender));
   });

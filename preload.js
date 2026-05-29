@@ -49,7 +49,7 @@ contextBridge.exposeInMainWorld('api', {
     // Menú de formato/edición (comandos sobre el editor rich-text del renderer).
     showEditMenu: () => ipcRenderer.send('show-edit-menu'),
     onEditAction: (callback) => ipcRenderer.on('edit-action', (_event, data) => callback(data)),
-    showImageMenu: () => ipcRenderer.send('show-image-menu'),
+    showImageMenu: (data) => ipcRenderer.send('show-image-menu', data),
     onImageAction: (callback) => ipcRenderer.on('image-action', (_event, data) => callback(data)),
 
     // Handshake de cierre seguro: el proceso principal solicita persistencia y espera

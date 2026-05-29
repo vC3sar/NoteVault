@@ -131,71 +131,6 @@ styles/utilities/_scrollbars.css
 
 # Files
 
-## File: js/insert-blocks/blocks/contact.js
-````javascript
-async insert()
-⋮----
-function renderContactHtml(name, role, email, phone, company, avatar, notes)
-````
-
-## File: js/insert-blocks/blocks/formula.js
-````javascript
-function loadKatexAndRender(formula, container)
-⋮----
-const render = () =>
-⋮----
-script.onload = () =>
-script.onerror = () =>
-⋮----
-async insert()
-⋮----
-function scanAndRenderFormulas()
-````
-
-## File: js/insert-blocks/blocks/gallery.js
-````javascript
-const close = ()
-⋮----
-async insert()
-````
-
-## File: js/insert-blocks/blocks/pdf.js
-````javascript
-async insert()
-⋮----
-function renderPdfHtml(url, title, desc, mode)
-````
-
-## File: js/insert-blocks/blocks/quote.js
-````javascript
-async insert()
-⋮----
-function renderQuoteHtml(text, author, source)
-````
-
-## File: js/insert-blocks/blocks/reference.js
-````javascript
-async insert()
-⋮----
-function renderReferenceHtml(title, authors, source, year, url, notes, citation)
-````
-
-## File: js/insert-blocks/blocks/timeline.js
-````javascript
-async insert()
-⋮----
-function renderTimelineHtml(title, layout, events)
-````
-
-## File: js/insert-blocks/blocks/video.js
-````javascript
-async insert()
-⋮----
-function parseVideoUrl(url)
-⋮----
-function renderVideoHtml(url, title)
-````
-
 ## File: .github/workflows/main.yml
 ````yaml
 name: 'Dependency review'
@@ -224,43 +159,6 @@ export function registerBlockEditor(type, handler)
 export function getBlockEditor(type)
 ````
 
-## File: js/insert-blocks/block-renderer.js
-````javascript
-function buildDataAttrs(data =
-⋮----
-const toKebab = (value) => String(value).replace(/[A-Z]/g, (match) => `-$
-⋮----
-function generateBlockId(type)
-⋮----
-export function blockShell(
-⋮----
-export function insertRichBlock(html)
-⋮----
-export function updateBlockElement(block)
-⋮----
-function updateChecklistProgress(block)
-⋮----
-function ensureActionIcons(block)
-⋮----
-function closestElement(target, selector)
-⋮----
-function getOwnedBlockContext(target)
-⋮----
-function getActiveRichBlockFromSelection()
-⋮----
-function syncActiveCaretBlock()
-⋮----
-function finishDrag()
-⋮----
-function normalizeRichBlockWrappers(root = document)
-⋮----
-function focusEditableBody(block)
-⋮----
-async function runBlockEditor(block)
-⋮----
-export function initRichBlocks(root = document)
-````
-
 ## File: js/insert-blocks/blocks/checklist.js
 ````javascript
 function buildChecklistBody(items)
@@ -268,11 +166,39 @@ function buildChecklistBody(items)
 async insert()
 ````
 
+## File: js/insert-blocks/blocks/contact.js
+````javascript
+async insert()
+⋮----
+function renderContactHtml(name, role, email, phone, company, avatar, notes)
+````
+
 ## File: js/insert-blocks/blocks/date-time.js
 ````javascript
 function insertChip(type, icon, label)
 ⋮----
 insert()
+````
+
+## File: js/insert-blocks/blocks/formula.js
+````javascript
+function loadKatexAndRender(formula, container)
+⋮----
+const render = () =>
+⋮----
+script.onload = () =>
+script.onerror = () =>
+⋮----
+async insert()
+⋮----
+function scanAndRenderFormulas()
+````
+
+## File: js/insert-blocks/blocks/gallery.js
+````javascript
+const close = ()
+⋮----
+async insert()
 ````
 
 ## File: js/insert-blocks/blocks/image.js
@@ -285,6 +211,27 @@ async insert()
 function getFavicon(url)
 ⋮----
 async insert()
+````
+
+## File: js/insert-blocks/blocks/pdf.js
+````javascript
+async insert()
+⋮----
+function renderPdfHtml(url, title, desc, mode)
+````
+
+## File: js/insert-blocks/blocks/quote.js
+````javascript
+async insert()
+⋮----
+function renderQuoteHtml(text, author, source)
+````
+
+## File: js/insert-blocks/blocks/reference.js
+````javascript
+async insert()
+⋮----
+function renderReferenceHtml(title, authors, source, year, url, notes, citation)
 ````
 
 ## File: js/insert-blocks/blocks/reminder.js
@@ -301,6 +248,22 @@ function buildTable(rows, columns, includeHeaders)
 async insert()
 ````
 
+## File: js/insert-blocks/blocks/timeline.js
+````javascript
+async insert()
+⋮----
+function renderTimelineHtml(title, layout, events)
+````
+
+## File: js/insert-blocks/blocks/video.js
+````javascript
+async insert()
+⋮----
+function parseVideoUrl(url)
+⋮----
+function renderVideoHtml(url, title)
+````
+
 ## File: js/insert-blocks/editor-dom.js
 ````javascript
 export function getEditor()
@@ -308,19 +271,6 @@ export function getEditor()
 export function ensureSelectionInEditor(editor)
 ⋮----
 export function insertHtmlAtCursor(html)
-````
-
-## File: js/insert-blocks/modal.js
-````javascript
-function createField(field, form)
-⋮----
-function collectFormData(form)
-⋮----
-export function openBlockModal(
-⋮----
-const finish = (value) =>
-⋮----
-export function closeBlockModal()
 ````
 
 ## File: js/insert-blocks/shared.js
@@ -848,246 +798,6 @@ body {
 .dark .shadow-primary\/20 {
 ````
 
-## File: styles/components/_blocks.css
-````css
-.block-config-modal {
-⋮----
-.block-config-dialog {
-⋮----
-.dark .block-config-dialog {
-⋮----
-.block-config-header,
-⋮----
-.block-config-title {
-⋮----
-.block-config-title span,
-⋮----
-.block-config-close,
-⋮----
-.block-config-close:hover,
-⋮----
-.block-config-form {
-⋮----
-.block-config-fields {
-⋮----
-.block-modal-field {
-⋮----
-.block-modal-field input,
-⋮----
-.dark .block-modal-field input,
-⋮----
-.block-modal-field input:focus,
-⋮----
-.block-modal-items-list {
-⋮----
-.block-modal-item-row {
-⋮----
-.block-modal-item-row button {
-⋮----
-.block-config-actions {
-⋮----
-.block-modal-primary,
-⋮----
-.block-modal-primary {
-⋮----
-.block-modal-secondary {
-⋮----
-#editor .rich-insert-block-wrap {
-⋮----
-#editor .rich-insert-block-wrap > p {
-⋮----
-#editor .rich-insert-block {
-⋮----
-.dark #editor .rich-insert-block {
-⋮----
-#editor .rich-insert-block:hover .rich-block-actions,
-⋮----
-#editor .rich-insert-block.is-editing {
-⋮----
-#editor .rich-insert-block.is-active-caret:not(.is-editing) {
-⋮----
-.dark #editor .rich-insert-block.is-active-caret:not(.is-editing) {
-⋮----
-#editor .rich-insert-block.is-dragging {
-⋮----
-#editor .rich-block-accent {
-⋮----
-#editor .rich-block-main {
-⋮----
-#editor .rich-block-header,
-⋮----
-#editor .rich-block-header {
-⋮----
-#editor .rich-block-heading strong {
-⋮----
-#editor .rich-block-heading small {
-⋮----
-.dark #editor .rich-block-heading small {
-⋮----
-#editor .rich-block-actions {
-⋮----
-#editor [data-rich-block-drag] {
-⋮----
-#editor [data-rich-block-drag]:active {
-⋮----
-body.rich-block-dragging {
-⋮----
-#editor .rich-block-body {
-⋮----
-#editor .rich-insert-block.is-editing .rich-block-body {
-⋮----
-#editor .rich-inline-chip {
-⋮----
-.dark #editor .rich-inline-chip {
-⋮----
-#editor .rich-reminder-date,
-⋮----
-#editor .rich-link-preview {
-⋮----
-#editor .rich-link-preview img {
-⋮----
-#editor .rich-link-preview span {
-⋮----
-#editor .rich-link-preview small,
-⋮----
-#editor .rich-image-block {
-⋮----
-#editor .rich-image-block img {
-⋮----
-#editor .rich-image-small {
-⋮----
-#editor .rich-image-medium {
-⋮----
-#editor .rich-image-full {
-⋮----
-#editor .rich-image-fallback {
-⋮----
-#editor .rich-image-block.is-broken img {
-⋮----
-#editor .rich-image-block.is-broken .rich-image-fallback {
-⋮----
-#editor .rich-image-block figcaption {
-⋮----
-#editor .rich-table {
-⋮----
-#editor .rich-checklist-progress {
-⋮----
-#editor .rich-checklist-progress-track {
-⋮----
-#editor .rich-checklist-progress-bar {
-⋮----
-#editor .rich-checklist-count {
-⋮----
-#editor .rich-checklist-items {
-⋮----
-#editor .rich-checklist-item {
-⋮----
-#editor .rich-checklist-item span {
-⋮----
-#editor .rich-checklist-item.is-checked span {
-⋮----
-.rich-quote-card {
-.dark .rich-quote-card {
-.rich-quote-mark {
-.rich-quote-text {
-.rich-quote-attribution {
-.rich-quote-author {
-.rich-quote-source {
-.dark .rich-quote-source {
-⋮----
-.rich-pdf-card {
-.rich-pdf-info {
-.rich-pdf-icon {
-.rich-pdf-details {
-.rich-pdf-title {
-.rich-pdf-desc {
-.dark .rich-pdf-desc {
-.rich-pdf-btn {
-.rich-pdf-embed-wrapper {
-.rich-pdf-iframe {
-⋮----
-.rich-contact-card {
-.rich-contact-header {
-.rich-contact-avatar {
-.rich-contact-avatar-fallback {
-.rich-contact-main-info {
-.rich-contact-name {
-.rich-contact-role {
-.dark .rich-contact-role {
-.rich-contact-body-info {
-.rich-contact-link {
-.rich-contact-link:hover {
-.rich-contact-notes {
-.dark .rich-contact-notes {
-⋮----
-.rich-reference-card {
-.rich-reference-citation {
-.rich-reference-authors {
-.rich-reference-year {
-.dark .rich-reference-year {
-.rich-reference-title {
-.rich-reference-source {
-.rich-reference-notes {
-.dark .rich-reference-notes {
-.rich-reference-actions {
-.rich-reference-btn {
-⋮----
-.rich-video-card {
-.rich-video-container {
-.rich-video-iframe,
-.rich-video-caption {
-.dark .rich-video-caption {
-.rich-video-fallback {
-.rich-video-fallback-icon {
-⋮----
-.rich-formula-card {
-.rich-formula-display-container {
-.rich-formula-plain {
-.rich-formula-desc {
-.rich-formula-actions {
-.rich-formula-btn {
-.rich-formula-btn:hover {
-⋮----
-.rich-gallery-card {
-.rich-gallery-title {
-.rich-gallery-grid {
-.rich-gallery-grid-2 {
-.rich-gallery-grid-3 {
-.rich-gallery-grid-4 {
-.rich-gallery-masonry {
-.rich-gallery-masonry .rich-gallery-item {
-.rich-gallery-item {
-.rich-gallery-img {
-.rich-gallery-img:hover {
-.rich-gallery-lightbox {
-.rich-gallery-lightbox-content {
-.rich-gallery-lightbox-content img {
-.rich-gallery-lightbox-close {
-.rich-gallery-lightbox-close:hover {
-⋮----
-.rich-timeline-card {
-.rich-timeline-title {
-.rich-timeline-container {
-.rich-timeline-line {
-.rich-timeline-item {
-.rich-timeline-dot-container {
-.rich-timeline-dot {
-.dark .rich-timeline-dot {
-.rich-timeline-content-wrap {
-.rich-timeline-date {
-.rich-timeline-label {
-.rich-timeline-desc {
-.dark .rich-timeline-desc {
-⋮----
-.rich-timeline-alternating .rich-timeline-line {
-⋮----
-.rich-timeline-alternating .rich-timeline-item {
-.rich-timeline-alternating .rich-timeline-item-even {
-.rich-timeline-alternating .rich-timeline-item-even .rich-timeline-dot-container {
-.rich-timeline-alternating .rich-timeline-item-odd {
-.rich-timeline-alternating .rich-timeline-item-odd .rich-timeline-dot-container {
-````
-
 ## File: styles/components/_context-menu.css
 ````css
 .dark #custom-context-menu,
@@ -1492,20 +1202,54 @@ input[type="color"]::-webkit-color-swatch {
 .dark .custom-scrollbar::-webkit-scrollbar-thumb:hover {
 ````
 
-## File: js/insert-blocks/catalog.js
+## File: js/insert-blocks/block-renderer.js
 ````javascript
-template: ()
+function buildDataAttrs(data =
 ⋮----
+const toKebab = (value) => String(value).replace(/[A-Z]/g, (match) => `-$
 ⋮----
-insert: async () =>
+function generateBlockId(type)
 ⋮----
-export function renderInsertBlocks()
+export function blockShell(
 ⋮----
-export async function insertBlockById(id)
+export function insertRichBlock(html)
 ⋮----
-export function hasInsertBlock(id)
+export function updateBlockElement(block)
 ⋮----
-export function getInsertBlockSummary()
+function updateChecklistProgress(block)
+⋮----
+function ensureActionIcons(block)
+⋮----
+function closestElement(target, selector)
+⋮----
+function getOwnedBlockContext(target)
+⋮----
+function getActiveRichBlockFromSelection()
+⋮----
+function syncActiveCaretBlock()
+⋮----
+function finishDrag()
+⋮----
+function normalizeRichBlockWrappers(root = document)
+⋮----
+function focusEditableBody(block)
+⋮----
+async function runBlockEditor(block)
+⋮----
+export function initRichBlocks(root = document)
+````
+
+## File: js/insert-blocks/modal.js
+````javascript
+function createField(field, form)
+⋮----
+function collectFormData(form)
+⋮----
+export function openBlockModal(
+⋮----
+const finish = (value) =>
+⋮----
+export function closeBlockModal()
 ````
 
 ## File: js/partials-loader.js
@@ -1821,6 +1565,250 @@ allowBuilds:
   electron-winstaller: false
 ````
 
+## File: styles/components/_blocks.css
+````css
+.block-config-modal {
+⋮----
+.block-config-dialog {
+⋮----
+.dark .block-config-dialog {
+⋮----
+.block-config-header,
+⋮----
+.block-config-title {
+⋮----
+.block-config-title span,
+⋮----
+.block-config-close,
+⋮----
+.block-config-close:hover,
+⋮----
+.block-config-form {
+⋮----
+.block-config-fields {
+⋮----
+.block-modal-field {
+⋮----
+.block-modal-field input,
+⋮----
+.dark .block-modal-field input,
+⋮----
+.block-modal-field input:focus,
+⋮----
+.block-modal-items-list {
+⋮----
+.block-modal-item-row {
+⋮----
+.block-modal-item-row button {
+⋮----
+.block-config-actions {
+⋮----
+.block-modal-primary,
+⋮----
+.block-modal-primary {
+⋮----
+.block-modal-secondary {
+⋮----
+#editor .rich-insert-block-wrap {
+⋮----
+#editor .rich-insert-block-wrap > p {
+⋮----
+#editor .rich-insert-block {
+⋮----
+.dark #editor .rich-insert-block {
+⋮----
+#editor .rich-insert-block:hover .rich-block-actions,
+⋮----
+#editor .rich-insert-block.is-editing {
+⋮----
+#editor .rich-insert-block.is-active-caret:not(.is-editing) {
+⋮----
+.dark #editor .rich-insert-block.is-active-caret:not(.is-editing) {
+⋮----
+#editor .rich-insert-block.is-dragging {
+⋮----
+#editor .rich-block-accent {
+⋮----
+#editor .rich-block-main {
+⋮----
+#editor .rich-block-header,
+⋮----
+#editor .rich-block-header {
+⋮----
+#editor .rich-block-heading strong {
+⋮----
+#editor .rich-block-heading small {
+⋮----
+.dark #editor .rich-block-heading small {
+⋮----
+#editor .rich-block-actions {
+⋮----
+#editor [data-rich-block-drag] {
+⋮----
+#editor [data-rich-block-drag]:active {
+⋮----
+body.rich-block-dragging {
+⋮----
+#editor .rich-block-body {
+⋮----
+#editor .rich-insert-block.is-editing .rich-block-body {
+⋮----
+#editor .rich-inline-chip {
+⋮----
+.dark #editor .rich-inline-chip {
+⋮----
+#editor .rich-reminder-date,
+⋮----
+#editor .rich-link-preview {
+⋮----
+#editor .rich-link-preview img {
+⋮----
+#editor .rich-link-preview span {
+⋮----
+#editor .rich-link-preview small,
+⋮----
+#editor .rich-image-block {
+⋮----
+#editor .rich-image-block img {
+⋮----
+#editor .rich-image-small {
+⋮----
+#editor .rich-image-medium {
+⋮----
+#editor .rich-image-full {
+⋮----
+#editor .rich-image-fallback {
+⋮----
+#editor .rich-image-block.is-broken img {
+⋮----
+#editor .rich-image-block.is-broken .rich-image-fallback {
+⋮----
+#editor .rich-image-block figcaption {
+⋮----
+#editor .rich-table {
+⋮----
+#editor .rich-checklist-progress {
+⋮----
+#editor .rich-checklist-progress-track {
+⋮----
+#editor .rich-checklist-progress-bar {
+⋮----
+#editor .rich-checklist-count {
+⋮----
+#editor .rich-checklist-items {
+⋮----
+#editor .rich-checklist-item {
+⋮----
+#editor .rich-checklist-item span {
+⋮----
+#editor .rich-checklist-item.is-checked span {
+⋮----
+.rich-quote-card {
+.dark .rich-quote-card {
+.rich-quote-mark {
+.rich-quote-text {
+.rich-quote-attribution {
+.rich-quote-author {
+.rich-quote-source {
+.dark .rich-quote-source {
+⋮----
+.rich-pdf-card {
+.rich-pdf-info {
+.rich-pdf-icon {
+.rich-pdf-details {
+.rich-pdf-title {
+.rich-pdf-desc {
+.dark .rich-pdf-desc {
+.rich-pdf-btn {
+.rich-pdf-embed-wrapper {
+.rich-pdf-iframe {
+⋮----
+.rich-contact-card {
+.rich-contact-header {
+.rich-contact-avatar {
+.rich-contact-avatar-fallback {
+.rich-contact-main-info {
+.rich-contact-name {
+.rich-contact-role {
+.dark .rich-contact-role {
+.rich-contact-body-info {
+.rich-contact-link {
+.rich-contact-link:hover {
+.rich-contact-notes {
+.dark .rich-contact-notes {
+⋮----
+.rich-reference-card {
+.rich-reference-citation {
+.rich-reference-authors {
+.rich-reference-year {
+.dark .rich-reference-year {
+.rich-reference-title {
+.rich-reference-source {
+.rich-reference-notes {
+.dark .rich-reference-notes {
+.rich-reference-actions {
+.rich-reference-btn {
+⋮----
+.rich-video-card {
+.rich-video-container {
+.rich-video-iframe,
+.rich-video-caption {
+.dark .rich-video-caption {
+.rich-video-fallback {
+.rich-video-fallback-icon {
+⋮----
+.rich-formula-card {
+.rich-formula-display-container {
+.rich-formula-plain {
+.rich-formula-desc {
+.rich-formula-actions {
+.rich-formula-btn {
+.rich-formula-btn:hover {
+⋮----
+.rich-gallery-card {
+.rich-gallery-title {
+.rich-gallery-grid {
+.rich-gallery-grid-2 {
+.rich-gallery-grid-3 {
+.rich-gallery-grid-4 {
+.rich-gallery-masonry {
+.rich-gallery-masonry .rich-gallery-item {
+.rich-gallery-item {
+.rich-gallery-img {
+.rich-gallery-item-fit-cover-adaptable {
+.rich-gallery-img-fit-cover-adaptable {
+.rich-gallery-item-fit-contain {
+.rich-gallery-img-fit-contain {
+.rich-gallery-img:hover {
+.rich-gallery-lightbox {
+.rich-gallery-lightbox-content {
+.rich-gallery-lightbox-content img {
+.rich-gallery-lightbox-close {
+.rich-gallery-lightbox-close:hover {
+⋮----
+.rich-timeline-card {
+.rich-timeline-title {
+.rich-timeline-container {
+.rich-timeline-line {
+.rich-timeline-item {
+.rich-timeline-dot-container {
+.rich-timeline-dot {
+.dark .rich-timeline-dot {
+.rich-timeline-content-wrap {
+.rich-timeline-date {
+.rich-timeline-label {
+.rich-timeline-desc {
+.dark .rich-timeline-desc {
+⋮----
+.rich-timeline-alternating .rich-timeline-line {
+⋮----
+.rich-timeline-alternating .rich-timeline-item {
+.rich-timeline-alternating .rich-timeline-item-even {
+.rich-timeline-alternating .rich-timeline-item-even .rich-timeline-dot-container {
+.rich-timeline-alternating .rich-timeline-item-odd {
+.rich-timeline-alternating .rich-timeline-item-odd .rich-timeline-dot-container {
+````
+
 ## File: styles/components/_voice-note.css
 ````css
 #editor .voice-note {
@@ -1877,6 +1865,22 @@ allowBuilds:
 ## File: styles/main.css
 ````css
 
+````
+
+## File: js/insert-blocks/catalog.js
+````javascript
+template: ()
+⋮----
+⋮----
+insert: async () =>
+⋮----
+export function renderInsertBlocks()
+⋮----
+export async function insertBlockById(id)
+⋮----
+export function hasInsertBlock(id)
+⋮----
+export function getInsertBlockSummary()
 ````
 
 ## File: partials/modal-insert.html
@@ -2448,6 +2452,44 @@ function serializeNoteForDisk(note)
 export async function saveAll()
 ````
 
+## File: modules/window.js
+````javascript
+function createWindow(debug, checkMedia)
+⋮----
+const wlog = (...args) =>
+const werr = (...args) =>
+⋮----
+click: ()
+````
+
+## File: js/notes.js
+````javascript
+export function renderNotesList()
+⋮----
+item.onclick = (e) =>
+⋮----
+item.querySelector('.item-options').onclick = (e) =>
+⋮----
+item.oncontextmenu = (e) =>
+⋮----
+export function cleanupOrphans()
+⋮----
+export async function selectNote(id)
+⋮----
+export async function addNote()
+⋮----
+export function renderTrashList()
+⋮----
+card.querySelector('.restore-btn').onclick = ()
+card.querySelector('.delete-forever-btn').onclick = ()
+⋮----
+export async function restoreNote(id)
+⋮----
+export async function permanentlyDeleteNote(id)
+⋮----
+export async function cleanupTrash()
+````
+
 ## File: modules/ipc-handlers.js
 ````javascript
 function registerIpcHandlers(
@@ -2494,44 +2536,6 @@ async function finalizeRecordingSession(id, data =
 ⋮----
 click: () =>
 ⋮----
-````
-
-## File: modules/window.js
-````javascript
-function createWindow(debug, checkMedia)
-⋮----
-const wlog = (...args) =>
-const werr = (...args) =>
-⋮----
-click: ()
-````
-
-## File: js/notes.js
-````javascript
-export function renderNotesList()
-⋮----
-item.onclick = (e) =>
-⋮----
-item.querySelector('.item-options').onclick = (e) =>
-⋮----
-item.oncontextmenu = (e) =>
-⋮----
-export function cleanupOrphans()
-⋮----
-export async function selectNote(id)
-⋮----
-export async function addNote()
-⋮----
-export function renderTrashList()
-⋮----
-card.querySelector('.restore-btn').onclick = ()
-card.querySelector('.delete-forever-btn').onclick = ()
-⋮----
-export async function restoreNote(id)
-⋮----
-export async function permanentlyDeleteNote(id)
-⋮----
-export async function cleanupTrash()
 ````
 
 ## File: package.json
@@ -3094,6 +3098,8 @@ const insertPlainText = (text) =>
 const normalizeClipboardHtml = (rawHtml) =>
 ⋮----
 reader.onload = (ev)
+⋮----
+const applyGalleryFitFromImage = (img, fit) =>
 ````
 
 ## File: styles.css
