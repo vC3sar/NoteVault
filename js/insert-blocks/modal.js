@@ -49,6 +49,28 @@ function createField(field, form) {
     `;
   }
 
+  if (field.type === "timeline-events") {
+    const items = field.items?.length ? field.items : [{ date: "", label: "", desc: "" }];
+    return `
+      <div class="block-modal-field block-modal-timeline" data-timeline-field="${escapeHTML(field.name)}">
+        <span>${escapeHTML(field.label)}</span>
+        <div class="block-modal-timeline-list space-y-2">
+          ${items.map((item) => `
+            <div class="block-modal-timeline-row flex gap-2 border border-outline-variant/15 p-2 rounded-lg bg-surface-container-low relative">
+              <div class="grid grid-cols-1 md:grid-cols-3 gap-2 flex-1">
+                <input type="text" data-timeline-date value="${escapeHTML(item.date || "")}" placeholder="Fecha (Ej. 1945)">
+                <input type="text" data-timeline-label value="${escapeHTML(item.label || "")}" placeholder="Evento (Ej. Fin de la Guerra)">
+                <input type="text" data-timeline-desc value="${escapeHTML(item.desc || "")}" placeholder="Descripción (Ej. Opcional)">
+              </div>
+              <button type="button" class="p-2 self-center rounded-lg hover:bg-surface-container-high text-on-surface-variant shrink-0" data-remove-timeline-item title="Eliminar"><i data-lucide="x" class="w-4 h-4"></i></button>
+            </div>
+          `).join("")}
+        </div>
+        <button type="button" class="block-modal-secondary mt-2" data-add-timeline-item><i data-lucide="plus" class="w-4 h-4"></i>Agregar hito</button>
+      </div>
+    `;
+  }
+
   const min = field.min != null ? `min="${escapeHTML(String(field.min))}"` : "";
   const max = field.max != null ? `max="${escapeHTML(String(field.max))}"` : "";
   return `
@@ -67,6 +89,16 @@ function collectFormData(form) {
     data[name] = Array.from(field.querySelectorAll(".block-modal-item-row input"))
       .map((input) => input.value.trim())
       .filter(Boolean);
+  });
+  form.querySelectorAll("[data-timeline-field]").forEach((field) => {
+    const name = field.getAttribute("data-timeline-field");
+    data[name] = Array.from(field.querySelectorAll(".block-modal-timeline-row"))
+      .map((row) => ({
+        date: row.querySelector("[data-timeline-date]").value.trim(),
+        label: row.querySelector("[data-timeline-label]").value.trim(),
+        desc: row.querySelector("[data-timeline-desc]").value.trim(),
+      }))
+      .filter((item) => item.date || item.label);
   });
   return data;
 }
@@ -123,6 +155,25 @@ export function openBlockModal({ title, icon = "square-plus", fields = [], submi
 
       const removeButton = event.target.closest("[data-remove-item]");
       if (removeButton) removeButton.closest(".block-modal-item-row")?.remove();
+
+      const addTimeline = event.target.closest("[data-add-timeline-item]");
+      if (addTimeline) {
+        const list = addTimeline.closest("[data-timeline-field]").querySelector(".block-modal-timeline-list");
+        list.insertAdjacentHTML("beforeend", `
+          <div class="block-modal-timeline-row flex gap-2 border border-outline-variant/15 p-2 rounded-lg bg-surface-container-low relative">
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-2 flex-1">
+              <input type="text" data-timeline-date value="" placeholder="Fecha">
+              <input type="text" data-timeline-label value="" placeholder="Evento">
+              <input type="text" data-timeline-desc value="" placeholder="Descripción">
+            </div>
+            <button type="button" class="p-2 self-center rounded-lg hover:bg-surface-container-high text-on-surface-variant shrink-0" data-remove-timeline-item title="Eliminar"><i data-lucide="x" class="w-4 h-4"></i></button>
+          </div>
+        `);
+        refreshIcons();
+      }
+
+      const removeTimeline = event.target.closest("[data-remove-timeline-item]");
+      if (removeTimeline) removeTimeline.closest(".block-modal-timeline-row")?.remove();
     });
 
     form.addEventListener("input", () => {

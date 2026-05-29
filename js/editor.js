@@ -1041,12 +1041,29 @@ export function setupEditor() {
     // Entradas desde menús nativos (proceso principal) para comandos del editor.
     window.api.onEditAction((data) => executeEditAction(data));
 
+    const applyGalleryFitFromImage = (img, fit) => {
+        if (!img) return false;
+        const galleryCard = img.closest('.rich-gallery-card');
+        const grid = img.closest('.rich-gallery-grid');
+        const block = img.closest('[data-block-instance]');
+        if (!galleryCard || !grid || !block) return false;
+
+        const nextFit = fit === 'contain' ? 'contain' : 'cover-adaptable';
+        grid.classList.remove('rich-gallery-fit-cover-adaptable', 'rich-gallery-fit-contain');
+        grid.classList.add(nextFit === 'contain' ? 'rich-gallery-fit-contain' : 'rich-gallery-fit-cover-adaptable');
+        galleryCard.dataset.fit = nextFit;
+        block.dataset.galleryFit = nextFit;
+        return true;
+    };
+
     window.api.onImageAction((action) => {
         if (!lastRightClickedImage) return;
         const img = lastRightClickedImage;
         if (action === 'delete') { img.remove(); }
         else if (action === 'center') { img.style.display = 'block'; img.style.margin = '1.5rem auto'; }
         else if (action === 'left') { img.style.display = 'block'; img.style.margin = '1.5rem 0'; }
+        else if (action === 'gallery-fit-cover-adaptable') { applyGalleryFitFromImage(img, 'cover-adaptable'); }
+        else if (action === 'gallery-fit-contain') { applyGalleryFitFromImage(img, 'contain'); }
         else { img.style.width = action; img.style.height = 'auto'; }
         handleInput();
         lastRightClickedImage = null;

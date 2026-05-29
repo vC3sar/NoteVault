@@ -49,11 +49,19 @@ js/insert-blocks.js
 js/insert-blocks/block-editors.js
 js/insert-blocks/block-renderer.js
 js/insert-blocks/blocks/checklist.js
+js/insert-blocks/blocks/contact.js
 js/insert-blocks/blocks/date-time.js
+js/insert-blocks/blocks/formula.js
+js/insert-blocks/blocks/gallery.js
 js/insert-blocks/blocks/image.js
 js/insert-blocks/blocks/link.js
+js/insert-blocks/blocks/pdf.js
+js/insert-blocks/blocks/quote.js
+js/insert-blocks/blocks/reference.js
 js/insert-blocks/blocks/reminder.js
 js/insert-blocks/blocks/table.js
+js/insert-blocks/blocks/timeline.js
+js/insert-blocks/blocks/video.js
 js/insert-blocks/catalog.js
 js/insert-blocks/editor-dom.js
 js/insert-blocks/modal.js
@@ -123,6 +131,92 @@ styles/utilities/_scrollbars.css
 
 # Files
 
+## File: js/insert-blocks/blocks/contact.js
+````javascript
+async insert()
+⋮----
+function renderContactHtml(name, role, email, phone, company, avatar, notes)
+````
+
+## File: js/insert-blocks/blocks/formula.js
+````javascript
+function loadKatexAndRender(formula, container)
+⋮----
+const render = () =>
+⋮----
+script.onload = () =>
+script.onerror = () =>
+⋮----
+async insert()
+⋮----
+function scanAndRenderFormulas()
+````
+
+## File: js/insert-blocks/blocks/gallery.js
+````javascript
+const close = ()
+⋮----
+async insert()
+````
+
+## File: js/insert-blocks/blocks/pdf.js
+````javascript
+async insert()
+⋮----
+function renderPdfHtml(url, title, desc, mode)
+````
+
+## File: js/insert-blocks/blocks/quote.js
+````javascript
+async insert()
+⋮----
+function renderQuoteHtml(text, author, source)
+````
+
+## File: js/insert-blocks/blocks/reference.js
+````javascript
+async insert()
+⋮----
+function renderReferenceHtml(title, authors, source, year, url, notes, citation)
+````
+
+## File: js/insert-blocks/blocks/timeline.js
+````javascript
+async insert()
+⋮----
+function renderTimelineHtml(title, layout, events)
+````
+
+## File: js/insert-blocks/blocks/video.js
+````javascript
+async insert()
+⋮----
+function parseVideoUrl(url)
+⋮----
+function renderVideoHtml(url, title)
+````
+
+## File: .github/workflows/main.yml
+````yaml
+name: 'Dependency review'
+on:
+  pull_request:
+    branches: [ "master" ]
+permissions:
+  contents: read
+  pull-requests: write
+jobs:
+  dependency-review:
+    runs-on: ubuntu-latest
+    steps:
+      - name: 'Checkout repository'
+        uses: actions/checkout@v4
+      - name: 'Dependency Review'
+        uses: actions/dependency-review-action@v4
+        with:
+          comment-summary-in-pr: always
+````
+
 ## File: js/insert-blocks/block-editors.js
 ````javascript
 export function registerBlockEditor(type, handler)
@@ -135,6 +229,8 @@ export function getBlockEditor(type)
 function buildDataAttrs(data =
 ⋮----
 const toKebab = (value) => String(value).replace(/[A-Z]/g, (match) => `-$
+⋮----
+function generateBlockId(type)
 ⋮----
 export function blockShell(
 ⋮----
@@ -205,6 +301,15 @@ function buildTable(rows, columns, includeHeaders)
 async insert()
 ````
 
+## File: js/insert-blocks/editor-dom.js
+````javascript
+export function getEditor()
+⋮----
+export function ensureSelectionInEditor(editor)
+⋮----
+export function insertHtmlAtCursor(html)
+````
+
 ## File: js/insert-blocks/modal.js
 ````javascript
 function createField(field, form)
@@ -216,193 +321,6 @@ export function openBlockModal(
 const finish = (value) =>
 ⋮----
 export function closeBlockModal()
-````
-
-## File: styles/components/_blocks.css
-````css
-.block-config-modal {
-⋮----
-.block-config-dialog {
-⋮----
-.dark .block-config-dialog {
-⋮----
-.block-config-header,
-⋮----
-.block-config-title {
-⋮----
-.block-config-title span,
-⋮----
-.block-config-close,
-⋮----
-.block-config-close:hover,
-⋮----
-.block-config-form {
-⋮----
-.block-config-fields {
-⋮----
-.block-modal-field {
-⋮----
-.block-modal-field input,
-⋮----
-.dark .block-modal-field input,
-⋮----
-.block-modal-field input:focus,
-⋮----
-.block-modal-items-list {
-⋮----
-.block-modal-item-row {
-⋮----
-.block-modal-item-row button {
-⋮----
-.block-config-actions {
-⋮----
-.block-modal-primary,
-⋮----
-.block-modal-primary {
-⋮----
-.block-modal-secondary {
-⋮----
-#editor .rich-insert-block-wrap {
-⋮----
-#editor .rich-insert-block-wrap > p {
-⋮----
-#editor .rich-insert-block {
-⋮----
-.dark #editor .rich-insert-block {
-⋮----
-#editor .rich-insert-block:hover .rich-block-actions {
-⋮----
-#editor .rich-insert-block.is-editing {
-⋮----
-#editor .rich-insert-block.is-active-caret:not(.is-editing) {
-⋮----
-.dark #editor .rich-insert-block.is-active-caret:not(.is-editing) {
-⋮----
-#editor .rich-insert-block.is-dragging {
-⋮----
-#editor .rich-block-accent {
-⋮----
-#editor .rich-block-main {
-⋮----
-#editor .rich-block-header,
-⋮----
-#editor .rich-block-header {
-⋮----
-#editor .rich-block-heading strong {
-⋮----
-#editor .rich-block-heading small {
-⋮----
-.dark #editor .rich-block-heading small {
-⋮----
-#editor .rich-block-actions {
-⋮----
-#editor [data-rich-block-drag] {
-⋮----
-#editor [data-rich-block-drag]:active {
-⋮----
-body.rich-block-dragging {
-⋮----
-#editor .rich-block-body {
-⋮----
-#editor .rich-insert-block.is-editing .rich-block-body {
-⋮----
-#editor .rich-inline-chip {
-⋮----
-.dark #editor .rich-inline-chip {
-⋮----
-#editor .rich-reminder-date,
-⋮----
-#editor .rich-link-preview {
-⋮----
-#editor .rich-link-preview img {
-⋮----
-#editor .rich-link-preview span {
-⋮----
-#editor .rich-link-preview small,
-⋮----
-#editor .rich-image-block {
-⋮----
-#editor .rich-image-block img {
-⋮----
-#editor .rich-image-small {
-⋮----
-#editor .rich-image-medium {
-⋮----
-#editor .rich-image-full {
-⋮----
-#editor .rich-image-fallback {
-⋮----
-#editor .rich-image-block.is-broken img {
-⋮----
-#editor .rich-image-block.is-broken .rich-image-fallback {
-⋮----
-#editor .rich-image-block figcaption {
-⋮----
-#editor .rich-table {
-⋮----
-#editor .rich-checklist-progress {
-⋮----
-#editor .rich-checklist-progress-track {
-⋮----
-#editor .rich-checklist-progress-bar {
-⋮----
-#editor .rich-checklist-count {
-⋮----
-#editor .rich-checklist-items {
-⋮----
-#editor .rich-checklist-item {
-⋮----
-#editor .rich-checklist-item span {
-⋮----
-#editor .rich-checklist-item.is-checked span {
-````
-
-## File: .github/workflows/main.yml
-````yaml
-name: 'Dependency review'
-on:
-  pull_request:
-    branches: [ "master" ]
-permissions:
-  contents: read
-  pull-requests: write
-jobs:
-  dependency-review:
-    runs-on: ubuntu-latest
-    steps:
-      - name: 'Checkout repository'
-        uses: actions/checkout@v4
-      - name: 'Dependency Review'
-        uses: actions/dependency-review-action@v4
-        with:
-          comment-summary-in-pr: always
-````
-
-## File: js/insert-blocks/catalog.js
-````javascript
-template: ()
-⋮----
-⋮----
-template: () => makeListBlock("Pendientes por fecha", [`$
-⋮----
-insert: async () =>
-⋮----
-export function renderInsertBlocks()
-⋮----
-export async function insertBlockById(id)
-⋮----
-export function hasInsertBlock(id)
-⋮----
-export function getInsertBlockSummary()
-````
-
-## File: js/insert-blocks/editor-dom.js
-````javascript
-export function getEditor()
-⋮----
-export function ensureSelectionInEditor(editor)
-⋮----
-export function insertHtmlAtCursor(html)
 ````
 
 ## File: js/insert-blocks/shared.js
@@ -930,6 +848,246 @@ body {
 .dark .shadow-primary\/20 {
 ````
 
+## File: styles/components/_blocks.css
+````css
+.block-config-modal {
+⋮----
+.block-config-dialog {
+⋮----
+.dark .block-config-dialog {
+⋮----
+.block-config-header,
+⋮----
+.block-config-title {
+⋮----
+.block-config-title span,
+⋮----
+.block-config-close,
+⋮----
+.block-config-close:hover,
+⋮----
+.block-config-form {
+⋮----
+.block-config-fields {
+⋮----
+.block-modal-field {
+⋮----
+.block-modal-field input,
+⋮----
+.dark .block-modal-field input,
+⋮----
+.block-modal-field input:focus,
+⋮----
+.block-modal-items-list {
+⋮----
+.block-modal-item-row {
+⋮----
+.block-modal-item-row button {
+⋮----
+.block-config-actions {
+⋮----
+.block-modal-primary,
+⋮----
+.block-modal-primary {
+⋮----
+.block-modal-secondary {
+⋮----
+#editor .rich-insert-block-wrap {
+⋮----
+#editor .rich-insert-block-wrap > p {
+⋮----
+#editor .rich-insert-block {
+⋮----
+.dark #editor .rich-insert-block {
+⋮----
+#editor .rich-insert-block:hover .rich-block-actions,
+⋮----
+#editor .rich-insert-block.is-editing {
+⋮----
+#editor .rich-insert-block.is-active-caret:not(.is-editing) {
+⋮----
+.dark #editor .rich-insert-block.is-active-caret:not(.is-editing) {
+⋮----
+#editor .rich-insert-block.is-dragging {
+⋮----
+#editor .rich-block-accent {
+⋮----
+#editor .rich-block-main {
+⋮----
+#editor .rich-block-header,
+⋮----
+#editor .rich-block-header {
+⋮----
+#editor .rich-block-heading strong {
+⋮----
+#editor .rich-block-heading small {
+⋮----
+.dark #editor .rich-block-heading small {
+⋮----
+#editor .rich-block-actions {
+⋮----
+#editor [data-rich-block-drag] {
+⋮----
+#editor [data-rich-block-drag]:active {
+⋮----
+body.rich-block-dragging {
+⋮----
+#editor .rich-block-body {
+⋮----
+#editor .rich-insert-block.is-editing .rich-block-body {
+⋮----
+#editor .rich-inline-chip {
+⋮----
+.dark #editor .rich-inline-chip {
+⋮----
+#editor .rich-reminder-date,
+⋮----
+#editor .rich-link-preview {
+⋮----
+#editor .rich-link-preview img {
+⋮----
+#editor .rich-link-preview span {
+⋮----
+#editor .rich-link-preview small,
+⋮----
+#editor .rich-image-block {
+⋮----
+#editor .rich-image-block img {
+⋮----
+#editor .rich-image-small {
+⋮----
+#editor .rich-image-medium {
+⋮----
+#editor .rich-image-full {
+⋮----
+#editor .rich-image-fallback {
+⋮----
+#editor .rich-image-block.is-broken img {
+⋮----
+#editor .rich-image-block.is-broken .rich-image-fallback {
+⋮----
+#editor .rich-image-block figcaption {
+⋮----
+#editor .rich-table {
+⋮----
+#editor .rich-checklist-progress {
+⋮----
+#editor .rich-checklist-progress-track {
+⋮----
+#editor .rich-checklist-progress-bar {
+⋮----
+#editor .rich-checklist-count {
+⋮----
+#editor .rich-checklist-items {
+⋮----
+#editor .rich-checklist-item {
+⋮----
+#editor .rich-checklist-item span {
+⋮----
+#editor .rich-checklist-item.is-checked span {
+⋮----
+.rich-quote-card {
+.dark .rich-quote-card {
+.rich-quote-mark {
+.rich-quote-text {
+.rich-quote-attribution {
+.rich-quote-author {
+.rich-quote-source {
+.dark .rich-quote-source {
+⋮----
+.rich-pdf-card {
+.rich-pdf-info {
+.rich-pdf-icon {
+.rich-pdf-details {
+.rich-pdf-title {
+.rich-pdf-desc {
+.dark .rich-pdf-desc {
+.rich-pdf-btn {
+.rich-pdf-embed-wrapper {
+.rich-pdf-iframe {
+⋮----
+.rich-contact-card {
+.rich-contact-header {
+.rich-contact-avatar {
+.rich-contact-avatar-fallback {
+.rich-contact-main-info {
+.rich-contact-name {
+.rich-contact-role {
+.dark .rich-contact-role {
+.rich-contact-body-info {
+.rich-contact-link {
+.rich-contact-link:hover {
+.rich-contact-notes {
+.dark .rich-contact-notes {
+⋮----
+.rich-reference-card {
+.rich-reference-citation {
+.rich-reference-authors {
+.rich-reference-year {
+.dark .rich-reference-year {
+.rich-reference-title {
+.rich-reference-source {
+.rich-reference-notes {
+.dark .rich-reference-notes {
+.rich-reference-actions {
+.rich-reference-btn {
+⋮----
+.rich-video-card {
+.rich-video-container {
+.rich-video-iframe,
+.rich-video-caption {
+.dark .rich-video-caption {
+.rich-video-fallback {
+.rich-video-fallback-icon {
+⋮----
+.rich-formula-card {
+.rich-formula-display-container {
+.rich-formula-plain {
+.rich-formula-desc {
+.rich-formula-actions {
+.rich-formula-btn {
+.rich-formula-btn:hover {
+⋮----
+.rich-gallery-card {
+.rich-gallery-title {
+.rich-gallery-grid {
+.rich-gallery-grid-2 {
+.rich-gallery-grid-3 {
+.rich-gallery-grid-4 {
+.rich-gallery-masonry {
+.rich-gallery-masonry .rich-gallery-item {
+.rich-gallery-item {
+.rich-gallery-img {
+.rich-gallery-img:hover {
+.rich-gallery-lightbox {
+.rich-gallery-lightbox-content {
+.rich-gallery-lightbox-content img {
+.rich-gallery-lightbox-close {
+.rich-gallery-lightbox-close:hover {
+⋮----
+.rich-timeline-card {
+.rich-timeline-title {
+.rich-timeline-container {
+.rich-timeline-line {
+.rich-timeline-item {
+.rich-timeline-dot-container {
+.rich-timeline-dot {
+.dark .rich-timeline-dot {
+.rich-timeline-content-wrap {
+.rich-timeline-date {
+.rich-timeline-label {
+.rich-timeline-desc {
+.dark .rich-timeline-desc {
+⋮----
+.rich-timeline-alternating .rich-timeline-line {
+⋮----
+.rich-timeline-alternating .rich-timeline-item {
+.rich-timeline-alternating .rich-timeline-item-even {
+.rich-timeline-alternating .rich-timeline-item-even .rich-timeline-dot-container {
+.rich-timeline-alternating .rich-timeline-item-odd {
+.rich-timeline-alternating .rich-timeline-item-odd .rich-timeline-dot-container {
+````
+
 ## File: styles/components/_context-menu.css
 ````css
 .dark #custom-context-menu,
@@ -1253,59 +1411,6 @@ input[type="color"]::-webkit-color-swatch {
 .dark .table-submenu {
 ````
 
-## File: styles/components/_voice-note.css
-````css
-#editor .voice-note {
-⋮----
-#editor .voice-note:hover {
-⋮----
-#editor .voice-note-content {
-⋮----
-#editor .voice-note-header {
-⋮----
-#editor .voice-note-badge,
-⋮----
-#editor .voice-note-badge {
-⋮----
-#editor .voice-note-badge::before {
-⋮----
-#editor .voice-note-status {
-⋮----
-#editor .voice-note-title {
-⋮----
-#editor .voice-note-title:focus {
-⋮----
-#editor .voice-note-meta {
-⋮----
-#editor .voice-note.voice-note-playing {
-⋮----
-.dark #editor .voice-note {
-⋮----
-.dark #editor .voice-note.voice-note-playing {
-⋮----
-.dark #editor .voice-note-meta {
-⋮----
-.dark #editor .voice-note-title {
-⋮----
-.dark #editor .voice-note-badge {
-⋮----
-.dark #editor .voice-note-status {
-⋮----
-#editor .voice-note-native-audio {
-⋮----
-#editor .voice-note-native-audio::-webkit-media-controls-enclosure,
-⋮----
-#editor .voice-note-native-audio::-webkit-media-controls-current-time-display,
-⋮----
-#editor .voice-note-native-audio::-webkit-media-controls-timeline {
-⋮----
-.dark #editor .voice-note-native-audio {
-⋮----
-.dark #editor .voice-note-native-audio::-webkit-media-controls-enclosure,
-⋮----
-.dark #editor .voice-note-native-audio::-webkit-media-controls-current-time-display,
-````
-
 ## File: styles/layout/_sidebar.css
 ````css
 #sidebar.collapsed {
@@ -1345,11 +1450,6 @@ input[type="color"]::-webkit-color-swatch {
 #sidebar:not(.collapsed) #main-nav-links > * + *,
 #sidebar:not(.collapsed) #main-nav-links .nav-item,
 #sidebar:not(.collapsed) #main-nav-links .sidebar-text,
-````
-
-## File: styles/main.css
-````css
-
 ````
 
 ## File: styles/utilities/_animations.css
@@ -1392,6 +1492,22 @@ input[type="color"]::-webkit-color-swatch {
 .dark .custom-scrollbar::-webkit-scrollbar-thumb:hover {
 ````
 
+## File: js/insert-blocks/catalog.js
+````javascript
+template: ()
+⋮----
+⋮----
+insert: async () =>
+⋮----
+export function renderInsertBlocks()
+⋮----
+export async function insertBlockById(id)
+⋮----
+export function hasInsertBlock(id)
+⋮----
+export function getInsertBlockSummary()
+````
+
 ## File: js/partials-loader.js
 ````javascript
 function loadPartialSync(name)
@@ -1410,35 +1526,6 @@ click: () =>
 function destroyTray()
 ⋮----
 function notifyMinimized()
-````
-
-## File: partials/modal-insert.html
-````html
-<div id="insert-modal" class="fixed inset-0 bg-black/45 backdrop-blur-sm hidden items-center justify-center z-50">
-    <div class="w-[760px] max-w-[92vw] max-h-[82vh] overflow-hidden rounded-2xl border border-outline-variant/20 bg-surface-container-lowest shadow-2xl">
-        <div class="px-5 py-4 border-b border-outline-variant/15 flex items-center justify-between">
-            <div>
-                <h4 class="text-lg font-extrabold text-on-surface tracking-tight">Insertar Elemento</h4>
-                <p class="text-xs text-on-surface-variant mt-0.5">Elige una categoría y agrega bloques en la nota.</p>
-            </div>
-            <button id="insert-modal-close" class="p-2 rounded-lg hover:bg-surface-container-high text-on-surface-variant">
-                <i data-lucide="x" class="w-4 h-4"></i>
-            </button>
-        </div>
-        <div class="px-4 pt-3 pb-2 border-b border-outline-variant/10 flex gap-2 overflow-x-auto">
-            <button data-insert-tab="recommended" class="insert-tab-btn bg-primary/10 text-primary border-primary/30">Recomendados</button>
-            <button data-insert-tab="structure" class="insert-tab-btn">Estructura</button>
-            <button data-insert-tab="lists" class="insert-tab-btn">Listas</button>
-            <button data-insert-tab="blocks" class="insert-tab-btn">Bloques</button>
-        </div>
-        <div class="p-4 overflow-y-auto custom-scrollbar max-h-[58vh] space-y-4">
-            <div data-insert-panel="recommended" class="insert-panel grid grid-cols-1 md:grid-cols-2 gap-3"></div>
-            <div data-insert-panel="structure" class="insert-panel hidden grid grid-cols-1 md:grid-cols-2 gap-3"></div>
-            <div data-insert-panel="lists" class="insert-panel hidden grid grid-cols-1 md:grid-cols-2 gap-3"></div>
-            <div data-insert-panel="blocks" class="insert-panel hidden grid grid-cols-1 md:grid-cols-2 gap-3"></div>
-        </div>
-    </div>
-</div>
 ````
 
 ## File: partials/modal-notebook.html
@@ -1732,6 +1819,91 @@ allowBuilds:
   core-js: true
   electron: false
   electron-winstaller: false
+````
+
+## File: styles/components/_voice-note.css
+````css
+#editor .voice-note {
+⋮----
+#editor .voice-note:hover {
+⋮----
+#editor .voice-note-content {
+⋮----
+#editor .voice-note-header {
+⋮----
+#editor .voice-note-badge,
+⋮----
+#editor .voice-note-badge {
+⋮----
+#editor .voice-note-badge::before {
+⋮----
+#editor .voice-note-status {
+⋮----
+#editor .voice-note-title {
+⋮----
+#editor .voice-note-title:focus {
+⋮----
+#editor .voice-note-meta {
+⋮----
+#editor .voice-note.voice-note-playing {
+⋮----
+.dark #editor .voice-note {
+⋮----
+.dark #editor .voice-note.voice-note-playing {
+⋮----
+.dark #editor .voice-note-meta {
+⋮----
+.dark #editor .voice-note-title {
+⋮----
+.dark #editor .voice-note-badge {
+⋮----
+.dark #editor .voice-note-status {
+⋮----
+#editor .voice-note-native-audio {
+⋮----
+#editor .voice-note-native-audio::-webkit-media-controls-enclosure,
+⋮----
+#editor .voice-note-native-audio::-webkit-media-controls-current-time-display,
+⋮----
+#editor .voice-note-native-audio::-webkit-media-controls-timeline {
+⋮----
+.dark #editor .voice-note-native-audio {
+⋮----
+.dark #editor .voice-note-native-audio::-webkit-media-controls-enclosure,
+⋮----
+.dark #editor .voice-note-native-audio::-webkit-media-controls-current-time-display,
+````
+
+## File: styles/main.css
+````css
+
+````
+
+## File: partials/modal-insert.html
+````html
+<div id="insert-modal" class="fixed inset-0 bg-black/45 backdrop-blur-sm hidden items-center justify-center z-50">
+    <div class="w-[760px] max-w-[92vw] max-h-[82vh] overflow-hidden rounded-2xl border border-outline-variant/20 bg-surface-container-lowest shadow-2xl">
+        <div class="px-5 py-4 border-b border-outline-variant/15 flex items-center justify-between">
+            <div>
+                <h4 class="text-lg font-extrabold text-on-surface tracking-tight">Insertar Elemento</h4>
+                <p class="text-xs text-on-surface-variant mt-0.5">Elige una categoría y agrega bloques en la nota.</p>
+            </div>
+            <button id="insert-modal-close" class="p-2 rounded-lg hover:bg-surface-container-high text-on-surface-variant">
+                <i data-lucide="x" class="w-4 h-4"></i>
+            </button>
+        </div>
+        <div class="px-4 pt-3 pb-2 border-b border-outline-variant/10 flex gap-2 overflow-x-auto">
+            <button data-insert-tab="recommended" class="insert-tab-btn bg-primary/10 text-primary border-primary/30">Recomendados</button>
+            <button data-insert-tab="structure" class="insert-tab-btn">Estructura</button>
+            <button data-insert-tab="blocks" class="insert-tab-btn">Bloques</button>
+        </div>
+        <div class="p-4 overflow-y-auto custom-scrollbar max-h-[58vh] space-y-4">
+            <div data-insert-panel="recommended" class="insert-panel grid grid-cols-1 md:grid-cols-2 gap-3"></div>
+            <div data-insert-panel="structure" class="insert-panel hidden grid grid-cols-1 md:grid-cols-2 gap-3"></div>
+            <div data-insert-panel="blocks" class="insert-panel hidden grid grid-cols-1 md:grid-cols-2 gap-3"></div>
+        </div>
+    </div>
+</div>
 ````
 
 ## File: partials/navbar.html
@@ -2276,34 +2448,6 @@ function serializeNoteForDisk(note)
 export async function saveAll()
 ````
 
-## File: js/notes.js
-````javascript
-export function renderNotesList()
-⋮----
-item.onclick = (e) =>
-⋮----
-item.querySelector('.item-options').onclick = (e) =>
-⋮----
-item.oncontextmenu = (e) =>
-⋮----
-export function cleanupOrphans()
-⋮----
-export async function selectNote(id)
-⋮----
-export async function addNote()
-⋮----
-export function renderTrashList()
-⋮----
-card.querySelector('.restore-btn').onclick = ()
-card.querySelector('.delete-forever-btn').onclick = ()
-⋮----
-export async function restoreNote(id)
-⋮----
-export async function permanentlyDeleteNote(id)
-⋮----
-export async function cleanupTrash()
-````
-
 ## File: modules/ipc-handlers.js
 ````javascript
 function registerIpcHandlers(
@@ -2360,6 +2504,34 @@ const wlog = (...args) =>
 const werr = (...args) =>
 ⋮----
 click: ()
+````
+
+## File: js/notes.js
+````javascript
+export function renderNotesList()
+⋮----
+item.onclick = (e) =>
+⋮----
+item.querySelector('.item-options').onclick = (e) =>
+⋮----
+item.oncontextmenu = (e) =>
+⋮----
+export function cleanupOrphans()
+⋮----
+export async function selectNote(id)
+⋮----
+export async function addNote()
+⋮----
+export function renderTrashList()
+⋮----
+card.querySelector('.restore-btn').onclick = ()
+card.querySelector('.delete-forever-btn').onclick = ()
+⋮----
+export async function restoreNote(id)
+⋮----
+export async function permanentlyDeleteNote(id)
+⋮----
+export async function cleanupTrash()
 ````
 
 ## File: package.json

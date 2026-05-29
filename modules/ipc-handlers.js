@@ -754,6 +754,9 @@ function registerIpcHandlers({ DATA_PATH, NOTES_DIR, COVERS_DIR, ATTACHMENTS_DIR
       { label: 'Centrar Imagen', click: () => event.sender.send('image-action', 'center') },
       { label: 'Alinear a la izquierda', click: () => event.sender.send('image-action', 'left') },
       { type: 'separator' },
+      { label: 'Galería: Cubrir espacio adaptable', click: () => event.sender.send('image-action', 'gallery-fit-cover-adaptable') },
+      { label: 'Galería: Mostrar completa (sin recorte)', click: () => event.sender.send('image-action', 'gallery-fit-contain') },
+      { type: 'separator' },
       { label: 'Eliminar Imagen', click: () => event.sender.send('image-action', 'delete') }
     ];
     const menu = Menu.buildFromTemplate(template);

@@ -9,6 +9,14 @@ import { linkBlock } from "./blocks/link.js";
 import { imageBlock } from "./blocks/image.js";
 import { tableBlock } from "./blocks/table.js";
 import { checklistBlock } from "./blocks/checklist.js";
+import { quoteBlock } from "./blocks/quote.js";
+import { pdfBlock } from "./blocks/pdf.js";
+import { contactBlock } from "./blocks/contact.js";
+import { referenceBlock } from "./blocks/reference.js";
+import { videoBlock } from "./blocks/video.js";
+import { formulaBlock } from "./blocks/formula.js";
+import { galleryBlock } from "./blocks/gallery.js";
+import { timelineBlock } from "./blocks/timeline.js";
 import {
   CATEGORY_MAP,
   RECOMMENDED_IDS,
@@ -72,29 +80,18 @@ const BLOCKS = [
       ),
   },
 
-  { id: "blockquote", name: "Cita", category: "blocks", description: "Bloque destacado.", icon: "quote", template: () => `<blockquote>Cita o referencia importante...</blockquote><p><br></p>` },
+  quoteBlock,
   { id: "code-block", name: "Bloque de código", category: "blocks", description: "Código con fondo.", icon: "code-2", template: () => `<pre><code>// Escribe tu código aquí</code></pre><p><br></p>` },
-  {
-    id: "gallery",
-    name: "Galería",
-    category: "blocks",
-    description: "Galería de imágenes.",
-    icon: "images",
-    template: () =>
-      wrapBlock(
-        "gallery",
-        `<div class="insert-columns insert-columns-3"><div class="insert-block-card">Imagen 1</div><div class="insert-block-card">Imagen 2</div><div class="insert-block-card">Imagen 3</div></div>`,
-      ),
-  },
-  { id: "video", name: "Video", category: "blocks", description: "Video por enlace.", icon: "video", template: () => wrapBlock("video", `<div class="insert-block-card"><strong>Video:</strong> <a href="https://ejemplo.com/video" target="_blank">Abrir video</a></div>`) },
-  { id: "pdf", name: "PDF", category: "blocks", description: "PDF por enlace.", icon: "file-text", template: () => wrapBlock("pdf", `<div class="insert-block-card"><strong>PDF:</strong> <a href="https://ejemplo.com/archivo.pdf" target="_blank">Abrir PDF</a></div>`) },
-  { id: "timeline", name: "Timeline", category: "blocks", description: "Línea de tiempo.", icon: "history", template: () => wrapBlock("timeline", `<ol><li>Hito 1</li><li>Hito 2</li></ol>`) },
-  { id: "formula", name: "Bloque de fórmula", category: "blocks", description: "Fórmulas.", icon: "sigma", template: () => wrapBlock("formula", `<pre><code>E = mc^2</code></pre>`) },
-  { id: "contact-block", name: "Bloque de contacto", category: "blocks", description: "Datos de contacto.", icon: "contact", template: () => wrapBlock("contact-block", `<div class="insert-block-card"><strong>Nombre:</strong> ...<br><strong>Email:</strong> ...</div>`) },
-  { id: "reference-block", name: "Bloque de referencia", category: "blocks", description: "Referencia externa.", icon: "book-marked", template: () => wrapBlock("reference-block", `<div class="insert-block-card"><strong>Referencia:</strong> Fuente / enlace</div>`) },
+  galleryBlock,
+  videoBlock,
+  pdfBlock,
+  timelineBlock,
+  formulaBlock,
+  contactBlock,
+  referenceBlock,
   {
     id: "voice-recorder",
-    name: "Grabadora de voz",
+    name: "Nota de voz",
     category: "blocks",
     description: "Graba audio con micrófono.",
     icon: "mic",

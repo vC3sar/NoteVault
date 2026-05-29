@@ -14,8 +14,14 @@ function buildDataAttrs(data = {}) {
     .join(" ");
 }
 
+function generateBlockId(type) {
+  const ts = Date.now();
+  const rand = Math.random().toString(36).slice(2, 6);
+  return `block-${type}-${ts}-${rand}`;
+}
+
 export function blockShell({ type, icon, title, meta = "", body = "", accent = "#6366f1", editable = true, data = {} }) {
-  const dataAttrs = buildDataAttrs({ blockType: type, blockIcon: icon, ...data });
+  const dataAttrs = buildDataAttrs({ blockType: type, blockIcon: icon, blockId: generateBlockId(type), ...data });
   return `
     <div class="rich-insert-block-wrap" data-block-instance="${createId()}">
       <section class="rich-insert-block" ${dataAttrs} style="--block-accent:${accent}">
