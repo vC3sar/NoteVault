@@ -87,24 +87,20 @@ function unwrapElement(el) {
 function normalizeInlineChips(root) {
     root.querySelectorAll('.rich-inline-chip').forEach((chip) => {
         const type = chip.getAttribute('data-block-type') || '';
-        const icon = chip.getAttribute('data-chip-icon') || '';
-        const text = (chip.textContent || '').replace(/\u00a0/g, ' ').replace(/\s+/g, ' ').trim();
-        chip.innerHTML = '';
-        chip.textContent = text;
+        const icon = chip.getAttribute('data-chip-icon') || 'clock';
+        let text = '';
+        chip.childNodes.forEach((child) => {
+            if (child.nodeType === Node.TEXT_NODE) text += child.textContent;
+            else if (child.tagName === 'SPAN') text += child.textContent;
+        });
+        text = text.replace(/\u00a0/g, ' ').replace(/\s+/g, ' ').trim();
+        if (!text) text = chip.textContent.trim();
+
         chip.setAttribute('contenteditable', 'false');
         if (type) chip.setAttribute('data-block-type', type);
         if (icon) chip.setAttribute('data-chip-icon', icon);
-    });
 
-    root.querySelectorAll('p').forEach((paragraph) => {
-        if (!paragraph.querySelector('.rich-inline-chip')) return;
-        paragraph.querySelectorAll('br').forEach((br) => br.remove());
-        Array.from(paragraph.childNodes).forEach((node) => {
-            if (node.nodeType !== Node.TEXT_NODE) return;
-            const cleaned = node.textContent.replace(/\u00a0/g, ' ').replace(/\s+/g, ' ');
-            if (!cleaned.trim()) node.remove();
-            else node.textContent = cleaned;
-        });
+        chip.innerHTML = `<i data-lucide="${icon}" class="w-3.5 h-3.5" aria-hidden="true"></i><span>${escapeHTML(text)}</span>`;
     });
 }
 
@@ -133,6 +129,13 @@ function normalizeLucidePlaceholders(root) {
         let fallbackClass = '';
         if (svg.closest('.insert-callout-icon-wrap')) fallbackClass = 'insert-callout-icon';
         replaceLucideSvg(svg, fallbackClass);
+    });
+
+    root.querySelectorAll('.rich-inline-chip').forEach((chip) => {
+        const name = chip.getAttribute('data-chip-icon');
+        if (name && !chip.querySelector('[data-lucide]')) {
+            chip.insertAdjacentHTML('afterbegin', `<i data-lucide="${name}" class="w-3.5 h-3.5" aria-hidden="true"></i>`);
+        }
     });
 
     root.querySelectorAll('.rich-block-icon').forEach((wrap) => {
@@ -370,6 +373,87 @@ export function showModal(title, placeholder, initialValue = '') {
     });
 }
 
+function normalizeDOMStructure(root) {
+    root.querySelectorAll('font').forEach(font => {
+        const span = root.ownerDocument.createElement('span');
+        let style = '';
+        if (font.hasAttribute('color')) {
+            style += `color: ${font.getAttribute('color')};`;
+        }
+        if (font.hasAttribute('size')) {
+            const sizeMap = { '1': '12px', '2': '14px', '3': '18px', '4': '20px', '5': '28px', '6': '36px', '7': '48px' };
+            const s = font.getAttribute('size');
+            if (sizeMap[s]) {
+                style += `font-size: ${sizeMap[s]};`;
+            }
+        }
+        if (font.hasAttribute('face')) {
+            style += `font-family: ${font.getAttribute('face')};`;
+        }
+        if (font.hasAttribute('style')) {
+            let existing = font.getAttribute('style');
+            if (!existing.endsWith(';')) existing += ';';
+            style += existing;
+        }
+        if (style) {
+            span.setAttribute('style', style);
+        }
+        while (font.firstChild) {
+            span.appendChild(font.firstChild);
+        }
+        font.parentNode.replaceChild(span, font);
+    });
+
+    let changed = true;
+    while (changed) {
+        changed = false;
+        
+        const formatTags = ['SPAN', 'B', 'I', 'U', 'STRONG', 'EM', 'STRIKE', 'DEL'];
+        
+        for (const tag of formatTags) {
+            root.querySelectorAll(tag).forEach(el => {
+                if (el.innerHTML.trim() === '' && !el.querySelector('br, img')) {
+                    el.remove();
+                    changed = true;
+                }
+            });
+        }
+
+        root.querySelectorAll('span, b, i, u, strong, em, strike, del').forEach(el => {
+            if (el.parentElement && el.parentElement.tagName === el.tagName) {
+                const elStyle = (el.getAttribute('style') || '').replace(/\s+/g, '');
+                const parentStyle = (el.parentElement.getAttribute('style') || '').replace(/\s+/g, '');
+                
+                if (elStyle === parentStyle && el.className === el.parentElement.className) {
+                    while (el.firstChild) {
+                        el.parentNode.insertBefore(el.firstChild, el);
+                    }
+                    el.remove();
+                    changed = true;
+                }
+            }
+        });
+
+        for (const tag of formatTags) {
+            root.querySelectorAll(tag).forEach(el => {
+                const next = el.nextSibling;
+                if (next && next.nodeType === Node.ELEMENT_NODE && next.tagName === el.tagName) {
+                    const elStyle = (el.getAttribute('style') || '').replace(/\s+/g, '');
+                    const nextStyle = (next.getAttribute('style') || '').replace(/\s+/g, '');
+                    
+                    if (elStyle === nextStyle && el.className === next.className) {
+                        while (next.firstChild) {
+                            el.appendChild(next.firstChild);
+                        }
+                        next.remove();
+                        changed = true;
+                    }
+                }
+            });
+        }
+    }
+}
+
 export function cleanHTML(html) {
     if (!html) return '';
     const parser = new DOMParser();
@@ -401,12 +485,16 @@ export function cleanHTML(html) {
         wrap.setAttribute('contenteditable', 'false');
         wrap.innerHTML = '<i data-lucide="lightbulb" class="insert-callout-icon" aria-hidden="true"></i>';
     });
+    
+    normalizeDOMStructure(preDoc.body);
     normalizeInlineChips(preDoc.body);
     normalizeRichBlocks(preDoc.body);
     normalizeLucidePlaceholders(preDoc.body);
 
     const sanitized = sanitizeHTML(preDoc.body.innerHTML);
     const doc = parser.parseFromString(sanitized, 'text/html');
+    
+    normalizeDOMStructure(doc.body);
     normalizeInlineChips(doc.body);
     normalizeRichBlocks(doc.body);
     normalizeLucidePlaceholders(doc.body);

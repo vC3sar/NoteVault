@@ -65,9 +65,9 @@ export function setupEventListeners() {
     });
 
     document.addEventListener('mousedown', (e) => {
-        const target = e.target.closest('[data-editor-action], #open-insert-modal');
+        const target = e.target.closest('[data-editor-action], #open-insert-modal, #insert-modal');
         if (!target) return;
-        // Evita perder la selección del editor al presionar el botón del header.
+        // Evita perder la selección del editor al presionar el botón del header o interactuar con el modal.
         e.preventDefault();
     });
 

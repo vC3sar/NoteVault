@@ -2,7 +2,8 @@ import { escapeHTML, refreshIcons } from "../../utils.js";
 import { insertHtmlAtCursor } from "../editor-dom.js";
 
 function insertChip(type, icon, label) {
-  const inserted = insertHtmlAtCursor(`<span class="rich-inline-chip" data-block-type="${type}" data-chip-icon="${icon}" contenteditable="false">${escapeHTML(label)}</span> `);
+  const html = `&nbsp;<span class="rich-inline-chip" data-block-type="${type}" data-chip-icon="${icon}" contenteditable="false"><i data-lucide="${icon}" class="w-3.5 h-3.5" aria-hidden="true"></i><span>${escapeHTML(label)}</span></span>&nbsp;`;
+  const inserted = insertHtmlAtCursor(html);
   if (inserted) refreshIcons();
   return inserted;
 }

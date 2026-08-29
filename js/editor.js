@@ -217,21 +217,6 @@ export async function forceSaveNote() {
         note.previewHash = newHash;
     }
 
-    if (editor && sanitizedContent !== content) {
-        editor.innerHTML = sanitizedContent;
-        // Rehidratar listeners de bloques dinámicos que se pierden al reasignar innerHTML.
-        try {
-            const { initRichBlocks, initVoiceNotePlayers } = await import('./insert-blocks.js');
-            initRichBlocks(editor);
-            initVoiceNotePlayers(editor);
-            const dbg = (localStorage.getItem('NOTEVAULT_DEBUG') === '1') || location.search.includes('debug=1');
-            if (dbg) console.log('[EDITOR] Rehydrated voice players after sanitize rewrite');
-        } catch (error) {
-            console.warn('No se pudo rehidratar voice players tras sanitizado:', error);
-        }
-        refreshIcons();
-    }
-
     try {
         await window.api.saveNoteContent(state.activeNoteId, sanitizedContent);
         await saveAll();
@@ -822,11 +807,22 @@ export function setupEditor() {
         clearTablePreview();
     });
 
+    const safeInsertHTML = (html) => {
+        const sel = window.getSelection();
+        if (!sel.rangeCount) return;
+        const range = sel.getRangeAt(0).cloneRange();
+        setTimeout(() => {
+            sel.removeAllRanges();
+            sel.addRange(range);
+            document.execCommand('insertHTML', false, html);
+            handleInput();
+        }, 0);
+    };
+
     const insertPlainText = (text) => {
         const normalized = (text || '').replace(/\r\n/g, '\n');
         const html = escapeHTML(normalized).replace(/\n/g, '<br>');
-        document.execCommand('insertHTML', false, html);
-        handleInput();
+        safeInsertHTML(html);
     };
 
     const normalizeClipboardHtml = (rawHtml) => {
@@ -850,6 +846,19 @@ export function setupEditor() {
 
     editor.addEventListener('paste', async (e) => {
         const clipboardData = e.clipboardData || window.clipboardData;
+
+        const sel = window.getSelection();
+        let node = sel && sel.anchorNode ? sel.anchorNode : null;
+        if (node && node.nodeType === Node.TEXT_NODE) node = node.parentElement;
+        const isInsidePre = node && node.closest ? node.closest('pre, code') : null;
+
+        if (isInsidePre) {
+            e.preventDefault();
+            const plainText = clipboardData.getData('text/plain') || '';
+            insertPlainText(plainText);
+            return;
+        }
+
         const items = clipboardData.items;
         let imageFound = false;
 
@@ -867,8 +876,7 @@ export function setupEditor() {
                 const res = await window.api.savePastedImage({ base64 });
                 if (res.success) {
                     const imgHtml = `<img src="${res.path}" class="max-w-full h-auto rounded-2xl shadow-lg my-6 border border-outline-variant/20 block processed" style="display: block; margin: 1.5rem 0;">`;
-                    document.execCommand('insertHTML', false, imgHtml);
-                    handleInput();
+                    safeInsertHTML(imgHtml);
                 }
                 break;
             }
@@ -908,13 +916,11 @@ export function setupEditor() {
                     img.style.display = "block";
                     img.style.margin = "1.5rem 0";
                 }
-                document.execCommand('insertHTML', false, cleanHTML(doc.body.innerHTML));
-                handleInput();
+                safeInsertHTML(cleanHTML(doc.body.innerHTML));
             } else if (html) {
                 const normalizedHtml = normalizeClipboardHtml(html);
                 if (normalizedHtml.trim()) {
-                    document.execCommand('insertHTML', false, normalizedHtml);
-                    handleInput();
+                    safeInsertHTML(normalizedHtml);
                 } else {
                     insertPlainText(plainText);
                 }
@@ -948,55 +954,83 @@ export function setupEditor() {
             const sel = window.getSelection();
             let node = sel && sel.anchorNode ? sel.anchorNode : null;
             if (node && node.nodeType === Node.TEXT_NODE) node = node.parentElement;
-            const blockRoot = node && node.closest ? node.closest('[data-block-instance]') : null;
-            if (blockRoot && editor.contains(blockRoot)) {
-                e.preventDefault();
-                const paragraph = document.createElement('p');
-                paragraph.innerHTML = '<br>';
-                blockRoot.insertAdjacentElement('afterend', paragraph);
-                const range = document.createRange();
-                range.setStart(paragraph, 0);
-                range.collapse(true);
-                sel.removeAllRanges();
-                sel.addRange(range);
-                handleInput();
-                return;
+
+            const heading = node && node.closest ? node.closest('h1, h2, h3, h4, h5, h6') : null;
+            if (heading && sel.rangeCount) {
+                const range = sel.getRangeAt(0);
+                if (range.endOffset === heading.textContent.length || range.endOffset === heading.childNodes.length) {
+                    e.preventDefault();
+                    const p = document.createElement('p');
+                    p.innerHTML = '<br>';
+                    heading.insertAdjacentElement('afterend', p);
+                    const newRange = document.createRange();
+                    newRange.setStart(p, 0);
+                    newRange.collapse(true);
+                    sel.removeAllRanges();
+                    sel.addRange(newRange);
+                    handleInput();
+                    return;
+                }
             }
 
-            e.preventDefault();
-            document.execCommand('insertParagraph', false);
-
-            if (document.queryCommandState('bold')) document.execCommand('bold', false, null);
-            if (document.queryCommandState('italic')) document.execCommand('italic', false, null);
-            if (document.queryCommandState('underline')) document.execCommand('underline', false, null);
-
-            document.execCommand('removeFormat', false, null);
-            document.execCommand('foreColor', false, '#191c1d');
-        }
-        
-        if (e.key === 'Enter') {
-            setTimeout(() => {
-                const sel = window.getSelection();
-                if (!sel || !sel.rangeCount) return;
-                const editorEl = document.getElementById('editor');
-                let node = sel.getRangeAt(0).startContainer;
-                if (node.nodeType === 3) node = node.parentNode;
-
-                let cur = node;
-                while (cur && cur !== editorEl) {
-                    if (cur.nodeType === 1 && (cur.tagName === 'SPAN' || cur.tagName === 'FONT')) {
-                        cur.removeAttribute('style');
-                        cur.className = '';
-                        break;
-                    }
-                    cur = cur.parentNode;
+            const blockRoot = node && node.closest ? node.closest('[data-block-instance]') : null;
+            if (blockRoot && editor.contains(blockRoot)) {
+                const isEditableBody = node.closest('.rich-block-body[contenteditable="true"]');
+                if (!isEditableBody) {
+                    e.preventDefault();
+                    const paragraph = document.createElement('p');
+                    paragraph.innerHTML = '<br>';
+                    blockRoot.insertAdjacentElement('afterend', paragraph);
+                    const range = document.createRange();
+                    range.setStart(paragraph, 0);
+                    range.collapse(true);
+                    sel.removeAllRanges();
+                    sel.addRange(range);
+                    handleInput();
+                    return;
                 }
+            }
+        }
 
-                if (document.queryCommandState('bold')) document.execCommand('bold', false, null);
-                if (document.queryCommandState('italic')) document.execCommand('italic', false, null);
-                const isDark = document.documentElement.classList.contains('dark');
-                document.execCommand('foreColor', false, isDark ? '#ffffff' : '#000000');
-            }, 0);
+        if (e.key === 'Backspace' || e.key === 'Delete') {
+            const sel = window.getSelection();
+            if (!sel || !sel.rangeCount) return;
+            const range = sel.getRangeAt(0);
+            
+            if (!range.collapsed) return;
+            
+            let node = sel.anchorNode;
+            let offset = sel.anchorOffset;
+            
+            if (node && node.nodeType === Node.TEXT_NODE) {
+                if (e.key === 'Backspace' && offset === 0) {
+                    node = node.parentElement;
+                } else if (e.key === 'Delete' && offset === node.length) {
+                    node = node.parentElement;
+                } else {
+                    return;
+                }
+            }
+            
+            const blockWrap = node && node.closest ? node.closest('.rich-insert-block-wrap') : null;
+            if (blockWrap) {
+                const editableBody = node.closest('.rich-block-body[contenteditable="true"]');
+                if (!editableBody) {
+                    e.preventDefault();
+                    return;
+                }
+            }
+            
+            if (e.key === 'Backspace') {
+                const p = node && node.closest ? node.closest('p, div, h1, h2, h3, h4, h5, h6') : null;
+                if (p && p.previousElementSibling && p.previousElementSibling.classList && p.previousElementSibling.classList.contains('rich-insert-block-wrap')) {
+                    if (range.startOffset === 0 && (!p.textContent || p.innerHTML === '<br>')) {
+                        e.preventDefault();
+                        p.remove();
+                        return;
+                    }
+                }
+            }
         }
     });
 
