@@ -14,6 +14,16 @@ const monthNames = [
 
 const dayNames = ["Domingo", "Lunes", "Martes", "Miércoles", "Jueves", "Viernes", "Sábado"];
 
+export function formatTimeAMPM(time24) {
+    if (!time24) return "";
+    let [hours, minutes] = time24.split(':');
+    hours = parseInt(hours, 10);
+    const ampm = hours >= 12 ? 'pm' : 'am';
+    hours = hours % 12;
+    hours = hours ? hours : 12; 
+    return `${hours}:${minutes} ${ampm}`;
+}
+
 export function initCalendar() {
     renderCalendar();
     selectDay(new Date());
@@ -119,7 +129,7 @@ function createDayCell(date, isPadding, isToday = false, isSelected = false) {
         classEvt.className = 'text-[9px] font-semibold px-1.5 py-0.5 rounded truncate border border-transparent flex items-center gap-1';
         classEvt.style.backgroundColor = 'var(--surface-container-high)';
         classEvt.style.color = 'var(--on-surface-variant)';
-        classEvt.innerHTML = `<span class="w-1.5 h-1.5 rounded-full shrink-0" style="background-color: ${safeHexColor(s.color, '#10b981')}"></span> ${escapeHTML(s.start)} ${escapeHTML(s.subject)}`;
+        classEvt.innerHTML = `<span class="w-1.5 h-1.5 rounded-full shrink-0" style="background-color: ${safeHexColor(s.color, '#10b981')}"></span> ${escapeHTML(formatTimeAMPM(s.start))} ${escapeHTML(s.subject)}`;
         eventsContainer.appendChild(classEvt);
     });
     
@@ -252,18 +262,39 @@ export async function deleteEvent(id) {
 }
 
 export function showScheduleModal() {
-    editingScheduleId = null;
-    document.getElementById('schedule-subject').value = '';
-    document.getElementById('schedule-start').value = '';
-    document.getElementById('schedule-end').value = '';
-    document.getElementById('schedule-color').value = '#10b981';
-    document.getElementById('schedule-day').value = '1';
-    
-    const addBtn = document.querySelector('#schedule-modal-overlay button[onclick*="addScheduleItem"]');
-    if (addBtn) addBtn.innerHTML = '<i data-lucide="plus" class="w-4 h-4"></i> Añadir al Horario';
-
     renderScheduleModalList();
     document.getElementById('schedule-modal-overlay').classList.remove('hidden');
+}
+
+export function showScheduleFormModal(id = null) {
+    editingScheduleId = id;
+    const title = document.getElementById('schedule-form-title');
+    const addBtn = document.getElementById('schedule-add-btn');
+
+    if (id) {
+        const item = state.calendar.schedule.find(s => s.id === id);
+        if (item) {
+            document.getElementById('schedule-subject').value = item.subject;
+            document.getElementById('schedule-start').value = item.start;
+            document.getElementById('schedule-end').value = item.end;
+            document.getElementById('schedule-color').value = item.color;
+            document.getElementById('schedule-day').value = item.day.toString();
+        }
+        if (title) title.textContent = 'Editar Clase';
+        if (addBtn) addBtn.innerHTML = '<i data-lucide="save" class="w-4 h-4"></i> Guardar Cambios';
+    } else {
+        document.getElementById('schedule-subject').value = '';
+        document.getElementById('schedule-start').value = '';
+        document.getElementById('schedule-end').value = '';
+        document.getElementById('schedule-color').value = '#10b981';
+        document.getElementById('schedule-day').value = '1';
+        
+        if (title) title.textContent = 'Añadir Clase';
+        if (addBtn) addBtn.innerHTML = '<i data-lucide="save" class="w-4 h-4"></i> Guardar';
+    }
+    
+    if (typeof refreshIcons === 'function') refreshIcons();
+    document.getElementById('schedule-form-modal-overlay').classList.remove('hidden');
 }
 
 export function setScheduleMode(mode) {
@@ -319,36 +350,11 @@ export async function addScheduleItem() {
     renderDayDetails(selectedDate);
     
     editingScheduleId = null;
-    const addBtn = document.getElementById('schedule-add-btn');
-    if (addBtn) {
-        addBtn.innerHTML = '<i data-lucide="plus" class="w-4 h-4"></i> Añadir al Horario';
-        if (typeof refreshIcons === 'function') refreshIcons();
-    }
-
-    // Reset de inputs para evitar valores residuales al volver a abrir el modal.
-    document.getElementById('schedule-subject').value = '';
-    document.getElementById('schedule-start').value = '';
-    document.getElementById('schedule-end').value = '';
+    document.getElementById('schedule-form-modal-overlay').classList.add('hidden');
 }
 
 export function editScheduleItem(id) {
-    editingScheduleId = id;
-    const item = state.calendar.schedule.find(s => s.id === id);
-    if (!item) return;
-
-    document.getElementById('schedule-subject').value = item.subject;
-    document.getElementById('schedule-start').value = item.start;
-    document.getElementById('schedule-end').value = item.end;
-    document.getElementById('schedule-color').value = item.color;
-    document.getElementById('schedule-day').value = item.day.toString();
-
-    const addBtn = document.getElementById('schedule-add-btn');
-    if (addBtn) {
-        addBtn.innerHTML = '<i data-lucide="save" class="w-4 h-4"></i> Guardar Cambios';
-        if (typeof refreshIcons === 'function') refreshIcons();
-    }
-
-    document.querySelector('#schedule-modal-overlay .space-y-4').scrollTop = 0;
+    showScheduleFormModal(id);
 }
 
 export async function deleteScheduleItem(id) {
@@ -389,7 +395,7 @@ export function renderScheduleList() {
                 <div class="bg-surface-container-high rounded-lg p-2.5 border border-outline-variant/10 shadow-sm">
                     <div class="flex items-center gap-2 mb-1">
                         <i data-lucide="clock" class="w-3 h-3 text-on-surface-variant opacity-60"></i>
-                        <span class="text-[11px] font-bold text-on-surface-variant">${escapeHTML(item.start)} - ${escapeHTML(item.end)}</span>
+                        <span class="text-[11px] font-bold text-on-surface-variant">${escapeHTML(formatTimeAMPM(item.start))} - ${escapeHTML(formatTimeAMPM(item.end))}</span>
                     </div>
                     <div class="text-sm font-bold text-on-surface leading-tight">${escapeHTML(item.subject)}</div>
                 </div>
@@ -437,7 +443,7 @@ function renderScheduleModalList() {
                     <div class="w-2.5 h-2.5 rounded-full shrink-0" style="background-color: ${safeColor}"></div>
                     <div class="truncate">
                         <div class="text-xs font-bold text-on-surface truncate">${escapeHTML(item.subject)}</div>
-                        <div class="text-[10px] font-bold text-on-surface-variant opacity-70">${escapeHTML(item.start)} - ${escapeHTML(item.end)}</div>
+                        <div class="text-[10px] font-bold text-on-surface-variant opacity-70">${escapeHTML(formatTimeAMPM(item.start))} - ${escapeHTML(formatTimeAMPM(item.end))}</div>
                     </div>
                 </div>
                 <div class="flex items-center gap-1">

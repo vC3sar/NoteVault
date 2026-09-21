@@ -918,7 +918,13 @@ export function setupEditor() {
                 }
                 safeInsertHTML(cleanHTML(doc.body.innerHTML));
             } else if (html) {
-                const normalizedHtml = normalizeClipboardHtml(html);
+                let normalizedHtml = '';
+                if (html.includes('data-block-instance') || html.includes('rich-insert-block')) {
+                    normalizedHtml = cleanHTML(html);
+                } else {
+                    normalizedHtml = normalizeClipboardHtml(html);
+                }
+
                 if (normalizedHtml.trim()) {
                     safeInsertHTML(normalizedHtml);
                 } else {
@@ -1030,6 +1036,90 @@ export function setupEditor() {
                         return;
                     }
                 }
+            } else if (e.key === 'Delete') {
+                const p = node && node.closest ? node.closest('p, div, h1, h2, h3, h4, h5, h6') : null;
+                if (p && p.nextElementSibling && p.nextElementSibling.classList && p.nextElementSibling.classList.contains('rich-insert-block-wrap')) {
+                    if (range.startOffset === (node.length || 0)) {
+                        e.preventDefault();
+                        return;
+                    }
+                }
+            }
+        }
+    });
+
+    editor.addEventListener('keyup', (e) => {
+        if (['ArrowLeft', 'ArrowRight', 'ArrowUp', 'ArrowDown'].includes(e.key)) {
+            if (e.shiftKey) return;
+            const sel = window.getSelection();
+            if (!sel || sel.rangeCount === 0) return;
+            const range = sel.getRangeAt(0);
+            if (range.collapsed) return;
+
+            let blockWrap = null;
+            if (range.startContainer === range.endContainer && range.endOffset - range.startOffset === 1) {
+                const node = range.startContainer.childNodes[range.startOffset];
+                if (node && node.nodeType === Node.ELEMENT_NODE) {
+                    if (node.classList.contains('rich-insert-block-wrap')) {
+                        blockWrap = node;
+                    } else if (node.classList.contains('rich-insert-block')) {
+                        blockWrap = node.closest('.rich-insert-block-wrap');
+                    }
+                }
+            }
+
+            if (blockWrap && !blockWrap.hasAttribute('data-delete-prompting')) {
+                blockWrap.setAttribute('data-delete-prompting', 'true');
+                
+                const overlay = document.createElement('div');
+                overlay.className = 'block-config-modal';
+                overlay.style.zIndex = '200';
+                overlay.innerHTML = `
+                    <div class="block-config-dialog" style="max-width: 320px; padding: 1.5rem; text-align: center;">
+                        <div style="margin-bottom: 1.2rem;">
+                            <h3 style="font-size: 1.1rem; font-weight: 800; margin-bottom: 0.4rem;">¿Eliminar bloque?</h3>
+                            <p style="font-size: 0.85rem; color: #64748b;">Has seleccionado este bloque con el teclado. ¿Deseas eliminarlo?</p>
+                        </div>
+                        <div style="display: flex; gap: 0.5rem; justify-content: center;">
+                            <button type="button" class="block-modal-secondary" id="btn-keep" style="flex: 1;">Dejarlo</button>
+                            <button type="button" class="block-modal-primary" id="btn-delete" style="flex: 1; background: #ef4444; border-color: #ef4444; color: white;">Eliminar</button>
+                        </div>
+                    </div>
+                `;
+                document.body.appendChild(overlay);
+
+                const cleanup = () => {
+                    overlay.remove();
+                    if (blockWrap && document.body.contains(blockWrap)) {
+                        blockWrap.removeAttribute('data-delete-prompting');
+                    }
+                    document.removeEventListener('keydown', onKey);
+                };
+
+                const onKey = (ev) => {
+                    if (ev.key === 'Enter') {
+                        ev.preventDefault();
+                        cleanup();
+                        blockWrap.remove();
+                        editor.dispatchEvent(new Event('input'));
+                    } else if (ev.key === 'Escape') {
+                        ev.preventDefault();
+                        cleanup();
+                        sel.collapseToEnd();
+                    }
+                };
+                document.addEventListener('keydown', onKey);
+
+                overlay.querySelector('#btn-keep').addEventListener('click', () => {
+                    cleanup();
+                    sel.collapseToEnd();
+                });
+
+                overlay.querySelector('#btn-delete').addEventListener('click', () => {
+                    cleanup();
+                    blockWrap.remove();
+                    editor.dispatchEvent(new Event('input'));
+                });
             }
         }
     });

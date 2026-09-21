@@ -83,18 +83,39 @@
     </div>
 </div>
 
-<!-- Schedule Modal -->
+<!-- Schedule List Modal -->
 <div id="schedule-modal-overlay"
     class="fixed inset-0 bg-black/60 backdrop-blur-sm z-50 flex items-center justify-center p-4 transition-opacity hidden">
-    <div
-        class="bg-surface-container-lowest p-6 rounded-2xl w-[450px] shadow-2xl animate-[fadeIn_0.2s_ease-out] max-h-[90vh] flex flex-col">
-        <h4 class="text-xl font-bold mb-4 text-on-surface">Gestionar Clases y Horario</h4>
+    <div class="bg-surface-container-lowest p-6 rounded-2xl w-[450px] shadow-2xl animate-[fadeIn_0.2s_ease-out] max-h-[90vh] flex flex-col">
+        <div class="flex items-center justify-between mb-4">
+            <h4 class="text-xl font-bold text-on-surface">Clases y Horario</h4>
+            <button onclick="window.calendarEngine.showScheduleFormModal()"
+                class="px-3 py-1.5 rounded-lg font-bold bg-primary/10 text-primary hover:bg-primary/20 transition-colors flex items-center gap-1.5 text-xs">
+                <i data-lucide="plus-circle" class="w-4 h-4"></i> Añadir Clase
+            </button>
+        </div>
+
+        <div id="schedule-modal-list" class="space-y-2 mt-2 flex-1 overflow-y-auto custom-scrollbar pr-2 mb-4">
+            <!-- List of items to edit/delete -->
+        </div>
+
+        <div class="flex justify-end pt-4 border-t border-outline-variant/10 shrink-0">
+            <button onclick="document.getElementById('schedule-modal-overlay').classList.add('hidden')"
+                class="px-5 py-2.5 rounded-lg font-bold text-on-surface-variant hover:bg-surface-container-high transition-colors">Cerrar</button>
+        </div>
+    </div>
+</div>
+
+<!-- Schedule Form Modal -->
+<div id="schedule-form-modal-overlay"
+    class="fixed inset-0 bg-black/60 backdrop-blur-sm z-[60] flex items-center justify-center p-4 transition-opacity hidden">
+    <div class="bg-surface-container-lowest p-6 rounded-2xl w-[450px] shadow-2xl animate-[fadeIn_0.2s_ease-out] max-h-[90vh] flex flex-col">
+        <h4 id="schedule-form-title" class="text-xl font-bold mb-4 text-on-surface">Añadir Clase</h4>
 
         <div class="space-y-4 flex-1 overflow-y-auto custom-scrollbar pr-2 mb-4">
             <div class="grid grid-cols-2 gap-4">
                 <div>
-                    <label
-                        class="block text-xs font-bold uppercase tracking-widest text-on-surface-variant mb-1">Día</label>
+                    <label class="block text-xs font-bold uppercase tracking-widest text-on-surface-variant mb-1">Día</label>
                     <select id="schedule-day"
                         class="w-full bg-surface-container-high border border-outline-variant/30 rounded-lg px-4 py-2.5 text-on-surface outline-none focus:ring-2 focus:ring-primary/20 font-medium">
                         <option value="1">Lunes</option>
@@ -106,8 +127,7 @@
                     </select>
                 </div>
                 <div>
-                    <label
-                        class="block text-xs font-bold uppercase tracking-widest text-on-surface-variant mb-1">Color</label>
+                    <label class="block text-xs font-bold uppercase tracking-widest text-on-surface-variant mb-1">Color</label>
                     <input type="color" id="schedule-color" value="#10b981"
                         class="w-full h-[42px] cursor-pointer border-0 rounded-lg p-0 overflow-hidden outline-none bg-transparent">
                 </div>
@@ -115,41 +135,31 @@
 
             <div class="grid grid-cols-2 gap-4">
                 <div>
-                    <label
-                        class="block text-xs font-bold uppercase tracking-widest text-on-surface-variant mb-1">Inicio</label>
+                    <label class="block text-xs font-bold uppercase tracking-widest text-on-surface-variant mb-1">Inicio</label>
                     <input type="time" id="schedule-start"
                         class="w-full bg-surface-container-high border border-outline-variant/30 rounded-lg px-4 py-2.5 text-on-surface outline-none focus:ring-2 focus:ring-primary/20 font-medium">
                 </div>
                 <div>
-                    <label
-                        class="block text-xs font-bold uppercase tracking-widest text-on-surface-variant mb-1">Fin</label>
+                    <label class="block text-xs font-bold uppercase tracking-widest text-on-surface-variant mb-1">Fin</label>
                     <input type="time" id="schedule-end"
                         class="w-full bg-surface-container-high border border-outline-variant/30 rounded-lg px-4 py-2.5 text-on-surface outline-none focus:ring-2 focus:ring-primary/20 font-medium">
                 </div>
             </div>
 
             <div>
-                <label class="block text-xs font-bold uppercase tracking-widest text-on-surface-variant mb-1">Materia /
-                    Actividad</label>
+                <label class="block text-xs font-bold uppercase tracking-widest text-on-surface-variant mb-1">Materia / Actividad</label>
                 <input type="text" id="schedule-subject" placeholder="Ej: Matemáticas"
                     class="w-full bg-surface-container-high border border-outline-variant/30 rounded-lg px-4 py-2.5 text-on-surface outline-none focus:ring-2 focus:ring-primary/20 font-medium">
             </div>
-
-            <div class="pt-4 border-t border-outline-variant/10">
-                <button id="schedule-add-btn" onclick="window.calendarEngine.addScheduleItem()"
-                    class="w-full py-2.5 rounded-lg font-bold bg-primary text-on-primary shadow-md hover:bg-indigo-700 transition-colors flex items-center justify-center gap-2">
-                    <i data-lucide="plus" class="w-4 h-4"></i> Añadir al Horario
-                </button>
-            </div>
-
-            <div id="schedule-modal-list" class="space-y-2 mt-4">
-                <!-- List of items to edit/delete -->
-            </div>
         </div>
 
-        <div class="flex justify-end pt-4 border-t border-outline-variant/10 shrink-0">
-            <button onclick="document.getElementById('schedule-modal-overlay').classList.add('hidden')"
-                class="px-5 py-2.5 rounded-lg font-bold text-on-surface-variant hover:bg-surface-container-high transition-colors">Cerrar</button>
+        <div class="flex justify-end gap-3 pt-4 border-t border-outline-variant/10 shrink-0">
+            <button onclick="document.getElementById('schedule-form-modal-overlay').classList.add('hidden')"
+                class="px-5 py-2.5 rounded-lg font-medium text-on-surface-variant hover:bg-surface-container-high transition-colors">Cancelar</button>
+            <button id="schedule-add-btn" onclick="window.calendarEngine.addScheduleItem()"
+                class="px-5 py-2.5 rounded-lg font-bold bg-primary text-on-primary shadow-md hover:bg-indigo-700 transition-colors flex items-center gap-2">
+                <i data-lucide="save" class="w-4 h-4"></i> Guardar
+            </button>
         </div>
     </div>
 </div>

@@ -139,7 +139,10 @@ export function openBlockModal({ title, icon = "square-plus", fields = [], submi
     };
 
     overlay.addEventListener("click", (event) => {
-      if (event.target === overlay || event.target.closest("[data-close-block-modal]")) finish(null);
+      if (event.target === overlay || event.target.closest("[data-close-block-modal]")) {
+        finish(null);
+        return;
+      }
 
       const addButton = event.target.closest("[data-add-item]");
       if (addButton) {

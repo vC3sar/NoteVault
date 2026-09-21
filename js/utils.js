@@ -186,9 +186,9 @@ function normalizeRichBlocks(root) {
 
 const ALLOWED_TAGS = new Set([
     'A', 'ABBR', 'B', 'BLOCKQUOTE', 'BR', 'CAPTION', 'CITE', 'CODE', 'COL',
-    'COLGROUP', 'DD', 'DEL', 'DETAILS', 'DIV', 'DL', 'DT', 'EM', 'FIGCAPTION',
+    'COLGROUP', 'DD', 'DEL', 'DETAILS', 'SUMMARY', 'DIV', 'DL', 'DT', 'EM', 'FIGCAPTION',
     'FIGURE', 'FONT', 'H1', 'H2', 'H3', 'H4', 'H5', 'H6', 'HR', 'I', 'IMG', 'AUDIO',
-    'INS', 'KBD', 'LABEL', 'LI', 'MARK', 'OL', 'P', 'PRE', 'Q', 'S', 'SAMP',
+    'VIDEO', 'SOURCE', 'IFRAME', 'INS', 'KBD', 'LABEL', 'LI', 'MARK', 'OL', 'P', 'PRE', 'Q', 'S', 'SAMP',
     'SECTION', 'SMALL', 'SPAN', 'STRONG', 'SUB', 'SUP', 'TABLE', 'TBODY', 'TD',
     'TFOOT', 'TH', 'THEAD', 'TR', 'U', 'UL', 'INPUT', 'STRIKE', 'BUTTON'
 ]);
@@ -197,7 +197,8 @@ const SAFE_ATTRS = new Set([
     'href', 'src', 'alt', 'title', 'class', 'style', 'colspan', 'rowspan',
     'scope', 'loading', 'target', 'rel', 'type', 'checked', 'disabled',
     'contenteditable', 'data-lucide', 'color', 'size', 'face', 'dir', 'align',
-    'controls', 'preload', 'playsinline', 'draggable'
+    'controls', 'preload', 'playsinline', 'draggable', 'frameborder', 'allow',
+    'allowfullscreen', 'width', 'height'
 ]);
 
 export function sanitizeHTML(html) {
@@ -277,7 +278,7 @@ export function sanitizeHTML(html) {
         }
     }
 
-    const forbidden = doc.body.querySelectorAll('script, iframe, object, embed, link, meta, base, form, textarea, select, option, svg, math');
+    const forbidden = doc.body.querySelectorAll('script, object, embed, link, meta, base, form, textarea, select, option, svg, math');
     forbidden.forEach(node => node.remove());
 
     const iterator = doc.createNodeIterator(doc.body, NodeFilter.SHOW_COMMENT);
